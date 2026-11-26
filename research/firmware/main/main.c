@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Composition root of the research firmware (FSD §5): the component, the console and the
 // markers. Load profiles arrive with their requirements.
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "driver/usb_serial_jtag.h"
 #include "driver/usb_serial_jtag_vfs.h"
@@ -227,6 +231,42 @@ static void cmd_cut(const char *arg)  // cut <n> <text>: the callback returns fa
     printf("ESPK cut calls=%d result=0x%x\n", c.calls, (unsigned)err);
 }
 
+// The read-only VFS of the data image, through POSIX calls (FR-DAT-05, FR-DAT-06)
+static void cmd_vfs(const char *path)
+{
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        printf("ESPK vfs err=%d\n", errno);
+        return;
+    }
+    struct stat st;
+    unsigned char head[16] = {0}, tail[4] = {0};
+    int ok_stat = fstat(fd, &st);
+    ssize_t nh = read(fd, head, sizeof head);
+    off_t end = lseek(fd, 0, SEEK_END);
+    off_t back = lseek(fd, -4, SEEK_END);
+    ssize_t nt = read(fd, tail, sizeof tail);
+    int closed = close(fd);
+    char hh[33], tt[9];
+    for (int i = 0; i < 16; i++) sprintf(hh + 2 * i, "%02x", head[i]);
+    for (int i = 0; i < 4; i++) sprintf(tt + 2 * i, "%02x", tail[i]);
+    printf("ESPK vfs size=%ld head=%.*s tail=%s end=%ld back=%ld close=%d\n", ok_stat == 0 ? (long)st.st_size : -1L,
+           (int)(nh * 2), hh, nt == 4 ? tt : "none", (long)end, (long)back, closed);
+}
+
+static void cmd_vfswrite(const char *path)
+{
+    int fd = open(path, O_WRONLY);
+    int e_open = fd < 0 ? errno : 0;
+    if (fd >= 0) close(fd);
+    char other[96];
+    snprintf(other, sizeof other, "%s.new", path);
+    fd = open(other, O_WRONLY | O_CREAT, 0644);
+    int e_create = fd < 0 ? errno : 0;
+    if (fd >= 0) close(fd);
+    printf("ESPK vfswrite open=%d create=%d\n", e_open, e_create);
+}
+
 static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
 {
     espk_task_info_t ti;
@@ -252,6 +292,10 @@ static void dispatch(char *line)
         if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
     } else if (strncmp(line, "synth ", 6) == 0) {
         cmd_synth(line + 6);
+    } else if (strncmp(line, "vfs ", 4) == 0) {
+        cmd_vfs(line + 4);
+    } else if (strncmp(line, "vfswrite ", 9) == 0) {
+        cmd_vfswrite(line + 9);
     } else if (strcmp(line, "taskinfo") == 0) {
         cmd_taskinfo();
     } else if (strcmp(line, "init") == 0 || strcmp(line, "deinit") == 0) {

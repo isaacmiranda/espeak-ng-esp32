@@ -623,3 +623,47 @@ tests:
     impl: "tests/target/test_core.py::test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported"
     status: successful
     result: {commit: 8059eb0, date: 2026-11-26, run: "artifact of 8059eb0 flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host/test_bss.py on research/firmware/build"}
+  - id: TC-DAT-03
+    title: "A corrupted image payload gets ESP_ERR_INVALID_CRC and the engine is not started (no languages)"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-03]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_data.py::test_a_corrupted_image_gets_invalid_crc_and_the_engine_is_not_started"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DAT-03-magic
+    title: "A magic other than ESPK gets ESP_ERR_INVALID_CRC"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-03]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_data.py::test_a_wrong_magic_gets_invalid_crc"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DAT-04
+    title: "An image for another engine version gets ESP_ERR_INVALID_VERSION"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-04]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_data.py::test_another_engine_version_gets_invalid_version"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DAT-05
+    title: "The VFS serves open, fstat, read, lseek and close with the image's bytes; write and create fail with EROFS"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-05, FR-DAT-06]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_data.py::test_the_vfs_serves_every_file_of_the_image_read_only"
+    status: not done
+    reason: "not implemented: the test has not run yet"
