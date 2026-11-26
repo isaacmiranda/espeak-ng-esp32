@@ -9,7 +9,7 @@ qualquer tarefa: **[`AI-Workflow.md`](AI-Workflow.md)**.
 |---|---|
 | [`AI-Workflow.md`](AI-Workflow.md) | O ciclo que toda mudança segue. Leia antes de mexer em código. |
 | [`standards/`](standards/) | Regras portáveis: [engenharia](standards/engineering.md), [testes](standards/testing.md), [documentação](standards/documentation.md). |
-| [`project/`](project/) | Ligações deste projeto: [arquitetura](project/architecture.md), [convenções](project/conventions.md), [a bancada](project/bancada.md). |
+| [`project/`](project/) | Ligações deste projeto: [arquitetura](project/architecture.md), [convenções](project/conventions.md), [a bancada](project/bancada.md), [próximos passos](project/proximos-passos.md) (retomada de sessão). |
 
 ## Os três planos
 

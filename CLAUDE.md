@@ -19,10 +19,10 @@ de qualquer mudança.**
 | 3 · Construção | `/build` | **Ready for shipment**: requisitos atendidos, jornada verde, reconcile vazio |
 | Liberação | tag (ato do responsável) | **Shipped**: versão publicada e jornada verde nos bytes publicados |
 
-Estado atual: **Fase 3 (construção), onda 1**: portões "AI harnessed" e "DUT ready" abertos (`testing/test-plan.yaml`
-→ `gates`). FSD em `docs/Functionality/FSD.md`, itens de bring-up em `testing/debugging-agenda.md`, portões em
-`testing/gates/`. Próximo passo: `/build` (F1 da FSD: reprodução do upstream e R1 no host). O que está em `seed/` é evidência,
-não produto.
+Estado atual: **Fase 3 (construção), onda 1**, 21 de 23 testes declarados verdes; a placa fala e o PCM dela é igual ao do
+upstream no host (F2). **Para retomar, leia `docs/Method/project/proximos-passos.md`** (posição, próximos atos em ordem,
+o que é do responsável, comandos e armadilhas) e atualize-o ao encerrar a sessão. O que está em `seed/` é evidência, não
+produto.
 
 ## A bancada
 

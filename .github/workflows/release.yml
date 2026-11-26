@@ -26,9 +26,11 @@ jobs:
           .venv/bin/pip install -q -r requirements.txt
       - name: record the firmware found on the shared board
         run: .venv/bin/python -m bench wait-event dut "^ESPK boot|^[A-Z]" --timeout 10 --reset || true
-      - name: flash the released artifact
-        run: .venv/bin/python -m bench flash dut artifact
-      - name: journey
+      # The journey flashes the released artifact itself (tests/bench/test_journey.py, fixture
+      # `flashed`) and compares the board with R1, which builds the pinned upstream on this notebook.
+      - name: flash the released artifact and run the journey
+        env:
+          ESPK_ARTIFACT: ${{ github.workspace }}/artifact
         run: .venv/bin/pytest -q tests/bench --run-bench -k jrn
   publish:
     needs: release-verify
