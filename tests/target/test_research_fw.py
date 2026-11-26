@@ -68,15 +68,18 @@ def test_unknown_command_gets_a_marker(flashed):
     assert m.fields == {"code": "unknown_command"}
 
 
-def test_default_volume_5_and_ceiling_10(flashed):
-    """FR-RES-07, FR-RES-08 on the board: after a reset the volume is 5; 11 is refused and changes nothing."""
+def test_default_volume_5_and_10_accepted(flashed):
+    """FR-RES-08 on the board: after a reset the volume is 5, and the bench ceiling 10 is accepted.
+    The refusal of 11 is proved on the host (tests/host/test_volume.py): the bench driver's own
+    guard keeps a value above the ceiling from reaching the board without a declared listening session."""
     ms, p = board.boot()
     assert "ready" in ms, p.stdout
     m, _p = board.command("volume", r"^ESPK volume")
     assert m.fields == {"ok": "5"}
     m, _p = board.command("volume 10", r"^ESPK volume")
     assert m.fields == {"ok": "10"}
-    m, _p = board.command("volume 11", r"^ESPK volume")
-    assert m.fields == {"err": "ceiling"}
     m, _p = board.command("volume", r"^ESPK volume")
     assert m.fields == {"ok": "10"}
+    ms, p = board.boot()  # a reset brings the default back
+    m, _p = board.command("volume", r"^ESPK volume")
+    assert m.fields == {"ok": "5"}

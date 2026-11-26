@@ -19,20 +19,20 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 25 de 26 declarados `successful` (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). Falta **JRN-06** (cancelar no meio da fala).
+- **Testes:** 29 de 30 declarados `successful` (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). Falta **JRN-06** (cancelar no meio da fala).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
 - **FR-ENG-05 (modo intacto) feito:** variante `research/firmware/sdkconfig.intact.defaults` (`-B build-intact -D SDKCONFIG=build-intact/sdkconfig "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.intact.defaults"`); ELF sem `__wrap_isw*`; na placa a divergência de R1 começa no primeiro item acentuado e **se espalha** (100 de 100 itens divergem, inclusive inglês depois do primeiro acento, pelo estado do motor); inglês sem acento desde um reset é igual a R1.
+- **Volume (FR-RES-07, 08, 09):** `volume` sem argumento responde `ESPK volume ok=<n>`, argumento ruim `err=range`, `listen close` volta ao padrão 5 (propostas minhas, ainda sem aceite). O guarda do driver barra `volume` > 10 antes da placa; o teste de 11 é do host.
 - **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5, inaudível: a capacidade `audio-out` segue `unproven` até a escuta do responsável. A placa tem o firmware de `174a978`.
 - **Capacidades ainda `unproven`:** `audio-out` (ES8311/I2S) e `release-verification` (o runner).
 
 ## Próximos atos, em ordem
 
-1. **Restante do áudio: `volume`, `listen open|close` e o teto (FR-RES-07, 08, 09).** Declarar os testes antes (o teto 10
-   e o padrão 5 são testáveis sem som; `listen open` faz som alto: pessoas presentes, FSD/bancada §1). Depois, o
-   **responsável confirma de ouvido** (volume acima de 5; o 5 é inaudível, −47,5 dB no AlertAlergo) para virar
-   `audio-out: yes`.
+1. **Confirmar o som de ouvido (`audio-out`) e fechar FR-RES-07/09 na placa.** `volume`, `listen open|close` e o teto 10
+   existem (`espk_volume.c`, host verde). Falta a metade na placa que exige `--listening` (pessoas presentes): `listen open
+   60`, `volume 60`, `say`, `listen close`. O responsável ouve; só então `audio-out: yes`. O volume 5 é inaudível.
 2. **Cancelar (JRN-06) e a camada assíncrona (§15, FR-RES-10 e 11, FR-ASY-*).** Tarefa de síntese com fila, pilha de
    64 KB na PSRAM, `espk_say`/`espk_cancel`, eventos START/DONE/CANCELLED. A tabela de estados da §15.2 é testável no host
    como função pura. O R1 precisa passar a repetir o cancelamento no mesmo bloco (passo novo no roteiro de `pcm_script.c`).

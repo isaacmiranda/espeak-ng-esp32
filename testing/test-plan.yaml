@@ -388,8 +388,8 @@ tests:
     verifies: [FR-RES-08]
     needs: []
     impl: "tests/host/test_volume.py::test_default_volume_is_5"
-    status: not done
-    reason: "not implemented: the volume and listen commands do not exist yet"
+    status: successful
+    result: {commit: 03d9fb6, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-RES-07
     title: "Above 10 without a listening session: err=ceiling and the volume is unchanged"
     shape: atomic
@@ -399,8 +399,8 @@ tests:
     verifies: [FR-RES-07]
     needs: []
     impl: "tests/host/test_volume.py::test_above_the_ceiling_is_refused_without_a_session_and_the_volume_stays"
-    status: not done
-    reason: "not implemented: the volume and listen commands do not exist yet"
+    status: successful
+    result: {commit: 03d9fb6, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-RES-09
     title: "A listening session allows 0-100 until listen close; close returns to the default; malformed arguments change nothing"
     shape: atomic
@@ -410,16 +410,16 @@ tests:
     verifies: [FR-RES-09]
     needs: []
     impl: "tests/host/test_volume.py::test_listening_session_allows_up_to_100_until_close"
-    status: not done
-    reason: "not implemented: the volume and listen commands do not exist yet"
-  - id: TC-RES-07-target
-    title: "On the board: volume 5 after reset, 10 accepted, 11 refused and unchanged"
+    status: successful
+    result: {commit: 03d9fb6, date: 2026-11-26, run: "local pytest tests/host"}
+  - id: TC-RES-08-target
+    title: "On the board: volume 5 after a reset, the bench ceiling 10 accepted, the default back after the next reset"
     shape: atomic
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-RES-07, FR-RES-08]
+    verifies: [FR-RES-08]
     needs: [dut, bench-flash, bench-command]
-    impl: "tests/target/test_research_fw.py::test_default_volume_5_and_ceiling_10"
-    status: not done
-    reason: "not implemented: the volume and listen commands do not exist yet"
+    impl: "tests/target/test_research_fw.py::test_default_volume_5_and_10_accepted"
+    status: successful
+    result: {commit: 03d9fb6, date: 2026-11-26, run: "artifact of 03d9fb6 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
