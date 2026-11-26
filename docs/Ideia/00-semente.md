@@ -39,4 +39,4 @@ transformam isto em FSD.
 - [`origem-do-porte.md`](origem-do-porte.md) — o que veio do AlertAlergo e de onde.
 - [`alertalergo-fsd-fala.md`](alertalergo-fsd-fala.md) — requisitos de fala do AlertAlergo (evidência).
 - [`spk-reference-drugs.md`](spk-reference-drugs.md) — lista de 20 fármacos de referência do AlertAlergo.
-- [`achados-pre-define.md`](achados-pre-define.md) — pauta do grill.
+- A pauta do grill foi absorvida pela [FSD](../Functionality/FSD.md) e pelo [plano de testes](../../testing/test-plan.yaml).

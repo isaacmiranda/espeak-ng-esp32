@@ -15,16 +15,20 @@ Tudo o que o CI e o notebook instalam tem versão exata: ESP-IDF **v5.5.5** (FSD
 (não `managed_components/`), `requirements.txt` com `==`. Atualizar versão é mudança própria, com a suíte verde antes e
 depois.
 
-## Comandos de verificação (proposta; o `/harness` fixa)
+## Comandos de verificação
+
+Do notebook, com o `venv` do projeto (`.venv/`). O CI (`.github/workflows/ci.yml`) roda os mesmos.
 
 | Comando | Faz | Portão de CI |
 |---|---|---|
-| `scripts/host-tests.sh` | nível host: PCM e fonemas contra o upstream, montador da imagem | sim |
-| `pytest -q tests/host tools/bench` | testes Python do host e do driver (porta serial falsa) | sim |
-| `ruff check tools tests` | lint do Python | sim |
-| `reuse lint` | licenças e SPDX | sim |
-| `scripts/idf.sh nice -n 15 ionice -c 2 -n 7 idf.py -C firmware -B build build -- -j2` | firmware de pesquisa | sim |
-| `pytest -q tests/target tests/bench --run-bench` | níveis com placa; exige o notebook com a placa | só na tag, no runner do notebook |
+| `.venv/bin/pytest -q tools/bench` | testes do driver na porta serial falsa | sim, a cada push |
+| `.venv/bin/ruff check tools conftest.py` | lint do Python (`ruff.toml`) | sim, a cada push |
+| `.venv/bin/reuse lint` | licenças e SPDX | sim, a cada push |
+| `cd research/firmware && nice -n 15 ionice -c 2 -n 7 ../../scripts/idf.sh idf.py -B build -G Ninja build -- -j2` | firmware de pesquisa | sim, a cada push (no CI, sem `nice`) |
+| `scripts/package-artifact.sh <build> <saída>` | monta o artefato (`flash_args`, imagens, `manifest.yaml`) | sim, a cada push |
+| `.venv/bin/pytest -q tests/bench --run-bench` | níveis com placa; exige o notebook com a placa | só na tag, no runner do notebook (`release.yml`) |
+
+Os testes do host do componente (R1, gerador, capacidade) entram nesta tabela e no CI com o código que verificam.
 
 "Convenção" quer dizer que a pessoa roda; "portão" quer dizer que o CI bloqueia. O repositório é público: o runner
 hospedado do GitHub Actions é gratuito para os níveis sem placa.

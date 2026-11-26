@@ -1,13 +1,13 @@
 # build (anchored: a bare `build/` would also ignore .claude/skills/build/)
 /build/
 /build-*/
-/firmware/build/
+/research/firmware/build/
 /managed_components/
-/firmware/managed_components/
+/research/firmware/managed_components/
 /sdkconfig
 /sdkconfig.old
-/firmware/sdkconfig
-/firmware/sdkconfig.old
+/research/firmware/sdkconfig
+/research/firmware/sdkconfig.old
 /dist/
 __pycache__/
 *.pyc
@@ -36,3 +36,4 @@ secrets.*
 .vscode/
 .idea/
 *.swp
+*.egg-info/

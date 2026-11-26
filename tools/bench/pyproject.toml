@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "espk-bench"
+version = "0.1.0"
+description = "Bench driver for espeak-ng-esp32: python -m bench <command>"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+dependencies = ["pyserial", "PyYAML", "esptool"]
+
+[tool.setuptools]
+packages = ["bench"]

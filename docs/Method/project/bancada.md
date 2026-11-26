@@ -33,6 +33,7 @@ Todos os testes do driver rodam sem placa, contra uma porta serial falsa (`tools
 | `telemetry <papel>` | lê os marcadores do produto, um por linha, carimba o horário do PC | `test_telemetry.py`: linhas boas, truncadas e intercaladas | marcadores de boot e de fala lidos |
 | `command <papel> <cmd>` | envia uma linha ao console de teste e devolve a resposta | `test_command.py`: eco, tempo esgotado, resposta parcial | o firmware responde ao comando básico |
 | `wait-event <papel> <padrão> --timeout <s>` | espera um padrão; abre o ouvinte **antes** de agir; prazo esgotado = `not done` | `test_wait_event.py`: padrão antes, depois e nunca | o marcador de boot é visto depois de um `reset` |
+| `udev-rule` | imprime a regra udev de cada papel a partir do serial de `bench.yaml`; recusa papel sem serial | `test_udev_and_config.py`: sem serial recusa; regra amarra link ao serial | o link `/dev/espk-dut` aparece depois de instalar a regra e replugar |
 
 Um único processo segura a porta serial. Nada de terminal aberto à mão.
 
@@ -40,13 +41,16 @@ Um único processo segura a porta serial. Nada de terminal aberto à mão.
 
 1. **Grupo `dialout`** para o usuário que roda o driver.
 2. **ModemManager desligado** (`systemctl disable --now ModemManager`).
-3. **Regra udev** que cria `/dev/espk-dut` a partir do número de série (versionada em `tools/bench/udev/`, instalada
-   pelo `/harness`). Pode conviver com o link do AlertAlergo para a mesma placa.
+3. **Regra udev** que cria `/dev/espk-dut` a partir do número de série: depois do `bench discover` gravar o serial em
+   `bench.yaml`, `python -m bench udev-rule | sudo tee /etc/udev/rules.d/99-espk.rules` e
+   `sudo udevadm control --reload && sudo udevadm trigger`. Pode conviver com o link do AlertAlergo para a mesma placa.
 4. **ESP-IDF v5.5.5** em `~/esp/esp-idf-v5.5.5`, sempre por `scripts/idf.sh` (ambiente limpo).
-5. **Ambiente Python** (`venv`) com as versões de `requirements.txt` (esptool, pyserial, pytest, PyYAML).
+5. **Ambiente Python:** `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt` (versões exatas; o driver
+   entra como pacote editável).
 6. **Recursos:** todo build com `nice -n 15 ionice -c 2 -n 7` e no máximo 2 jobs; um processo pesado por vez.
 7. **Rede:** o único Wi-Fi do notebook é o seu uplink: não reconfigurar. Carga de Wi-Fi da placa (SoftAP) não depende do
    notebook entrar na rede dela.
+8. **`espeak-ng` do sistema** (referência R2 da FSD): `sudo apt install espeak-ng`.
 
 ## CI
 
@@ -56,8 +60,9 @@ Um único processo segura a porta serial. Nada de terminal aberto à mão.
   (`pytest --run-bench`). Jornada vermelha não publica. Etiquetas `[self-hosted, bench-notebook]`, registro efêmero,
   disparado só por tag, com aprovação para contribuição externa (repositório público: código de terceiros nunca roda
   no notebook sem aprovação).
-- **Registrar o runner é uma concessão do responsável.** O `/harness` instala o runner e o script, diz o que registrar
-  significa e espera o "sim".
+- **Registrar o runner é uma concessão do responsável.** `tools/bench/runner/install.sh` instala (versão e SHA-256
+  fixados); `tools/bench/runner/register.sh` registra por repositório, efêmero, em laço, com o rótulo `bench-notebook`,
+  e só roda com o "sim" do responsável.
 
 ## Riscos físicos
 

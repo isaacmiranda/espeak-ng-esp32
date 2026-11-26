@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Research firmware partition table (FSD §2.2, CON-PLT-05). 16 MB flash, two OTA slots,
+# the eSpeak data partition takes the rest of the flash.
+# Name,     Type, SubType, Offset,  Size
+nvs,        data, nvs,     ,        24K
+otadata,    data, ota,     ,        8K
+phy_init,   data, phy,     ,        4K
+ota_0,      app,  ota_0,   ,        3M
+ota_1,      app,  ota_1,   ,        3M
+espeak,     data, 0x40,    ,        0x9E0000

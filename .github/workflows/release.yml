@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Tag only: build, verify the released artifact on the bench notebook, then publish.
+# A red journey publishes nothing (FSD FR-BLD-03; docs/Method/project/bancada.md §CI).
+name: release
+on:
+  push:
+    tags: ["v*", "espeak-ng-v*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+  release-verify:
+    needs: build
+    runs-on: [self-hosted, bench-notebook]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: espk-research-firmware
+          path: artifact
+      - name: driver environment
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -q -r requirements.txt
+      - name: record the firmware found on the shared board
+        run: .venv/bin/python -m bench wait-event dut "^ESPK boot|^[A-Z]" --timeout 10 --reset || true
+      - name: flash the released artifact
+        run: .venv/bin/python -m bench flash dut artifact
+      - name: journey
+        run: .venv/bin/pytest -q tests/bench --run-bench -k jrn
+  publish:
+    needs: release-verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: espk-research-firmware
+          path: artifact
+      - run: cd artifact && zip -qr ../espk-research-firmware-${{ github.ref_name }}.zip .
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: espk-research-firmware-${{ github.ref_name }}.zip

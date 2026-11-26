@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Exact versions for the bench notebook and CI (FSD CON-BLD-01).
+esptool==5.7.0
+pyserial==3.5
+pytest==9.2.0
+PyYAML==6.0.4
+reuse==6.3.0
+ruff==0.17.6
+-e tools/bench

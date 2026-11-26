@@ -11,8 +11,8 @@ outro lugar.
   Exceção deliberada: o protocolo do estudo de escuta é requisito (o *quê* se mede e como se decide), por isso mora na
   FSD; o roteiro de aplicação mora no manual.
 - **O `CLAUDE.md` não é Método.** Configura o assistente e aponta.
-- **Sem rascunho.** Nada de `TODO` em documento no ramo principal; `Ideia/achados-pre-define.md` é a única pauta
-  provisória e sai à medida que a FSD absorve os itens.
+- **Sem rascunho.** Nada de `TODO` em documento no ramo principal; o que está pendente mora em
+  `docs/Functionality/open-issues.md` ou em `testing/debugging-agenda.md`.
 - **Dois idiomas.** README e guia de contribuição existem em inglês e pt-BR desde o início; a política para FSD, Método
   e manual (qual é a fonte, como a tradução acompanha) é fixada na FSD. Uma tradução que discorda da fonte está velha.
 - **Afirmações sobre o estado da arte** citam a fonte e a data da busca (`docs/Ideia/pesquisa-2026-11-26/`).

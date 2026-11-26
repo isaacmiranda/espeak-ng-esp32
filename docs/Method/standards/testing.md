@@ -63,3 +63,44 @@ Nos outros níveis, **observação é de instrumento**: nenhum passo depende de 
 Entrada externa da biblioteca é o texto. Casos de segurança: texto longo, caracteres inválidos em UTF-8, comandos
 embutidos do eSpeak (SSML/«\x01») — ancorados em CWE (estouro de buffer: CWE-120/787) e nas correções de fuzzing do
 upstream posteriores à 1.52.0.
+
+## Preparação, limpeza e evidência
+
+Todo teste com placa segue estes procedimentos. Um teste que precise de outro passo o declara no plano; um teste
+atômico nunca depende de outro ter rodado antes (só os `JRN-*` têm ordem).
+
+### P1 · Antes de uma sessão com placa
+
+1. A suíte `host` inteira está verde (`pytest -q tools/bench` e os testes do host). Vermelho no host: a sessão não
+   começa.
+2. `python -m bench discover` encontra `dut`. Sem o papel: tudo o que precisa de placa é `not done (precondition)`.
+3. **Placa compartilhada:** registrar o firmware encontrado
+   (`python -m bench wait-event dut "^ESPK boot|^[A-Z]" --timeout 10 --reset`) na evidência.
+4. Gravar o artefato da execução (`python -m bench flash dut <artefato>`), sempre com o `flash_args` dele.
+5. `python -m bench wait-event dut "^ESPK ready" --timeout 15 --reset` antes do primeiro estímulo.
+6. Volume no teto de bancada; só sessão de escuta, com pessoas presentes, passa dele (`--listening`).
+
+### P2 · Depois de cada teste
+
+- Voz, velocidade e volume voltam ao padrão (`voice`, `rate`, `volume 5`), ou o próximo teste começa com
+  `bench reset dut`.
+- Um teste que deixa a placa num estado anormal (imagem corrompida, partição apagada) regrava o artefato no próprio
+  `cleanup`.
+
+### P3 · Ao sair da sessão
+
+- O firmware de pesquisa fica gravado; o commit dele vai para a evidência.
+
+### Evidência
+
+Cada execução grava `test-results/<run-id>/` (`<run-id>` = `AAAAMMDD-HHMMSS-<commit curto>`):
+
+| Arquivo | Conteúdo |
+|---|---|
+| `manifest.yaml` | commit, artefato (com o `manifest.yaml` dele), versões, papel e serial da placa, firmware encontrado e deixado, hora |
+| `results.json` | por teste: id, status, motivo do `not done`, duração |
+| `logs/` | saída carimbada de `bench telemetry`/`command`/`wait-event` |
+| `evidence/` | tabelas de hash, relatórios de medida |
+
+O resultado no plano carrega o commit, para que um resultado velho apareça velho. Nada de dado de ouvinte identificável
+em `test-results/`.

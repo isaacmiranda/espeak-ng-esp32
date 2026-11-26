@@ -1,0 +1,145 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Test plan of espeak-ng-esp32 — every test, what it verifies, what it needs, where it lives,
+# what it last produced. Owned by /build (docs/Method/standards/testing.md).
+#
+# status: written by whatever ran the test, never by hand: not done | successful | failed
+#         `not done` always carries a reason (not written | not implemented | needs <cap> | precondition).
+# Blocked is computed from `needs` against `capabilities`; it is never typed.
+# A capability with available: unproven counts as unavailable and is a debugging-agenda item.
+
+fsd: docs/Functionality/FSD.md
+phase: 1            # 0 definition · 1 harness · 2 commissioning · 3 build
+wave: 1             # 1 standard · 2 deviation · 3 negative + security (locked until the previous is green)
+
+gates:
+  load-defined:   {verdict: null, date: null, commit: null}
+  ai-harnessed:   {verdict: null, date: null, commit: null}
+  dut-ready:      {verdict: null, date: null, commit: null}
+  ready-for-shipment: {verdict: null, date: null, commit: null}
+  shipped:        {verdict: null, date: null, commit: null}
+
+capabilities:
+  # --- the bench driver (tools/bench/), one per command; /commission flips each to yes
+  bench-discover:
+    what: "`bench discover` finds role dut and it matches bench.yaml (serial recorded)"
+    available: unproven
+    proven_by: [tools/bench/tests/test_discover.py]
+  bench-chip-info:
+    what: "`bench chip-info dut` reports esp32-s3, 16 MB flash, PSRAM and the MAC of the FSD's unit"
+    available: unproven
+    proven_by: [tools/bench/tests/test_chip_info.py]
+  bench-flash:
+    what: "`bench flash dut <artifact>` writes with offsets from flash_args; the artifact's marker is seen"
+    available: unproven
+    proven_by: [tools/bench/tests/test_flash.py]
+  bench-reset:
+    what: "`bench reset dut` reboots through the native USB lines; a new ESPK boot is seen"
+    available: unproven
+    proven_by: [tools/bench/tests/test_reset.py]
+  bench-telemetry:
+    what: "`bench telemetry dut` prints timestamped marker lines"
+    available: unproven
+    proven_by: [tools/bench/tests/test_telemetry.py]
+  bench-command:
+    what: "`bench command dut <line>` sends a console line and returns the ESPK reply; refuses volume above the ceiling"
+    available: unproven
+    proven_by: [tools/bench/tests/test_command.py]
+  bench-wait-event:
+    what: "`bench wait-event dut <pattern> --timeout s [--reset]` opens the listener before acting"
+    available: unproven
+    proven_by: [tools/bench/tests/test_wait_event.py]
+  udev-link:
+    what: "/dev/espk-dut exists and points at the board recorded in bench.yaml (`bench udev-rule`)"
+    available: unproven
+    proven_by: [tools/bench/tests/test_udev_and_config.py]
+  # --- project equipment and seams
+  dut:
+    what: "the Waveshare ESP32-S3-RLCD-4.2 named by the FSD §2.2, running this project's artifact"
+    available: unproven
+    note: "shared with alertalergo-v3-firmware: record the firmware found before flashing and the one left after"
+  audio-out:
+    what: "ES8311/I2S plays a test tone at bench volume 5 and the firmware reports underrun=0"
+    available: unproven
+  pcm-capture:
+    what: "the firmware hashes the PCM delivered to the callback (ESPK done … sha256=) — the R3 seam"
+    available: unproven
+  r1-host-reference:
+    what: "upstream 1.52.0 built on the host from the pinned tarball produces PCM hashes and phonemes"
+    available: unproven
+  espeak-ng-system:
+    what: "Ubuntu package espeak-ng 1.52.0+dfsg-5build1 installed on the bench notebook and in CI (R2)"
+    available: "no"
+    note: "not installed on the notebook (2026-11-26); needs `sudo apt install espeak-ng` by the owner"
+  release-verification:
+    what: "tag-triggered journey run against the released artifact on the bench notebook runner"
+    available: unproven
+    note: "becomes yes when /commission has seen one tag run end to end; an absent bench at verify time is not done"
+
+# Journey (FSD §28.1): one workflow test per step, in order. The gate every hardware session runs behind.
+tests:
+  - id: JRN-01
+    title: "Flash the CI artifact; ESPK boot carries the tag's commit"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-01, FR-BLD-04]
+    needs: [dut, bench-flash, bench-wait-event, release-verification]
+    impl: ""
+    status: not done
+    reason: not written
+  - id: JRN-02
+    title: "ESPK ready: the data image is valid"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-02, FR-DAT-03]
+    needs: [dut, bench-wait-event]
+    impl: ""
+    status: not done
+    reason: not written
+  - id: JRN-03
+    title: "say a pt-BR verification item: ESPK start, then ESPK done underrun=0"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-03, FR-RES-11, FR-RES-12]
+    needs: [dut, bench-command, audio-out]
+    impl: ""
+    status: not done
+    reason: not written
+  - id: JRN-04
+    title: "The pt-BR item's PCM hash equals R1"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-REF-03]
+    needs: [dut, bench-command, pcm-capture, r1-host-reference]
+    impl: ""
+    status: not done
+    reason: not written
+  - id: JRN-05
+    title: "voice en; say an en item; hash equals R1"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-05, FR-REF-03]
+    needs: [dut, bench-command, pcm-capture, r1-host-reference]
+    impl: ""
+    status: not done
+    reason: not written
+  - id: JRN-06
+    title: "cancel during a long utterance: ESPK cancelled within 100 ms"
+    shape: workflow
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-10]
+    needs: [dut, bench-command, bench-telemetry]
+    impl: ""
+    status: not done
+    reason: not written

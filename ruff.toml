@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+target-version = "py311"
+line-length = 110
+src = ["tools/bench", "tools/bench/tests"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "RUF"]

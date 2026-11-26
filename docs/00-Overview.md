@@ -26,7 +26,7 @@ medida que a FSD os absorve.
 | Julgando a correção | [`Functionality/FSD.md`](Functionality/FSD.md) |
 | Operando a bancada ou uma sessão de escuta | [`UserDocumentation/User-Manual.md`](UserDocumentation/User-Manual.md) |
 | Querendo entender a bancada | [`Method/project/bancada.md`](Method/project/bancada.md) |
-| Preparando o harness | [`Ideia/achados-pre-define.md`](Ideia/achados-pre-define.md) (propostas para o `/harness`) |
+| Querendo saber o que testar e o que falta provar | [`../testing/test-plan.yaml`](../testing/test-plan.yaml), [`../testing/debugging-agenda.md`](../testing/debugging-agenda.md) |
 
 ## Roteando uma frase nova
 
