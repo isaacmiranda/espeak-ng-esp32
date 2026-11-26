@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.2.1
+fsd_version: 0.2.2
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -18,6 +18,8 @@ change_history:
     cada item tocado uma única vez, sem repetição (decisão do responsável)
   - 0.2.1 (2026-11-26): corpus en sem listas de terceiros (FR-COR-05); OTA fora do escopo; rede da ferramenta por
     SoftAP com pareamento (FR-LST-19). Decisões do responsável sobre OD-03, OD-04 e OD-05
+  - 0.2.2 (2026-11-26): R2 compara pelo mesmo ponto de entrada (FR-REF-05): o CLI e a API síncrona dão PCM
+    diferentes para o mesmo texto (achado do /build; o CLI do sistema é bit a bit igual ao CLI de R1)
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -389,7 +391,7 @@ Prova que o porte não altera o motor. Há três referências [user]:
 | Ref. | Fonte | Critério |
 |---|---|---|
 | **R1** | upstream 1.52.0 compilado no host a partir do mesmo tarball pelo script deste repositório | bit a bit; portão |
-| **R2** | `espeak-ng` do sistema (pacote do Ubuntu), `espeak-ng --stdout` e `espeak-ng -x -q` | bit a bit esperado; divergência analisada e registrada, sem falhar o build |
+| **R2** | eSpeak NG do sistema (pacote do Ubuntu): a biblioteca `libespeak-ng` pela API síncrona, e o CLI `espeak-ng --stdout` / `-x -q` | bit a bit esperado contra R1 **pelo mesmo ponto de entrada** (API × API, CLI × CLI); divergência analisada e registrada, sem falhar o build |
 | **R3** | PCM entregue pelo callback na placa | bit a bit contra R1; portão |
 
 ### 7.2 Requisitos
@@ -404,8 +406,9 @@ Prova que o porte não altera o motor. Há três referências [user]:
   ser registrada com o item, o primeiro índice de amostra divergente, a diferença máxima por amostra e a SNR, e deve
   bloquear a release até uma emenda desta FSD decidir o critério.
 - **FR-REF-05** [Must · user · v0.1] A ferramenta R2 deve comparar, para cada idioma da imagem, a transcrição
-  fonêmica e o SHA-256 do PCM de R1 com os do `espeak-ng` do sistema, e registrar a versão do pacote do sistema no
-  relatório.
+  fonêmica e o SHA-256 do PCM de R1 com os do eSpeak NG do sistema, sempre pelo mesmo ponto de entrada: o PCM da API
+  síncrona de R1 com o da API síncrona da biblioteca do sistema, e o PCM e os fonemas do CLI de R1 com os do CLI do
+  sistema. O relatório registra a versão do pacote do sistema.
 - **FR-REF-06** [Must · user · v0.1] Uma divergência em R2 deve gerar uma linha no relatório com o idioma, o item, o
   tipo (fonemas, PCM ou ambos), a diferença máxima por amostra, a SNR e a causa atribuída, sem falhar o build.
 - **FR-REF-07** [Must · user · v0.1] R1 e R2 devem rodar para **todos** os idiomas do upstream, com o corpus
@@ -445,7 +448,7 @@ verification:
 | FR-REF-01 | tarball verificado · corpus | um hash e uma transcrição por item × idioma | tarball sem conferência do SHA-256 | host |
 | FR-REF-02 | componente e R1 compilados no host · corpus de verificação | hashes iguais | comparar o componente consigo mesmo | host |
 | FR-REF-04 | divergência injetada (item com PCM alterado no teste da ferramenta) | linha com índice, diferença e SNR; status de bloqueio | divergência só no log, sem bloquear | host |
-| FR-REF-05 | `espeak-ng` do sistema instalado · todos os idiomas | relatório com versão do pacote e comparação por item | pacote ausente tratado como igual | host |
+| FR-REF-05 | eSpeak NG do sistema instalado · todos os idiomas | relatório com versão do pacote e comparação por item e por ponto de entrada | pacote ausente tratado como igual; PCM do CLI comparado com PCM da API | host |
 | FR-REF-06 | divergência conhecida (pacote com patch) | linha com causa; build verde | build vermelho; divergência omitida | host |
 | FR-REF-07 | CI · todos os idiomas | relatório cobre cada idioma do upstream | idioma omitido sem registro | host |
 | FR-REF-08 | os três portes gravados em sequência | tabela com as seis medidas por porte | medidas de portes em placas ou corpora diferentes | bench |
