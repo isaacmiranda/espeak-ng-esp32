@@ -29,6 +29,6 @@ def test_say_and_cancel_are_not_supported_and_there_is_no_task(flashed):
     m, _p = board.command("cancel", r"^ESPK cancel")
     assert m.fields == {"err": "ESP_ERR_NOT_SUPPORTED"}, m
     m, _p = board.command("taskinfo", r"^ESPK taskinfo")
-    assert m.fields == {} and "none" in str(m), m
+    assert m.fields == {"task": "none"}, m
     m, _p = board.command("synth Hello there.", r"^ESPK (sync|error)", timeout=30)
     assert m.event == "sync", "the synchronous core must keep working"

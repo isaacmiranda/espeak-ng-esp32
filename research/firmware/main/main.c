@@ -160,7 +160,7 @@ static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
 {
     espk_task_info_t ti;
     if (espk_task_info(&ti) != ESP_OK) {
-        printf("ESPK taskinfo none\n");
+        printf("ESPK taskinfo task=none\n");
     } else {
         printf("ESPK taskinfo stack=%u psram=%d hwm=%u\n", (unsigned)ti.stack_bytes, ti.stack_in_psram,
                (unsigned)ti.stack_hwm_bytes);
