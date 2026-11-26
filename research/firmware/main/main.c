@@ -171,6 +171,32 @@ static espk_config_t s_cfg = {.evt_cb = on_event};
 
 static unsigned heap_internal_free(void) { return (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL); }
 
+// A test seam (FR-CAP-10): take PSRAM until only `leave_kb` KB are free, or give it back
+#define HOG_MAX 64
+static void *s_hog[HOG_MAX];
+
+static void cmd_hog(const char *arg)
+{
+    size_t leave = (size_t)atoi(arg) * 1024;
+    int n = 0;
+    while (n < HOG_MAX && s_hog[n]) n++;
+    while (n < HOG_MAX && heap_caps_get_free_size(MALLOC_CAP_SPIRAM) > leave + 256 * 1024) {
+        s_hog[n] = heap_caps_malloc(256 * 1024, MALLOC_CAP_SPIRAM);
+        if (!s_hog[n]) break;
+        n++;
+    }
+    printf("ESPK hog psram_free=%u\n", (unsigned)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+}
+
+static void cmd_unhog(void)
+{
+    for (int i = 0; i < HOG_MAX; i++) {
+        free(s_hog[i]);
+        s_hog[i] = NULL;
+    }
+    printf("ESPK unhog psram_free=%u\n", (unsigned)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+}
+
 static void cmd_init(bool deinit)
 {
     esp_err_t err = deinit ? espk_deinit() : espk_init(&s_cfg);
@@ -298,6 +324,10 @@ static void dispatch(char *line)
         if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
     } else if (strncmp(line, "synth ", 6) == 0) {
         cmd_synth(line + 6);
+    } else if (strncmp(line, "hog ", 4) == 0) {
+        cmd_hog(line + 4);
+    } else if (strcmp(line, "unhog") == 0) {
+        cmd_unhog();
     } else if (strncmp(line, "vfs ", 4) == 0) {
         cmd_vfs(line + 4);
     } else if (strncmp(line, "vfswrite ", 9) == 0) {

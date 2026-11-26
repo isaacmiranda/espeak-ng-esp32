@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
 #ifdef CONFIG_SPIRAM
@@ -67,6 +68,14 @@ esp_err_t espk_init(const espk_config_t *cfg)
         ESP_LOGE(TAG, "init: ESP_ERR_NOT_SUPPORTED (no PSRAM)");
         return ESP_ERR_NOT_SUPPORTED;
     }
+#ifdef ESPK_PSRAM_PEAK_BYTES
+    // FR-CAP-10: the report's PSRAM peak must be free before the data are loaded
+    if (heap_caps_get_free_size(MALLOC_CAP_SPIRAM) < ESPK_PSRAM_PEAK_BYTES) {
+        ESP_LOGE(TAG, "init: ESP_ERR_NO_MEM (PSRAM free %u B, the report's peak %u B)",
+                 (unsigned)heap_caps_get_free_size(MALLOC_CAP_SPIRAM), (unsigned)ESPK_PSRAM_PEAK_BYTES);
+        return ESP_ERR_NO_MEM;
+    }
+#endif
     const char *reason = "";
     esp_err_t err = espk_part_mount(CONFIG_ESPK_PARTITION_LABEL, CONFIG_ESPK_PARTITION_SUBTYPE,
                                     CONFIG_ESPK_MOUNT_POINT, PACKAGE_VERSION, &reason);

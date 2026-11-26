@@ -11,7 +11,12 @@ endif()
 target_compile_definitions(${COMPONENT_LIB} PRIVATE ESPK_COMMIT="${ESPK_COMMIT}")
 # The data image goes to the `espeak` partition and into flash_args, so `bench flash`
 # writes it with the app. It is built by scripts/build-image.sh (CI: the host job).
-if(NOT DEFINED ENV{ESPK_IMAGE} OR NOT EXISTS "$ENV{ESPK_IMAGE}")
-    message(FATAL_ERROR "ESPK_IMAGE must name the data image: run scripts/build-image.sh <out> first")
+# With ESPK_DATA_DIR the component builds the image itself (language list, capacity checks: FSD 13);
+# with ESPK_IMAGE the firmware flashes a ready image (the CI's).
+if(NOT DEFINED ENV{ESPK_DATA_DIR})
+    if(NOT DEFINED ENV{ESPK_IMAGE} OR NOT EXISTS "$ENV{ESPK_IMAGE}")
+        message(FATAL_ERROR "ESPK_DATA_DIR must name the compiled upstream data, or ESPK_IMAGE a ready image "
+                            "(scripts/build-image.sh <out>)")
+    endif()
+    esptool_py_flash_to_partition(flash "espeak" "$ENV{ESPK_IMAGE}")
 endif()
-esptool_py_flash_to_partition(flash "espeak" "$ENV{ESPK_IMAGE}")

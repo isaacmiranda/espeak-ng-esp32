@@ -953,3 +953,14 @@ tests:
     impl: "tests/host/test_capacity.py::test_the_report_follows_the_files_not_a_table"
     status: successful
     result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
+  - id: TC-CAP-10
+    title: "With the PSRAM free below the report's peak espk_init() gives ESP_ERR_NO_MEM and stays UNINIT; with the PSRAM back it starts"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-CAP-10]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_init_with_too_little_psram_is_refused_and_nothing_is_loaded"
+    status: not done
+    reason: "not implemented: the test has not run yet"

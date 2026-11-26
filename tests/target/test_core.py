@@ -140,3 +140,22 @@ def test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported(flashed):
     internal1, psram1 = int(m.fields["internal_free"]), int(m.fields["psram_free"])
     assert psram0 - psram1 >= 600_000, f"PSRAM cost of init: {psram0 - psram1}"
     assert internal0 - internal1 <= 24_000, f"internal cost of init: {internal0 - internal1}"
+
+
+def test_init_with_too_little_psram_is_refused_and_nothing_is_loaded(flashed):
+    """FR-CAP-10: with the PSRAM taken (a test seam) below the report's peak, espk_init() gives ESP_ERR_NO_MEM,
+    the component stays UNINIT, and once the PSRAM is back it starts."""
+    _ready()
+    m, _p = board.command("deinit", r"^ESPK deinit")
+    assert m.fields["result"] == "ESP_OK"
+    m, _p = board.command("hog 600", r"^ESPK hog")
+    assert int(m.fields["psram_free"]) < 800_000, m.fields
+    m, _p = board.command("init", r"^ESPK init")
+    assert m.fields["result"] == "ESP_ERR_NO_MEM", m.fields
+    m, _p = board.command("info", r"^ESPK (info|error)")
+    assert m.event == "error" and m.fields["code"] == "ESP_ERR_INVALID_STATE", m  # still UNINIT
+    m, _p = board.command("unhog", r"^ESPK unhog")
+    m, _p = board.command("init", r"^ESPK init")
+    assert m.fields["result"] == "ESP_OK", m.fields
+    m, _p = board.command(f"say --mute {PT}", r"^ESPK (done|error)", timeout=30)
+    assert m.event == "done"

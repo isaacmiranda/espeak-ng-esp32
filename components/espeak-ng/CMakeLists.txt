@@ -36,3 +36,43 @@ endif()
 if(CONFIG_ESPK_ASYNC AND CONFIG_ESPK_TASK_STACK LESS 49152)
     message(FATAL_ERROR "CONFIG_ESPK_TASK_STACK=${CONFIG_ESPK_TASK_STACK} is below the 49152 B floor (FR-ASY-06)")
 endif()
+
+# FR-CAP: language selection, the data image and the capacity checks, at configure time. They need the compiled
+# upstream data (the espeak-ng-data of an upstream build): ESPK_DATA_DIR names it. Without it the integrator
+# supplies a ready image (the research firmware's ESPK_IMAGE) and no capacity check runs.
+if(DEFINED ENV{ESPK_DATA_DIR})
+    idf_build_get_property(_python PYTHON)
+    idf_build_get_property(_project_dir PROJECT_DIR)
+    set(_cap_args --data "$ENV{ESPK_DATA_DIR}" --languages "${CONFIG_ESPK_LANGUAGES}"
+        --default-voice "${CONFIG_ESPK_DEFAULT_VOICE}" --budget-kb ${CONFIG_ESPK_PSRAM_BUDGET_KB}
+        --warn-pct ${CONFIG_ESPK_CAPACITY_WARN_PCT}
+        --out "${CMAKE_BINARY_DIR}/espeak.img" --report "${CMAKE_BINARY_DIR}/espk_capacity.json")
+    if(CONFIG_ESPK_LANGUAGES_ALL)
+        list(APPEND _cap_args --all)
+    endif()
+    if(CONFIG_PARTITION_TABLE_CUSTOM)
+        list(APPEND _cap_args --partitions "${_project_dir}/${CONFIG_PARTITION_TABLE_CUSTOM_FILENAME}"
+             --label "${CONFIG_ESPK_PARTITION_LABEL}")
+    endif()
+    if(CONFIG_ESPK_ASYNC)
+        if(CONFIG_ESPK_TASK_STACK_PSRAM)
+            set(_stack_where y)
+        else()
+            set(_stack_where n)
+        endif()
+        list(APPEND _cap_args --task-stack ${CONFIG_ESPK_TASK_STACK} --task-stack-psram ${_stack_where})
+    endif()
+    execute_process(COMMAND ${_python} "${CMAKE_CURRENT_LIST_DIR}/tools/capacity.py" ${_cap_args}
+                    RESULT_VARIABLE _cap_rc OUTPUT_VARIABLE _cap_out ERROR_VARIABLE _cap_err)
+    message(STATUS "espeak-ng capacity:\n${_cap_out}")
+    if(_cap_rc)
+        message(FATAL_ERROR "espeak-ng capacity check failed:\n${_cap_err}")
+    endif()
+    file(READ "${CMAKE_BINARY_DIR}/espk_capacity.json" _cap_json)
+    string(JSON _peak GET "${_cap_json}" psram_peak_bytes)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE ESPK_PSRAM_PEAK_BYTES=${_peak})  # FR-CAP-10
+    esptool_py_flash_to_partition(flash "${CONFIG_ESPK_PARTITION_LABEL}" "${CMAKE_BINARY_DIR}/espeak.img")
+    # a change in the data files is a change in the image: configure again
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+                 "$ENV{ESPK_DATA_DIR}/phondata" "$ENV{ESPK_DATA_DIR}/phontab" "$ENV{ESPK_DATA_DIR}/phonindex")
+endif()
