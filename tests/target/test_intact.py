@@ -30,6 +30,7 @@ def test_intact_elf_has_no_wrap_symbols():
 
 
 def test_intact_board_diverges_from_r1_starting_at_the_first_accented_item(flashed):
+    _build_dir()  # the board must carry the intact variant, not the normal artifact
     """The engine keeps state between says, so once an accent is misread later items drift too (even
     English): in a sequence the divergence starts at the first accented item and never before it."""
     script = board.verify_script()
@@ -46,6 +47,7 @@ def test_intact_board_diverges_from_r1_starting_at_the_first_accented_item(flash
 
 def test_intact_board_equals_r1_without_accents(flashed):
     """What holds without the wrap (as TC-REF-03-noaccent): English and unaccented text from a reset."""
+    _build_dir()
     script = "init en\nvoice en\n" + "".join(
         f"say {t}\n" for t in ("The battery is low.", "It is 2:30 pm.", "The battery is low."))
     assert not board.compare(board.board_run(script), board.r1_run(script))

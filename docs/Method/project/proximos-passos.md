@@ -11,7 +11,7 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 2. Abra a sessão dizendo onde o projeto está (skill `/build`, §0): Fase 3, **onda 1** (só testes `standard` e
    funcionalidades; deviation e negative ficam travados).
 3. Confira a árvore: `git status`, `git log --oneline -5`, `gh run list -w ci -L 1` (o último CI verde conhecido foi `9946bf8`).
-4. A placa está no notebook com o firmware de pesquisa normal (build local de `6951a9e`, regravado depois da variante intacta). Antes de gravar outra coisa, leia o
+4. A placa está no notebook com o firmware de pesquisa normal (build local de `6951a9e`, regravado depois da variante intacta; agora o de `174a978`, com áudio). Antes de gravar outra coisa, leia o
    que está nela (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`); ela é compartilhada com o
    AlertAlergo V3.
 
@@ -19,21 +19,20 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 24 de 26 declarados `successful` (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). Faltam **JRN-03**
-  (áudio pelo alto-falante) e **JRN-06** (cancelar no meio da fala).
+- **Testes:** 25 de 26 declarados `successful` (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). Falta **JRN-06** (cancelar no meio da fala).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
 - **FR-ENG-05 (modo intacto) feito:** variante `research/firmware/sdkconfig.intact.defaults` (`-B build-intact -D SDKCONFIG=build-intact/sdkconfig "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.intact.defaults"`); ELF sem `__wrap_isw*`; na placa a divergência de R1 começa no primeiro item acentuado e **se espalha** (100 de 100 itens divergem, inclusive inglês depois do primeiro acento, pelo estado do motor); inglês sem acento desde um reset é igual a R1.
+- **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5, inaudível: a capacidade `audio-out` segue `unproven` até a escuta do responsável. A placa tem o firmware de `174a978`.
 - **Capacidades ainda `unproven`:** `audio-out` (ES8311/I2S) e `release-verification` (o runner).
 
 ## Próximos atos, em ordem
 
-1. **Áudio pelo ES8311 (JRN-03, capacidade `audio-out`).** Portar `seed/alertalergo-port/firmware/components/l1_audio/`
-   (`audio_es8311.c`: I2C `0x18`, I2S 0, `esp_codec_dev`) para o firmware de pesquisa, adaptado ao PCM a 22 050 Hz mono,
-   e escrever o comando `say` sem `--mute`, `volume`, `listen open|close` (FR-RES-04, 07, 08, 09, 12). **Faz som na
-   placa:** volume padrão 5, teto de bancada 10 (o driver recusa mais, `bancada.md`); alguém presente, sem alto-falante
-   junto ao ouvido. Escrever o `JRN-03` antes do código.
+1. **Restante do áudio: `volume`, `listen open|close` e o teto (FR-RES-07, 08, 09).** Declarar os testes antes (o teto 10
+   e o padrão 5 são testáveis sem som; `listen open` faz som alto: pessoas presentes, FSD/bancada §1). Depois, o
+   **responsável confirma de ouvido** (volume acima de 5; o 5 é inaudível, −47,5 dB no AlertAlergo) para virar
+   `audio-out: yes`.
 2. **Cancelar (JRN-06) e a camada assíncrona (§15, FR-RES-10 e 11, FR-ASY-*).** Tarefa de síntese com fila, pilha de
    64 KB na PSRAM, `espk_say`/`espk_cancel`, eventos START/DONE/CANCELLED. A tabela de estados da §15.2 é testável no host
    como função pura. O R1 precisa passar a repetir o cancelamento no mesmo bloco (passo novo no roteiro de `pcm_script.c`).
