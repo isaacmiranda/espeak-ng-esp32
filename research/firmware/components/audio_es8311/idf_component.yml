@@ -1,0 +1,4 @@
+# esp_codec_dev (Apache-2.0), the ES8311 driver the AlertAlergo port uses.
+dependencies:
+  idf: ">=5.5"
+  espressif/esp_codec_dev: "~1.4.0"

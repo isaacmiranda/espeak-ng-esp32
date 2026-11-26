@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """The journey (FSD §28.1): one workflow test per step, in order.
 
-JRN-03 (audio) and JRN-06 (cancel) arrive with those features.
+JRN-06 (cancel) arrives with its feature.
 """
 
 import sys
@@ -35,6 +35,21 @@ def test_jrn_01_boot_carries_the_artifact_commit(flashed):
 def test_jrn_02_ready(flashed):
     ms, p = board.boot()
     assert "ready" in ms, p.stdout
+
+
+def test_jrn_03_say_speaks_through_the_codec(flashed):
+    """FR-RES-03, FR-RES-11 (start before done), FR-RES-12: `say` without --mute, default volume 5."""
+    ms, p = board.boot()
+    assert "ready" in ms, p.stdout
+    text = PT.encode()
+    _m, p = board.command(f"say {PT}", r"^ESPK (done|error)", timeout=60)
+    events = [m.event for m in board.markers(p.stdout)]
+    assert "start" in events and "done" in events, p.stdout
+    assert events.index("start") < events.index("done"), events
+    done = next(m for m in board.markers(p.stdout) if m.event == "done")
+    assert int(done.fields["samples"]) > 0
+    assert int(done.fields["bytes"]) == len(text)
+    assert done.fields["underrun"] == "0", done.fields
 
 
 def test_jrn_04_pt_br_hash_equals_r1(flashed):

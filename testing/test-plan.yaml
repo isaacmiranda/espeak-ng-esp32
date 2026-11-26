@@ -121,9 +121,9 @@ tests:
     wave: 1
     verifies: [FR-RES-03, FR-RES-11, FR-RES-12]
     needs: [dut, bench-command, audio-out]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_03_say_speaks_through_the_codec"
     status: not done
-    reason: not written
+    reason: "not implemented: the firmware has no audio output yet (say without --mute)"
   - id: JRN-04
     title: "The pt-BR item's PCM hash equals R1"
     shape: workflow
