@@ -61,10 +61,10 @@ Um único processo segura a porta serial. Nada de terminal aberto à mão.
 
 ## Riscos físicos
 
-1. **Volume de bancada:** teste automático com som roda num teto de volume baixo (valor: pauta do `/define`); só sessão
-   de escuta sobe o volume, com pessoas presentes. Nunca encostar o alto-falante no ouvido.
-2. **Sessão de escuta** segue o protocolo do estudo: posição do ouvinte, fone ou alto-falante, volume e ruído de fundo
-   fixados; nada disso é improvisado na hora.
+1. **Volume de bancada:** teste automático com som roda no teto de volume **10** (de 0 a 100), com padrão **5** no boot
+   (FSD FR-RES-07, FR-RES-08); só uma sessão de escuta aberta (`listen open`) sobe o volume, com pessoas presentes. Nunca encostar o alto-falante no ouvido.
+2. **Sessão de escuta** registra posição do ouvinte, volume e ruído de fundo na evidência; o estudo com o CEP fixa esses
+   valores no protocolo antes da coleta.
 
 ## Armadilhas conhecidas (herdadas do porte de partida)
 

@@ -13,7 +13,7 @@ onde o defeito que ele pega pode se manifestar**. O nível mora no **teste**, nu
 | **host** | PC: as mesmas fontes do eSpeak NG compiladas com CMake; `pytest` | ms a s, a cada commit | PCM idêntico ao upstream, fonemas fixados, montador da imagem de dados, texto → normalização, contratos de build (tamanho, símbolos). |
 | **target** | A placa (`bench flash` + `bench wait-event`) | segundos, antes do merge | Leitura da partição, PSRAM, pilha, watchdog, tempo até o 1º áudio, fator de tempo real, heap mínima, PCM no aparelho igual ao do host. |
 | **bench** | A placa com carga de convivência (Wi-Fi, BLE, tela) e captura de áudio, se a FSD pedir | minutos, antes da liberação | Ponta a ponta: fala sob carga de rádio e tela, sequências longas, reinício no meio da fala. |
-| **listening** | Pessoas ouvindo a placa, sob o protocolo do estudo | sessões agendadas | Só o que um ouvinte decide: reconhecimento de palavras e de fármacos, nota de qualidade. |
+| **listening** | Pessoas ouvindo a placa | sessões agendadas | Só o que um ouvinte decide. Hoje: escuta interna da equipe para ajuste, sem número publicado; depois, o estudo aprovado pelo CEP. |
 
 Não há nível `sim`: o produto é um dispositivo só.
 
@@ -55,7 +55,7 @@ Nos outros níveis, **observação é de instrumento**: nenhum passo depende de 
 | Cancelamento no meio da fala | `bench command` em instante medido pela telemetria | driver |
 | Reinício no meio da fala | `bench reset dut` | driver |
 | Texto patológico (longo, acentuado, comandos embutidos) | `bench command` com o texto | driver |
-| Qualidade percebida | **não instrumentável**: só `listening` | pessoas, sob protocolo |
+| Qualidade percebida | **não instrumentável**: só `listening`; o ASR do CI é estimativa, não substituto | pessoas |
 | Áudio no ar (o que sai do alto-falante) | **não instrumentável** sem microfone de medição; o PCM entregue ao I2S é observável por *seam* | firmware (*seam*) |
 
 ## Segurança

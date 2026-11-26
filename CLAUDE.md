@@ -1,9 +1,10 @@
 # espeak-ng-esp32
 
-Pesquisa e componente de código livre: **eSpeak NG 1.52 como componente ESP-IDF nativo para o ESP32-S3**, com voz
-pt-BR, medido no aparelho (memória, latência, convivência com Wi-Fi/BLE/tela) e avaliado por **ouvintes** (estudo de
-inteligibilidade em pt-BR, inclusive de nomes de fármacos). Hardware de referência: **Waveshare ESP32-S3-RLCD-4.2**
-(a mesma placa do AlertAlergo V3). O ponto de partida é o porte feito no AlertAlergo V3 (`seed/alertalergo-port/`).
+Componente livre e de uso geral: **eSpeak NG 1.52 como componente ESP-IDF nativo**, para todos os idiomas do upstream
+e qualquer ESP32 com PSRAM, com as fontes do upstream intactas e o PCM provado igual ao do upstream. Também é plataforma
+de pesquisa: medido no aparelho (memória, latência, convivência com Wi-Fi/BLE/tela), com inteligibilidade estimada por
+ASR e, no futuro, um estudo com ouvintes aprovado pelo CEP. Prioridade: pt-BR, depois en. Hardware de referência:
+**Waveshare ESP32-S3-RLCD-4.2** (a mesma placa do AlertAlergo V3). O ponto de partida é o porte feito no AlertAlergo V3 (`seed/alertalergo-port/`).
 
 Este arquivo só configura o assistente e aponta. As regras estão no Método: **leia `docs/Method/AI-Workflow.md` antes
 de qualquer mudança.**
@@ -18,8 +19,9 @@ de qualquer mudança.**
 | 3 · Construção | `/build` | **Ready for shipment**: requisitos atendidos, jornada verde, reconcile vazio |
 | Liberação | tag (ato do responsável) | **Shipped**: versão publicada e jornada verde nos bytes publicados |
 
-Estado atual: **antes da Fase 0.** Não existe FSD. Comece por `docs/Ideia/achados-pre-define.md`, depois `/grill-me`
-sobre `docs/Ideia/` e então `/define`. Sem cláusula, sem código: o que está em `seed/` é evidência, não produto.
+Estado atual: **Fase 0, FSD em rascunho** (`docs/Functionality/FSD.md`, aprovação pendente; decisões abertas em
+`docs/Functionality/open-issues.md`). Próximo passo depois da aprovação: `/harness`. O que está em `seed/` é evidência,
+não produto.
 
 ## A bancada
 

@@ -1,6 +1,6 @@
 # espeak-ng-esp32 — Manual
 
-> **Status:** nada é operável ainda. Os capítulos abaixo são a estrutura que o `/define` e o `/build` preenchem.
+> **Status:** nada é operável ainda. A FSD está em rascunho; os capítulos abaixo são preenchidos pelo `/build`.
 
 ## 1. Integrar o componente num projeto ESP-IDF
 
@@ -14,10 +14,11 @@
 
 *A escrever: firmware de pesquisa, comandos de medição, onde fica a evidência.*
 
-## 4. Aplicar uma sessão de escuta
+## 4. Conduzir uma escuta interna
 
-*A escrever depois da aprovação do protocolo: preparo do local, volume, ordem das listas, registro das respostas,
-o que fazer quando algo dá errado no meio da sessão.*
+*A escrever: abrir a sessão (`listen open`), volume, ordem das listas, registro das respostas com código pseudônimo,
+o que fazer quando algo dá errado no meio da sessão. O estudo com participantes de fora da equipe ganha capítulo próprio
+quando o protocolo for aprovado pelo CEP.*
 
 ## 5. Recuperar a placa
 

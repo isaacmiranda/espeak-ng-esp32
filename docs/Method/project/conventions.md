@@ -4,14 +4,14 @@
 
 - Firmware e componente: C (ESP-IDF). Ferramentas, testes e análise: Python 3.
 - Código, API, símbolos, commits e README em inglês; FSD, protocolo do estudo e material de ouvintes em pt-BR.
-- Prefixo de API pública do componente e marcadores de log: decididos no `/define` (proposta: `espk_` e `SPEECH`).
+- Prefixo da API pública do componente: `espk_`; tag de log do componente: `espk`; marcadores do firmware de pesquisa:
+  `ESPK <evento> chave=valor …` (FSD FR-LOG-01).
 - Marcadores de log observáveis por teste: `TAG event key=value …` numa linha, estáveis entre versões.
 - Todo arquivo próprio leva cabeçalho SPDX (`GPL-3.0-or-later`); terceiros constam de `REUSE.toml`.
 
 ## Versões fixadas
 
-Tudo o que o CI e o notebook instalam tem versão exata: ESP-IDF **v5.5.5** (a do porte de partida; troca é decisão do
-`/define`), eSpeak NG **1.52.0** pelo tarball com SHA-256 fixado, `dependencies.lock` versionado
+Tudo o que o CI e o notebook instalam tem versão exata: ESP-IDF **v5.5.5** (FSD §2.2), eSpeak NG **1.52.0** pelo tarball com SHA-256 fixado, `dependencies.lock` versionado
 (não `managed_components/`), `requirements.txt` com `==`. Atualizar versão é mudança própria, com a suíte verde antes e
 depois.
 

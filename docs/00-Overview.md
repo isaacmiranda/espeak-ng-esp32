@@ -23,10 +23,10 @@ medida que a FSD os absorve.
 | Se você está… | Leia |
 |---|---|
 | Fazendo uma mudança | [`Method/AI-Workflow.md`](Method/AI-Workflow.md) |
-| Julgando a correção | `Functionality/` (vazio até o `/define`) |
+| Julgando a correção | [`Functionality/FSD.md`](Functionality/FSD.md) |
 | Operando a bancada ou uma sessão de escuta | [`UserDocumentation/User-Manual.md`](UserDocumentation/User-Manual.md) |
 | Querendo entender a bancada | [`Method/project/bancada.md`](Method/project/bancada.md) |
-| Começando o projeto | [`Ideia/achados-pre-define.md`](Ideia/achados-pre-define.md), depois `/grill-me` e `/define` |
+| Preparando o harness | [`Ideia/achados-pre-define.md`](Ideia/achados-pre-define.md) (propostas para o `/harness`) |
 
 ## Roteando uma frase nova
 

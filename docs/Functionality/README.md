@@ -1,3 +1,3 @@
 # Functionality (O QUÊ)
 
-Vazio até o `/define`. A FSD da pesquisa nasce aqui (`FSD.md`), a partir de [`../Ideia/`](../Ideia/).
+A especificação: [`FSD.md`](FSD.md). Decisões abertas e valores propostos à espera de aceite: [`open-issues.md`](open-issues.md).
