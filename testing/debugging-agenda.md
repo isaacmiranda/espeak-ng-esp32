@@ -5,11 +5,7 @@ correspondente em [`test-plan.yaml`](test-plan.yaml), não para casos de teste.
 
 ## Abertos
 
-| Parte | Não comprovada porque | Comprovada por | Capacidade |
-|---|---|---|---|
-| Link udev `/dev/espk-dut` | a regra exige `sudo` (responsável) | `python -m bench udev-rule \| sudo tee /etc/udev/rules.d/99-espk.rules`, recarregar, replugar; `ls -l /dev/espk-dut` | `udev-link` |
-| ModemManager | ativo no notebook; desligá-lo exige `sudo` | `systemctl is-active ModemManager` = `inactive` | — |
-| `espeak-ng` do sistema (R2) | não instalado; exige `sudo` | `espeak-ng --version` mostra 1.52.0 | `espeak-ng-system` |
+Nenhum do lado da bancada.
 
 ## Movidos para a Fase 3, onda 1 (bring-up antes da jornada)
 
@@ -27,4 +23,5 @@ Dependem do componente, que o `/build` constrói; até lá não há código que 
 ## Resolvidos (2026-11-26)
 
 Driver de bancada com a placa real (sete comandos), a placa neste projeto (`chip-info`), caminho CI → gravação
-(run 45859053285). As observações estão nas capacidades.
+(run 45859053285), link udev `/dev/espk-dut`, ModemManager desligado, `espeak-ng` 1.52.0 do sistema. As observações
+estão nas capacidades.

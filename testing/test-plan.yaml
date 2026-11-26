@@ -33,7 +33,7 @@ capabilities:
   bench-flash:
     what: "`bench flash dut <artifact>` writes with offsets from flash_args; the artifact's marker is seen"
     available: yes
-    observed: {date: 2026-11-26, commit: a441368, driver: espk-bench 0.1.0, evidence: "CI run 45859053285 (commit bc2927a) artifact flashed; offsets from flash_args 0x0/0x20000/0x8000/0xf000; ESPK boot fw=bc2927a commit=bc2927a seen"}
+    observed: {date: 2026-11-26, commit: a441368, driver: espk-bench 0.1.0, evidence: "CI run 45859053285 (commit bc2927a) artifact flashed; offsets from flash_args 0x0/0x20000/0x8000/0xf000; ESPK boot fw=bc2927a commit=bc2927a seen; again with CI run 45861574416 (commit 225e9f8): ESPK boot fw=225e9f8 commit=225e9f8, ESPK alive n=1..2"}
     proven_by: [tools/bench/tests/test_flash.py]
   bench-reset:
     what: "`bench reset dut` reboots through the native USB lines; a new ESPK boot is seen"
@@ -57,13 +57,14 @@ capabilities:
     proven_by: [tools/bench/tests/test_wait_event.py]
   udev-link:
     what: "/dev/espk-dut exists and points at the board recorded in bench.yaml (`bench udev-rule`)"
-    available: unproven
+    available: yes
+    observed: {date: 2026-11-26, evidence: "/dev/espk-dut -> ttyACM0 after `bench udev-rule` installed; bench discover finds serial 3C:DC:75:F8:63:2C"}
     proven_by: [tools/bench/tests/test_udev_and_config.py]
   # --- project equipment and seams
   dut:
     what: "the Waveshare ESP32-S3-RLCD-4.2 named by the FSD §2.2, running this project's artifact"
     available: yes
-    observed: {date: 2026-11-26, found: "alertalergo 0.0.1-dev.309+g60b6894", left: "espk_research a441368-dirty (local build, heartbeat + console)", psram: "8MB octal (AP)"}
+    observed: {date: 2026-11-26, found: "alertalergo 0.0.1-dev.309+g60b6894", left: "espk_research 225e9f8 (CI run 45861574416 artifact)", psram: "8MB octal (AP)"}
     note: "shared with alertalergo-v3-firmware: record the firmware found before flashing and the one left after"
     limitation: "every open of the port used to reset the board (DTR lowered before RTS); fixed in tools/bench/bench/ports.py — a reset during a test is a bench fault first"
   audio-out:
@@ -77,8 +78,8 @@ capabilities:
     available: unproven
   espeak-ng-system:
     what: "Ubuntu package espeak-ng 1.52.0+dfsg-5build1 installed on the bench notebook and in CI (R2)"
-    available: "no"
-    note: "not installed on the notebook (2026-11-26); needs `sudo apt install espeak-ng` by the owner"
+    available: yes
+    observed: {date: 2026-11-26, evidence: "espeak-ng --version: eSpeak NG text-to-speech: 1.52.0 (Ubuntu 1.52.0+dfsg-5build1)"}
   release-verification:
     what: "tag-triggered journey run against the released artifact on the bench notebook runner"
     available: unproven
