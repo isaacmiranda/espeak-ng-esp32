@@ -95,9 +95,9 @@ tests:
     wave: 1
     verifies: [FR-RES-01, FR-BLD-04]
     needs: [dut, bench-flash, bench-wait-event, release-verification]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_01_boot_carries_the_artifact_commit"
     status: not done
-    reason: not written
+    reason: not implemented
   - id: JRN-02
     title: "ESPK ready: the data image is valid"
     shape: workflow
@@ -106,9 +106,9 @@ tests:
     wave: 1
     verifies: [FR-RES-02, FR-DAT-03]
     needs: [dut, bench-wait-event]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_02_ready"
     status: not done
-    reason: not written
+    reason: not implemented
   - id: JRN-03
     title: "say a pt-BR verification item: ESPK start, then ESPK done underrun=0"
     shape: workflow
@@ -128,9 +128,9 @@ tests:
     wave: 1
     verifies: [FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_04_pt_br_hash_equals_r1"
     status: not done
-    reason: not written
+    reason: not implemented
   - id: JRN-05
     title: "voice en; say an en item; hash equals R1"
     shape: workflow
@@ -139,9 +139,9 @@ tests:
     wave: 1
     verifies: [FR-RES-05, FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_05_en_hash_equals_r1"
     status: not done
-    reason: not written
+    reason: not implemented
   - id: JRN-06
     title: "cancel during a long utterance: ESPK cancelled within 100 ms"
     shape: workflow
@@ -232,3 +232,58 @@ tests:
     impl: "tests/host/test_image.py::test_image_round_trip_and_layout"
     status: successful
     result: {commit: 5482045, date: 2026-11-26, run: "local pytest tests/host"}
+  - id: TC-RES-01
+    title: "ESPK boot carries fw, commit (the artifact's), idf, espeak, rate, bss, langs and init_ms"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-01, FR-MEM-05]
+    needs: [dut, bench-flash, bench-wait-event]
+    impl: "tests/target/test_research_fw.py::test_boot_marker_fields"
+    status: not done
+    reason: not implemented
+  - id: TC-RES-02
+    title: "ESPK ready follows ESPK boot when the data are valid"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-02]
+    needs: [dut, bench-flash, bench-wait-event]
+    impl: "tests/target/test_research_fw.py::test_ready_follows_boot"
+    status: not done
+    reason: not implemented
+  - id: TC-SYN-02
+    title: "The engine reports 22 050 Hz after init"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-02]
+    needs: [dut, bench-flash, bench-wait-event]
+    impl: "tests/target/test_research_fw.py::test_sample_rate_is_22050"
+    status: not done
+    reason: not implemented
+  - id: TC-RES-03
+    title: "say --mute reports ESPK done with id, samples, timings, heap_min and the PCM SHA-256"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-03]
+    needs: [dut, bench-flash, bench-command, pcm-capture]
+    impl: "tests/target/test_research_fw.py::test_say_mute_reports_the_pcm_hash"
+    status: not done
+    reason: not implemented
+  - id: TC-RES-05
+    title: "voice switches among the image's voices; an absent voice is refused and the previous one kept"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-05, FR-SYN-06]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_research_fw.py::test_voice_switch_and_unknown_voice"
+    status: not done
+    reason: not implemented

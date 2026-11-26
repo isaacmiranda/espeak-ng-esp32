@@ -123,7 +123,7 @@ Estes números são lidos pelo build. Cada um é uma restrição.
 | Placa de referência | Waveshare ESP32-S3-RLCD-4.2 | [user] |
 | Chip | ESP32-S3 | [user] |
 | Flash da placa de referência | 16 MB | [seed:alertalergo] (confirmação por `bench chip-info` no `/commission`) |
-| PSRAM da placa de referência | 8 MB (assumed: módulo N16R8; confirmação por `bench chip-info`) | [seed:alertalergo] |
+| PSRAM da placa de referência | 8 MB, octal (confirmado pelo `/commission` em 2026-11-26) | [seed:alertalergo] |
 | Codec de áudio | ES8311 por I2S | [seed:alertalergo] |
 | ESP-IDF do firmware de pesquisa e dos exemplos | v5.5.5 | [user] |
 | ESP-IDF declarado pelo componente | `>=5.5` | [user] |
@@ -259,7 +259,7 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 
 ### 4.2 Premissas
 
-- O módulo da placa de referência tem 8 MB de PSRAM (assumed, confirmado no `/commission`).
+- O módulo da placa de referência tem 8 MB de PSRAM octal (confirmado no `/commission`, 2026-11-26).
 - O pacote `espeak-ng` do Ubuntu 26.04 é 1.52.0 (`1.52.0+dfsg-5build1`), conferido em 2026-11-26.
 - O runner hospedado do GitHub Actions é gratuito para repositório público e tem memória para rodar o ASR.
 

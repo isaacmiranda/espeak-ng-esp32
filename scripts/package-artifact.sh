@@ -7,11 +7,15 @@ set -euo pipefail
 build=$1 out=$2
 [ -f "$build/flash_args" ] || { echo "no flash_args in $build" >&2; exit 1; }
 mkdir -p "$out"
-cp "$build/flash_args" "$out/"
-tail -n +2 "$build/flash_args" | while read -r _off path; do
+head -n 1 "$build/flash_args" > "$out/flash_args"
+tail -n +2 "$build/flash_args" | while read -r off path; do
   [ -n "$path" ] || continue
+  src="$build/$path"
+  # a file outside the build dir (the data image) comes inside the artifact by its name
+  case "$path" in /*|*..*) path=$(basename "$path") ;; esac
   mkdir -p "$out/$(dirname "$path")"
-  cp "$build/$path" "$out/$path"
+  cp "$src" "$out/$path"
+  echo "$off $path" >> "$out/flash_args"
 done
 {
   echo "commit: $(git rev-parse HEAD)"

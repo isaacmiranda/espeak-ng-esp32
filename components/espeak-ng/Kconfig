@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Configuration catalogue of the component (FSD §19). Options arrive with the
+# requirements that use them.
+menu "eSpeak NG (espk)"
+
+    config ESPK_PARTITION_LABEL
+        string "Data partition label"
+        default "espeak"
+
+    config ESPK_PARTITION_SUBTYPE
+        hex "Data partition subtype"
+        default 0x40
+
+    config ESPK_MOUNT_POINT
+        string "Read-only VFS mount point of the data"
+        default "/espeak"
+
+    config ESPK_DEFAULT_VOICE
+        string "Initial voice"
+        default "en"
+
+    config ESPK_MAX_TEXT_LEN
+        int "Longest text accepted, in bytes"
+        default 1024
+
+endmenu
