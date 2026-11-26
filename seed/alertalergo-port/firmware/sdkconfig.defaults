@@ -1,0 +1,57 @@
+# Fatos de plataforma do FSD (CON-HW-01, CON-SW-08). Variante: sdkconfig.<variante>.defaults.
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+# sem PSRAM o app ainda sobe, para emitir BOOT fatal=hw_mismatch (FR-PLT-02)
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+# LVGL 9 em 1 bpp (CON-SW-04); fontes embutidas provisórias até FR-UI-11
+CONFIG_LV_COLOR_DEPTH_1=y
+# malloc da libc em vez do pool estático de 64 KB: a RAM interna é curta (eSpeak
+# NG, BLE) e os blocos grandes vão para a PSRAM (> SPIRAM_MALLOC_ALWAYSINTERNAL)
+CONFIG_LV_USE_CLIB_MALLOC=y
+CONFIG_LV_FONT_MONTSERRAT_20=y
+CONFIG_LV_FONT_MONTSERRAT_28=y
+CONFIG_LV_FONT_MONTSERRAT_48=y
+# A tarefa main roda o LVGL (desenho e flush); a pilha padrão de 3584 B
+# estourou num redesenho parcial (local-iter-clock, 2026-11-07).
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+# TLS da consulta à API (FR-API-02): buffers do mbedTLS (~40 KB) na PSRAM, para a
+# heap interna livre ficar ≥ 32 KB durante a fala (FR-SPK-06)
+CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC=y
+# Pilha BLE: NimBLE, papéis observer e central (CON-SW-03); Bluedroid desligado
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_BLUEDROID_ENABLED=n
+CONFIG_BT_NIMBLE_ROLE_OBSERVER=y
+CONFIG_BT_NIMBLE_ROLE_CENTRAL=y
+CONFIG_BT_NIMBLE_ROLE_PERIPHERAL=n
+CONFIG_BT_NIMBLE_ROLE_BROADCASTER=n
+CONFIG_BT_NIMBLE_LOG_LEVEL_WARNING=y
+
+# Wi-Fi do cadastro e do provisionamento (FSD §23): a RAM interna é curta e a fala
+# exige ≥ 32 KB livres (FR-SPK-06; a margem medida em 2026-11-08 foi de 7,8 KB).
+# Buffers do Wi-Fi e do lwIP na PSRAM quando possível; sem AMPDU (a página é pequena)
+# e sem o código quente do Wi-Fi na IRAM, que sai do mesmo pool da heap.
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+CONFIG_ESP_WIFI_IRAM_OPT=n
+CONFIG_ESP_WIFI_RX_IRAM_OPT=n
+CONFIG_ESP_WIFI_AMPDU_TX_ENABLED=n
+CONFIG_ESP_WIFI_AMPDU_RX_ENABLED=n
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=6
+
+# 2026-11-12: o SoftAP não subia no provisionamento (`wifi:alloc eb len=752 fail`
+# e LoadProhibited em ieee80211_hostap_attach): faltou RAM interna (FR-NET-10,
+# FR-SPK-06). O .bss do eSpeak não pode ir para a PSRAM (SPIRAM_IGNORE_NOTFOUND,
+# FR-PLT-02, é incompatível com SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY), então sai
+# código da IRAM (mesmo pool da heap no S3) e os pools do NimBLE vão para a PSRAM.
+CONFIG_BT_CTRL_RUN_IN_FLASH_ONLY=y
+CONFIG_BT_NIMBLE_MEM_ALLOC_MODE_EXTERNAL=y
+CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
+CONFIG_RINGBUF_PLACE_FUNCTIONS_INTO_FLASH=y
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=4

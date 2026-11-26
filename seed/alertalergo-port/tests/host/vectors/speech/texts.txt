@@ -1,0 +1,10 @@
+Atenção. Paciente, jose da silva. Alergia a, dipirona.
+Atenção. Paciente, maria souza. Alergia a, penicilina.
+Atenção. Paciente, ana. Alergia a, aas.
+Atenção. Paciente, joao pereira. Alergia a, sulfametoxazol.
+Atenção. Paciente, lucia. Alergia a, ibuprofeno.
+maria souza
+Pulseira sem cadastro
+Bateria fraca. Carregue o aparelho.
+Pulseira gravada.
+Erro na gravação.

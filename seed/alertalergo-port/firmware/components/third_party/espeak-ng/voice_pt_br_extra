@@ -1,0 +1,3 @@
+// voice_pt_br_extra: linhas acrescentadas ao arquivo da voz pt-BR (diretivas do arquivo de voz do
+// eSpeak NG, ex.: `replace 1 y i`). Vazio de propósito até o responsável escolher (OD-19).
+// scripts/gen-espeak.sh as copia para data/lang/pt-br; depois, regenerar os hashes (TC-SPK-04).

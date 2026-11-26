@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software or its study, please cite it as below."
+title: "espeak-ng-esp32: eSpeak NG as a native ESP-IDF component for the ESP32-S3, with a Brazilian Portuguese intelligibility study"
+type: software
+authors:
+  - family-names: Miranda
+    given-names: Isaac
+license: GPL-3.0-or-later
+repository-code: "https://github.com/isaacmiranda/espeak-ng-esp32"
+keywords:
+  - text-to-speech
+  - eSpeak NG
+  - ESP32-S3
+  - ESP-IDF
+  - Brazilian Portuguese
+  - accessibility
+  - intelligibility
+references:
+  - type: software
+    title: "eSpeak NG"
+    version: "1.52.0"
+    repository-code: "https://github.com/espeak-ng/espeak-ng"
+    license: GPL-3.0-or-later
+    authors:
+      - name: "eSpeak NG contributors"

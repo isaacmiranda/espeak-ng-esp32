@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// pt_listx (o «pt_extra» de FR-SPK-07): pronuncia dos farmacos da lista de referencia clinica (FSD FR-SPK-07).
+// O aparelho fala o campo sem acento (FR-SLOT-01), entao a silaba tonica e os
+// hiatos que o acento marcaria vem daqui. Verbetes sem acento, em minusculas.
+// Fonte da pronuncia correta: a forma acentuada (ex.: "codeína" -> k,ode'in&).
+// $N = tonica na N-esima silaba (regras de letra-som do pt-BR para o resto).
+// Cada farmaco novo da lista (testing/manual/spk-reference-drugs.md) entra aqui;
+// scripts/gen-espeak.sh o copia para o dictsource antes de compilar.
+cefalexina $3
+nimesulida $3
+morfina $1
+carbamazepina $4
+codeina k,ode'in&
+lidocaina l,idoka'in&
+acido 'asidw
+acetilsalicilico ,asetS,iUsalis'ilikU

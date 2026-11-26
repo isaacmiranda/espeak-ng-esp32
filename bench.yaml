@@ -1,0 +1,20 @@
+# Mapa de papéis da bancada (docs/Method/project/bancada.md).
+# Versionado: papel -> como reconhecer a placa. Caminho de /dev/ttyACM* NUNCA entra aqui.
+# `serial` fica em branco até o /commission rodar `python -m bench discover` com a placa ligada
+# (nada abaixo foi lido da placa neste repositório).
+project: espeak-ng-esp32
+link_prefix: /dev/espk-           # regra udev: /dev/espk-<papel>, amarrada ao número de série
+status: unproven                  # vira `available` no /commission
+shared_with: alertalergo-v3-firmware   # a mesma placa; cada sessão regrava o próprio artefato
+audio:
+  bench_volume_ceiling: null      # teto de volume dos testes automáticos: decisão do /define (achados §2)
+roles:
+  dut:
+    board: Waveshare ESP32-S3-RLCD-4.2
+    chip: esp32s3
+    flash_mb: 16
+    psram: true
+    codec: es8311
+    vid_pid: "303a:1001"          # USB-Serial/JTAG nativo; o mesmo par no modo de gravação
+    serial: null
+    required: true

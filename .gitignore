@@ -1,0 +1,38 @@
+# build (anchored: a bare `build/` would also ignore .claude/skills/build/)
+/build/
+/build-*/
+/firmware/build/
+/managed_components/
+/firmware/managed_components/
+/sdkconfig
+/sdkconfig.old
+/firmware/sdkconfig
+/firmware/sdkconfig.old
+/dist/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# evidence and listening-study data (may identify participants: never in git)
+/test-results/
+/study-data/
+
+# research scratch from the assistant
+/research_notes/
+/reports/
+
+# secrets
+*.key
+*.pem
+.env
+/secrets/
+secrets.*
+
+# editor
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,51 @@
+
+# FSD §18.2 FR-SPK-04 — o eSpeak NG vendorizado, compilado no host, contra a
+# referência do upstream (scripts/gen-espeak.sh). Mesmas fontes do firmware.
+set(ESPK ${COMPONENTS}/third_party/espeak-ng)
+set(ESPK_U ${ESPK}/upstream/src/libespeak-ng)
+set(ESPK_D ${ESPK}/upstream/src/ucd-tools/src)
+add_library(espeak_host STATIC
+    ${ESPK_U}/common.c ${ESPK_U}/mnemonics.c ${ESPK_U}/error.c ${ESPK_U}/ieee80.c
+    ${ESPK_U}/compiledata.c ${ESPK_U}/compiledict.c
+    ${ESPK_U}/dictionary.c ${ESPK_U}/encoding.c ${ESPK_U}/intonation.c ${ESPK_U}/langopts.c
+    ${ESPK_U}/numbers.c ${ESPK_U}/phoneme.c ${ESPK_U}/phonemelist.c ${ESPK_U}/readclause.c
+    ${ESPK_U}/setlengths.c ${ESPK_U}/soundicon.c ${ESPK_U}/spect.c ${ESPK_U}/ssml.c
+    ${ESPK_U}/synthdata.c ${ESPK_U}/synthesize.c ${ESPK_U}/tr_languages.c ${ESPK_U}/translate.c
+    ${ESPK_U}/translateword.c ${ESPK_U}/voices.c ${ESPK_U}/wavegen.c ${ESPK_U}/speech.c ${ESPK_U}/espeak_api.c
+    ${ESPK_D}/case.c ${ESPK_D}/categories.c ${ESPK_D}/ctype.c ${ESPK_D}/proplist.c ${ESPK_D}/scripts.c ${ESPK_D}/tostring.c)
+target_include_directories(espeak_host PUBLIC ${ESPK}/upstream/src/include
+    PRIVATE ${ESPK}/config ${ESPK_U} ${ESPK_D}/include)
+target_compile_options(espeak_host PRIVATE -w -Wno-error -fwrapv)
+target_compile_definitions(espeak_host PUBLIC LIBESPEAK_NG_EXPORT=1 PRIVATE PATH_ESPEAK_DATA="/es")
+target_link_libraries(espeak_host PUBLIC m)
+add_executable(speech_pcm speech_pcm.c)
+target_compile_options(speech_pcm PRIVATE -Wno-error)
+target_include_directories(speech_pcm PRIVATE ${COMPONENTS}/l1_speech/include)
+target_link_libraries(speech_pcm espeak_host)
+add_test(NAME TC-SPK-04 COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/check_speech_pcm.py
+         $<TARGET_FILE:speech_pcm> ${ESPK}/data ${CMAKE_CURRENT_BINARY_DIR}/speech_pcm_out)
+
+# l2_enroll_flow — máquina do cadastro × sessão GATT (FSD §10.3, §16)
+add_executable(test_enroll_flow test_enroll_flow.c ${COMPONENTS}/l2_enroll_flow/enroll_flow.c
+               ${COMPONENTS}/l2_mode_enroll/mode_enroll.c ${COMPONENTS}/l2_at_parser/at_parser.c
+               ${COMPONENTS}/l2_at_parser/at_plan.c)
+target_include_directories(test_enroll_flow PRIVATE ${COMPONENTS}/l2_enroll_flow/include
+    ${COMPONENTS}/l2_mode_enroll/include ${COMPONENTS}/l2_at_parser/include)
+target_link_libraries(test_enroll_flow l2_slot_codec)
+foreach(n 25 26 27 28 29 30)
+    add_test(NAME TC-PRV-${n} COMMAND test_enroll_flow TC-PRV-${n})
+endforeach()
+
+# FSD FR-API-04 — classes de falha da consulta à API
+add_executable(test_api_classify test_api_classify.c ${COMPONENTS}/l1_api_client/api_classify.c)
+target_include_directories(test_api_classify PRIVATE ${COMPONENTS}/l1_api_client/include)
+add_test(NAME TC-API-08 COMMAND test_api_classify)
+
+# FSD FR-SPK-07 — pronúncia dos fármacos (pt_listx): tônica e hiatos
+add_executable(speech_phonemes speech_phonemes.c)
+target_compile_options(speech_phonemes PRIVATE -Wno-error)
+target_link_libraries(speech_phonemes espeak_host)
+add_test(NAME TC-SPK-05 COMMAND speech_phonemes ${ESPK}/data)
+
+# FSD §19 / §11.3 — vibração e LED
+add_executable(test_signal test_signal.c ${COMPONENTS}/l2_signal/signal.c ${COMPONENTS}/l2_alert_policy/alert_policy.c)

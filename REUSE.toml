@@ -1,0 +1,47 @@
+# REUSE 3.3 — licensing of files that cannot carry an SPDX header, and of vendored third-party trees.
+# Files with their own SPDX/copyright header keep it ("closest").
+version = 1
+
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Isaac Miranda and espeak-ng-esp32 contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/**"
+precedence = "closest"
+SPDX-FileCopyrightText = "eSpeak NG contributors (https://github.com/espeak-ng/espeak-ng), tag 1.52.0"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "seed/alertalergo-port/firmware/components/third_party/espeak-ng/data/**"
+precedence = "override"
+SPDX-FileCopyrightText = "eSpeak NG contributors; compiled from phsource/ and dictsource/ of the 1.52.0 tarball"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "seed/alertalergo-port/firmware/components/third_party/waveshare_rlcd/**"
+precedence = "closest"
+SPDX-FileCopyrightText = "Waveshare (https://github.com/waveshareteam/ESP32-S3-RLCD-4.2)"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = [".claude/skills/grill-me/**", ".claude/skills/define/**", ".claude/skills/harness/**", ".claude/skills/commission/**", ".claude/skills/build/**", ".claude/skills/UPSTREAM-LICENSE"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Sensors IoT (Embedded-AI-Harness); adaptations 2026 Isaac Miranda"
+SPDX-License-Identifier = "MIT"
+
+# Upstream notes: ieee80.c is also offered under BSD-2-Clause (its header); the ucd-tools tables are generated from
+# the Unicode Character Database (upstream COPYING.UCD).
+[[annotations]]
+path = "seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/src/libespeak-ng/ieee80.c"
+precedence = "override"
+SPDX-FileCopyrightText = "2022 Ulrich Müller; eSpeak NG contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later AND BSD-2-Clause"
+
+[[annotations]]
+path = ["seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/src/ucd-tools/src/case.c", "seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/src/ucd-tools/src/categories.c", "seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/src/ucd-tools/src/proplist.c", "seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstream/src/ucd-tools/src/scripts.c"]
+precedence = "override"
+SPDX-FileCopyrightText = "2012-2018 Reece H. Dunn; Unicode, Inc. (data)"
+SPDX-License-Identifier = "GPL-3.0-or-later AND Unicode-DFS-2016"
