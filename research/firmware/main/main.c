@@ -23,6 +23,12 @@
 #include "freertos/task.h"
 #include "mbedtls/sha256.h"
 
+#ifdef CONFIG_ESPK_BSS_IN_PSRAM  // the option exists only with PSRAM (FR-MEM-02)
+#define BSS_PLACE "psram"
+#else
+#define BSS_PLACE "internal"
+#endif
+
 #define CONSOLE_LINE_MAX 1100  // FR-RES-16: texts up to 1 024 bytes plus the command word
 #define CONSOLE_STACK (16 * 1024)  // the console only parses; the synthesis has its own task (FR-ASY-05)
 
@@ -370,7 +376,7 @@ void app_main(void)
     const esp_app_desc_t *app = esp_app_get_description();
     printf("ESPK boot fw=%s commit=%s idf=%s espeak=1.52.0 rate=%d bss=%s langs=%s init_ms=%lld\n",
            app->version, ESPK_COMMIT, esp_get_idf_version(), espk_sample_rate(),
-           CONFIG_ESPK_BSS_IN_PSRAM ? "psram" : "internal", langs[0] ? langs : "none",
+           BSS_PLACE, langs[0] ? langs : "none",
            init_ms);
     if (err != ESP_OK) {
         printf("ESPK error code=%s\n", esp_err_to_name(err));
