@@ -19,8 +19,8 @@ de qualquer mudança.**
 | 3 · Construção | `/build` | **Ready for shipment**: requisitos atendidos, jornada verde, reconcile vazio |
 | Liberação | tag (ato do responsável) | **Shipped**: versão publicada e jornada verde nos bytes publicados |
 
-Estado atual: **Fase 0, FSD em rascunho** (`docs/Functionality/FSD.md`, aprovação pendente; decisões abertas em
-`docs/Functionality/open-issues.md`). Próximo passo depois da aprovação: `/harness`. O que está em `seed/` é evidência,
+Estado atual: **Fase 0 concluída**: FSD aprovada (`docs/Functionality/FSD.md`; decisões abertas em
+`docs/Functionality/open-issues.md`). Próximo passo: `/harness`. O que está em `seed/` é evidência,
 não produto.
 
 ## A bancada

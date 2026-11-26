@@ -1,18 +1,18 @@
 # espeak-ng-esp32 — Especificação Funcional (FSD)
 
 ```yaml
-document_status: draft                # vira "approved" quando o responsável aprovar o portão "Load defined"
+document_status: approved
 fsd_version: 0.1.0
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
 author: Isaac Miranda (responsável); redação assistida por IA (AI-USE.md)
 reviewers: Isaac Miranda
-approval_status: pending
+approval_status: approved (Isaac Miranda, 2026-11-26)
 created: 2026-11-26
 last_updated: 2026-11-26
 change_history:
-  - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26
+  - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26; valores propostos aceitos pelo responsável no mesmo dia
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -119,7 +119,7 @@ Estes números são lidos pelo build. Cada um é uma restrição.
 | Codec de áudio | ES8311 por I2S | [seed:alertalergo] |
 | ESP-IDF do firmware de pesquisa e dos exemplos | v5.5.5 | [user] |
 | ESP-IDF declarado pelo componente | `>=5.5` | [user] |
-| ESP-IDF verificado só por build | uma versão 6.x fixada no CI (proposto: a última 6.x estável na data do `/harness`) | [user] · proposto |
+| ESP-IDF verificado só por build | uma versão 6.x fixada no CI (a última 6.x estável na data do `/harness`) | [user] |
 | eSpeak NG | 1.52.0, tarball com SHA-256 `bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23` | [user] [seed:alertalergo] |
 | Taxa de amostragem esperada | 22 050 Hz | [user] |
 | Tamanho do `espeak-ng-data` completo | ≈ 24 MB instalado (pacote Ubuntu `espeak-ng-data` 1.52.0); o valor exato da nossa imagem é medido pelo gerador | [derived] |
@@ -304,7 +304,7 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 - **FR-RES-15** [Must · user · v0.1] Uma linha de comando desconhecida deve receber `ESPK err=unknown_command`, sem
   efeito na fala em curso.
 - **FR-RES-16** [Should · user · v0.1] O firmware deve aceitar textos de até 1 024 bytes por `say` e responder
-  `ESPK err=too_long` acima disso (proposto: 1 024).
+  `ESPK err=too_long` acima disso (1 024).
 
 ### 5.3 Contratos
 
@@ -319,7 +319,7 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 | FR-RES-07 | sem sessão · `volume 11` | `err=ceiling`; volume inalterado | volume aplicado | host (parser) · target |
 | FR-RES-08 | boot | `info` mostra volume 5 | outro valor | target |
 | FR-RES-09 | `listen open 60` · `volume 60` · `listen close` · `volume 60` | aceito dentro da sessão; recusado depois | sessão sobrevivendo ao reinício | target |
-| FR-RES-10 | fala longa em curso e mais duas na fila · `cancel` | `ESPK cancelled` em ≤ 100 ms (proposto); a fila não fala | as falas da fila tocam | target |
+| FR-RES-10 | fala longa em curso e mais duas na fila · `cancel` | `ESPK cancelled` em ≤ 100 ms; a fila não fala | as falas da fila tocam | target |
 | FR-RES-11 | `say` longo | `start` antes de `done`; `cancel` aceito no meio | console bloqueado durante a fala | target |
 | FR-RES-12 | `say` | campo `underrun` presente | campo ausente | target |
 | FR-RES-13 | `ready` · `info` | campos completos e coerentes com `ESPK boot` | divergência com o boot | target |
@@ -453,11 +453,11 @@ verification:
 - **FR-COR-02** [Must · derived · v0.1] Cada item do corpus de verificação pt-BR que tem acento deve ter um item par
   sem acento, para medir as duas condições.
 - **FR-COR-03** [Must · user · v0.1] O corpus automático, usado em todos os idiomas, deve ser gerado sem texto em
-  idioma natural: os numerais `0 1 2 3 4 5 6 7 8 9 10 100 1000`, a data `2026-11-26` e a hora `14:30` (proposto).
+  idioma natural: os numerais `0 1 2 3 4 5 6 7 8 9 10 100 1000`, a data `2026-11-26` e a hora `14:30`.
 - **FR-COR-04** [Must · user · v0.1] O corpus de escuta pt-BR deve conter: as 200 palavras mais frequentes da lista
-  Leipzig pt-BR (CC BY 4.0), excluídas as palavras de uma letra (proposto: 200); 50 frases semanticamente
+  Leipzig pt-BR (CC BY 4.0), excluídas as palavras de uma letra (200); 50 frases semanticamente
   imprevisíveis geradas por modelos gramaticais a partir dessas palavras, pelo método de Benoît et al. (1996)
-  (proposto: 50); e 30 frases do dia a dia de aparelho com fala (proposto: 30).
+  (50); e 30 frases do dia a dia de aparelho com fala (30).
 - **FR-COR-05** [Should · user · v0.1] O corpus de escuta en deve conter frases semanticamente imprevisíveis geradas
   pelo mesmo método e as Harvard sentences, se a licença for confirmada (OD-03).
 - **FR-COR-06** [Must · user · v0.1] Todo arquivo de corpus deve ter licença registrada no `REUSE.toml`. Material
@@ -488,7 +488,7 @@ inteligibilidade [user].
 
 - **FR-ASR-01** [Must · user · v0.1] A cada tag de release, o CI deve sintetizar o corpus de escuta pt-BR e en no host
   (R1), em 140, 175 e 220 ppm, e transcrever cada amostra com `whisper.cpp`, com a versão e o SHA-256 do modelo
-  fixados (proposto: modelo `small` multilíngue).
+  fixados (modelo `small` multilíngue).
 - **FR-ASR-02** [Must · user · v0.1] O relatório deve dar CER e WER por idioma × velocidade × tipo de corpus, e, no
   pt-BR, também por condição (com e sem acento).
 - **FR-ASR-03** [Must · derived · v0.1] O relatório deve registrar a versão do `whisper.cpp`, o hash do modelo, o
@@ -666,7 +666,7 @@ verification:
 - **FR-CAP-07** [Must · user · v0.1] Se o pico estimado de PSRAM passar do orçamento configurado
   (`CONFIG_ESPK_PSRAM_BUDGET_KB`), o build deve falhar.
 - **FR-CAP-08** [Must · user · v0.1] Se a imagem ou o pico de PSRAM passar de 90 % do limite, o build deve emitir um
-  aviso e seguir (proposto: 90 %).
+  aviso e seguir (90 %).
 - **FR-CAP-09** [Must · user · v0.1] Os tamanhos do relatório devem ser calculados a partir dos arquivos compilados no
   próprio build, não de uma tabela mantida à mão.
 - **FR-CAP-10** [Must · derived · v0.1] Em uso, `espk_init()` deve conferir a PSRAM livre antes de carregar os dados e
@@ -740,12 +740,12 @@ verification:
   padrões do upstream.
 - **FR-SYN-08** [Must · derived · v0.1] `espk_set_rate()` fora do intervalo do upstream (80 a 450 ppm) deve devolver
   `ESP_ERR_INVALID_ARG` sem mudar a velocidade.
-- **FR-SYN-09** [Must · user · v0.1] Um texto maior que `CONFIG_ESPK_MAX_TEXT_LEN` (padrão 1 024 bytes, proposto)
+- **FR-SYN-09** [Must · user · v0.1] Um texto maior que `CONFIG_ESPK_MAX_TEXT_LEN` (padrão 1 024 bytes)
   deve ser recusado com `ESP_ERR_INVALID_SIZE`.
 - **FR-SYN-10** [Must · derived · v0.1] Uma chamada a `espk_synth()` de outra tarefa enquanto uma síntese está em
   curso deve devolver `ESP_ERR_INVALID_STATE`.
 - **FR-SYN-11** [Must · derived · v0.1] `espk_deinit()` seguido de `espk_init()` deve deixar o componente pronto, com
-  a mesma heap livre de antes, numa tolerância de 1 KB (proposto).
+  a mesma heap livre de antes, numa tolerância de 1 KB.
 - **NFR-SYN-01** [Must · user · v0.1] Na placa de referência, sem carga (`idle`), com a `.bss` no modo padrão, o RTF
   de cada item do corpus de verificação pt-BR a 175 ppm deve ser ≤ 0,5.
 - **NFR-SYN-02** [Must · user · v0.1] Nas mesmas condições, o tempo do pedido até o primeiro callback deve ser
@@ -753,7 +753,7 @@ verification:
 - **NFR-SYN-03** [Must · pack:esp32 · v0.1] A síntese do texto de mais de 500 caracteres do corpus não deve disparar o
   task watchdog com o tempo padrão do ESP-IDF (5 s).
 - **NFR-SYN-04** [Must · user · v0.1] 50 sínteses seguidas do corpus de verificação pt-BR, em `idle`, devem terminar
-  sem reinício, sem watchdog e com a heap interna livre final a até 1 KB da inicial (proposto).
+  sem reinício, sem watchdog e com a heap interna livre final a até 1 KB da inicial.
 
 ### 14.3 Contratos
 
@@ -768,7 +768,7 @@ verification:
     - espk_synth() devolve ESPK_ERR_CANCELLED.
     - O callback foi chamado exatamente 3 vezes.
     - Uma espk_synth() seguinte com outro texto dá o hash R1 desse texto.
-  timing: o retorno ocorre em até 100 ms depois do callback que devolveu false (proposto)
+  timing: o retorno ocorre em até 100 ms depois do callback que devolveu false
   tolerance: nenhuma
   prohibited_outcomes:
     - Callback chamado depois de devolver false.
@@ -816,32 +816,32 @@ Estados: `UNINIT`, `IDLE`, `SPEAKING`, `CANCELLING`.
 | `IDLE` | `say` | fila com vaga | `SPEAKING` | enfileira; evento `START` | — |
 | `IDLE` | `say` | texto grande demais | `IDLE` | `ESP_ERR_INVALID_SIZE` | — |
 | `IDLE` | `cancel` | — | `IDLE` | sem efeito; `ESP_OK` | — |
-| `IDLE` | `espk_deinit` | — | `UNINIT` | encerra tarefa | ≤ 100 ms (proposto) |
+| `IDLE` | `espk_deinit` | — | `UNINIT` | encerra tarefa | ≤ 100 ms |
 | `SPEAKING` | `say` | fila com vaga | `SPEAKING` | enfileira | — |
 | `SPEAKING` | `say` | fila cheia | `SPEAKING` | `ESP_ERR_NO_MEM`; nada muda | — |
 | `SPEAKING` | fim do texto | fila vazia | `IDLE` | evento `DONE` | — |
 | `SPEAKING` | fim do texto | fila com item | `SPEAKING` | evento `DONE`; evento `START` do próximo | — |
 | `SPEAKING` | `cancel` | — | `CANCELLING` | pede parada; esvazia a fila | — |
 | `SPEAKING` | erro do motor | — | `IDLE` | evento `ERROR`; esvazia a fila | — |
-| `SPEAKING` | `espk_deinit` | — | `CANCELLING` → `UNINIT` | cancela, encerra | ≤ 100 ms (proposto) |
-| `CANCELLING` | síntese parou | — | `IDLE` | evento `CANCELLED` | ≤ 100 ms do `cancel` (proposto) |
+| `SPEAKING` | `espk_deinit` | — | `CANCELLING` → `UNINIT` | cancela, encerra | ≤ 100 ms |
+| `CANCELLING` | síntese parou | — | `IDLE` | evento `CANCELLED` | ≤ 100 ms do `cancel` |
 | `CANCELLING` | `say` | — | `CANCELLING` | enfileira para depois do `CANCELLED` | — |
 | `CANCELLING` | `cancel` | — | `CANCELLING` | ignorado; `ESP_OK` | — |
 
 ### 15.3 Requisitos
 
 - **FR-ASY-01** [Must · user · v0.1] `espk_say()` deve enfileirar o texto e voltar sem esperar a síntese, em até 5 ms
-  (proposto).
+ .
 - **FR-ASY-02** [Must · user · v0.1] A camada deve emitir, pelo callback de eventos, `START`, `DONE`, `CANCELLED` e
   `ERROR`, cada um com o id do pedido. O `DONE` traz o número de amostras, `synth_ms` e `first_ms`.
 - **FR-ASY-03** [Must · user · v0.1] `espk_cancel()` deve levar ao evento `CANCELLED` do pedido em curso em até
-  100 ms (proposto) e descartar os pedidos da fila.
-- **FR-ASY-04** [Must · derived · v0.1] Com a fila cheia (`CONFIG_ESPK_QUEUE_LEN`, padrão 4, proposto),
+  100 ms e descartar os pedidos da fila.
+- **FR-ASY-04** [Must · derived · v0.1] Com a fila cheia (`CONFIG_ESPK_QUEUE_LEN`, padrão 4),
   `espk_say()` deve devolver `ESP_ERR_NO_MEM` sem alterar a fila.
 - **FR-ASY-05** [Must · user · v0.1] A pilha da tarefa deve ter o tamanho de `CONFIG_ESPK_TASK_STACK` (padrão
   65 536 B [seed:alertalergo]) e ficar na PSRAM quando `CONFIG_ESPK_TASK_STACK_PSRAM` estiver ligado (padrão ligado).
 - **FR-ASY-06** [Must · derived · v0.1] O build deve falhar com `CONFIG_ESPK_TASK_STACK` abaixo de 49 152 B
-  (proposto: o uso medido na semente, ~39 KB, mais 25 %).
+  (o uso medido na semente, ~39 KB, mais 25 %).
 - **FR-ASY-07** [Must · derived · v0.1] O PCM entregue pela camada assíncrona deve ser igual, bit a bit, ao do núcleo
   síncrono para o mesmo texto e a mesma voz.
 - **FR-ASY-08** [Must · derived · v0.1] Com `CONFIG_ESPK_ASYNC` desligado, `espk_say()` e `espk_cancel()` devem
@@ -906,7 +906,7 @@ verification:
 | FR-MEM-01 | firmware de teste com PSRAM desligada · `espk_init` | `ESP_ERR_NOT_SUPPORTED`; nada alocado | pânico; dados na RAM interna | target |
 | FR-MEM-02 | build padrão | símbolos `phoneme_list`, `frame_pool`, `echo_buf` em `extram_bss` no `.map` | patch na fonte do upstream | host |
 | FR-MEM-03 | os dois builds · perfis | tabela completa | modo sem medida | bench |
-| FR-MEM-04 | init · `heap_caps_get_info` | PSRAM livre cai pelo pico do relatório (± 5 %, proposto); RAM interna não | dados na RAM interna | target |
+| FR-MEM-04 | init · `heap_caps_get_info` | PSRAM livre cai pelo pico do relatório (± 5 %); RAM interna não | dados na RAM interna | target |
 | FR-MEM-05 | boot | `init_ms` em `ESPK boot` e no relatório | medida ausente | target |
 
 ---
@@ -948,7 +948,7 @@ verification:
 - **CON-PLT-01** [Must · user · v0.1] O firmware de pesquisa e os exemplos devem compilar com o ESP-IDF v5.5.5,
   chamado por `scripts/idf.sh`.
 - **CON-PLT-02** [Must · user · v0.1] O manifesto do componente deve declarar `idf: ">=5.5"` e os `targets` `esp32`,
-  `esp32s2`, `esp32s3` e `esp32p4` (proposto: esses quatro; outros chips com PSRAM entram por contribuição com
+  `esp32s2`, `esp32s3` e `esp32p4` (esses quatro; outros chips com PSRAM entram por contribuição com
   evidência).
 - **CON-PLT-03** [Must · user · v0.1] O exemplo `hello` deve compilar no CI também com a versão 6.x fixada de §2.2.
 - **CON-PLT-04** [Must · user · v0.1] O README deve dizer, por chip, o nível de suporte: "verificado na placa" (só o
@@ -979,17 +979,17 @@ verification:
 | `CONFIG_ESPK_LANGUAGES` | `en` | [user] |
 | `CONFIG_ESPK_LANGUAGES_ALL` | desligado | [user] |
 | `CONFIG_ESPK_DEFAULT_VOICE` | `en` | [user] |
-| `CONFIG_ESPK_PSRAM_BUDGET_KB` | 2 048 | proposto |
-| `CONFIG_ESPK_CAPACITY_WARN_PCT` | 90 | proposto |
+| `CONFIG_ESPK_PSRAM_BUDGET_KB` | 2 048 | [user] |
+| `CONFIG_ESPK_CAPACITY_WARN_PCT` | 90 | [user] |
 | `CONFIG_ESPK_BSS_IN_PSRAM` | ligado | [user] |
 | `CONFIG_ESPK_UCD_WRAP` | ligado se a F2 confirmar a #1611 | [user] |
 | `CONFIG_ESPK_ASYNC` | ligado | [user] |
 | `CONFIG_ESPK_TASK_STACK` | 65 536 | [seed:alertalergo] |
 | `CONFIG_ESPK_TASK_STACK_PSRAM` | ligado | [user] |
-| `CONFIG_ESPK_TASK_PRIORITY` | 5 | proposto |
-| `CONFIG_ESPK_TASK_CORE` | sem afinidade | proposto |
-| `CONFIG_ESPK_QUEUE_LEN` | 4 | proposto |
-| `CONFIG_ESPK_MAX_TEXT_LEN` | 1 024 | proposto |
+| `CONFIG_ESPK_TASK_PRIORITY` | 5 | [user] |
+| `CONFIG_ESPK_TASK_CORE` | sem afinidade | [user] |
+| `CONFIG_ESPK_QUEUE_LEN` | 4 | [user] |
+| `CONFIG_ESPK_MAX_TEXT_LEN` | 1 024 | [user] |
 
 - **FR-CFG-01** [Must · derived · v0.1] Cada opção do catálogo deve existir no `Kconfig` do componente com o padrão da
   tabela.
@@ -1188,7 +1188,7 @@ Uma execução comum, de ponta a ponta, sobre os bytes do artefato do CI de uma 
 3. `say` de um item do corpus de verificação pt-BR → `ESPK start`, `ESPK done` com `underrun=0`.
 4. Hash desse item igual ao de R1.
 5. `voice en`, `say` de um item en → hash igual ao de R1.
-6. `cancel` no meio de uma fala longa → `ESPK cancelled` em ≤ 100 ms (proposto).
+6. `cancel` no meio de uma fala longa → `ESPK cancelled` em ≤ 100 ms.
 
 A partir da v0.2, a jornada ganha o passo 7: `load all` e os passos 3 e 4 de novo, com `heap_min` ≥ 24 576 B.
 
@@ -1221,7 +1221,7 @@ relatório de lacunas. Esta FSD não tem coluna de situação.
 | `ESP_ERR_INVALID_STATE` | fora do estado exigido |
 | `ESP_ERR_INVALID_ARG` | parâmetro fora do intervalo |
 | `ESP_ERR_INVALID_SIZE` | texto acima do limite |
-| `ESPK_ERR_CANCELLED` | síntese cancelada (base própria do componente, `0x7E00`, proposto) |
+| `ESPK_ERR_CANCELLED` | síntese cancelada (base própria do componente, `0x7E00`) |
 
 ## Relacionados
 

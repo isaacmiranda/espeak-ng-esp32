@@ -1,6 +1,6 @@
 # espeak-ng-esp32 — Manual
 
-> **Status:** nada é operável ainda. A FSD está em rascunho; os capítulos abaixo são preenchidos pelo `/build`.
+> **Status:** nada é operável ainda. A FSD está aprovada; os capítulos abaixo são preenchidos pelo `/build`.
 
 ## 1. Integrar o componente num projeto ESP-IDF
 
