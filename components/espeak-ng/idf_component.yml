@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Manifest of the component for the ESP Component Registry (FSD CON-PLT-02).
+version: "0.1.0"
+description: "eSpeak NG 1.52 as a native ESP-IDF component: text to speech for ESP32 chips with PSRAM"
+url: https://github.com/isaacmiranda/espeak-ng-esp32
+license: GPL-3.0-or-later
+targets:
+  - esp32
+  - esp32s2
+  - esp32s3
+  - esp32p4
+dependencies:
+  idf: ">=5.5"

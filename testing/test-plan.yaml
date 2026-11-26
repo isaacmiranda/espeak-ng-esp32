@@ -299,7 +299,7 @@ tests:
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-REF-03, FR-ENG-04]
+    verifies: [FR-REF-03, FR-ENG-04, FR-SYN-01]
     needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/target/test_equivalence.py::test_board_pcm_equals_r1_over_the_verification_corpus"
     status: successful
@@ -766,3 +766,91 @@ tests:
     impl: "tests/target/test_data.py::test_a_corrupted_image_gets_invalid_crc_and_the_engine_is_not_started"
     status: successful
     result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
+  - id: TC-NFR-SYN-01
+    title: "Every pt-BR corpus item synthesises at RTF <= 0.5 and sentences of <= 20 words start within 300 ms"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [NFR-SYN-01, NFR-SYN-02]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_performance.py::test_every_item_synthesises_at_half_real_time_or_better_and_starts_within_300_ms"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-NFR-SYN-03
+    title: "The longest corpus text (> 500 characters) synthesises with the default watchdog and no reset"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [NFR-SYN-03]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_performance.py::test_the_longest_text_does_not_trigger_the_watchdog"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-NFR-SYN-04
+    title: "50 syntheses in a row: no reset, the internal heap free at the end within 1 KB of the start"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [NFR-SYN-04]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_performance.py::test_fifty_syntheses_in_a_row_leave_the_internal_heap_where_it_was"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-RES-04
+    title: "say --mute and say give the same PCM hash (each equal to R1's in the same sequence)"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-04]
+    needs: [dut, bench-flash, bench-command, r1-host-reference]
+    impl: "tests/target/test_performance.py::test_mute_and_sound_give_the_same_pcm_hash"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ENG-03
+    title: "Only the synchronous runtime is compiled: no MBROLA, Klatt, speech player, sonic, fifo or event object in the map"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-ENG-03]
+    needs: []
+    impl: "tests/host/test_build_facts.py::test_only_the_synchronous_runtime_is_compiled"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-PLT-01
+    title: "scripts/idf.sh pins ESP-IDF v5.5.5, the FSD's value, and that tree is v5.5.5"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-PLT-01]
+    needs: []
+    impl: "tests/host/test_build_facts.py::test_the_engine_is_built_with_the_pinned_idf_through_the_wrapper"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-PLT-02
+    title: "The component manifest declares idf >=5.5 and the targets esp32, esp32s2, esp32s3, esp32p4"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-PLT-02]
+    needs: []
+    impl: "tests/host/test_build_facts.py::test_the_component_manifest_declares_the_idf_and_the_four_targets"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-PLT-05
+    title: "partitions.csv equals the FSD partition table; espeak takes the rest of the 16 MB flash"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-PLT-05]
+    needs: []
+    impl: "tests/host/test_build_facts.py::test_the_partition_table_is_the_one_of_the_fsd"
+    status: not done
+    reason: "not implemented: the test has not run yet"
