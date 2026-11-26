@@ -210,3 +210,25 @@ tests:
     impl: "tests/host/test_corpus_verify.py::test_accented_items_have_unaccented_pairs"
     status: successful
     result: {commit: 9ba5ca3, date: 2026-11-26, run: "local pytest tests/host"}
+  - id: TC-DAT-07
+    title: "The image generator gives the same bytes from the same data and voice list"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DAT-07]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_image.py::test_image_is_deterministic"
+    status: not done
+    reason: not implemented
+  - id: TC-DAT-05-host
+    title: "The reference reader gets back every file of the image byte for byte; header and table follow FSD Appendix A"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DAT-05]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_image.py::test_image_round_trip_and_layout"
+    status: not done
+    reason: not implemented

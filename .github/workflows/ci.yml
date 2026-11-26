@@ -22,7 +22,7 @@ jobs:
         with:
           path: ~/.cache/espk
           key: espk-r1-${{ hashFiles('components/espeak-ng/tools/upstream.env', 'tools/ref/pcm_dump.c') }}
-      - run: ruff check tools tests conftest.py
+      - run: ruff check components tools tests conftest.py
       - run: reuse lint
       - run: pytest -q tools/bench tests/host
   firmware:

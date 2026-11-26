@@ -57,7 +57,8 @@ def test_accented_items_have_unaccented_pairs():
     pairs = {i["pair"]: i for i in items if i["pair"] != "-"}
     for a in accented:
         assert a["id"] in pairs, f"{a['id']} has no unaccented pair"
-        assert pairs[a["id"]]["text"] == strip_accents(a["text"]), f"pair of {a['id']} is not the stripped text"
+        pair = pairs[a["id"]]["text"]
+        assert pair == strip_accents(a["text"]), f"pair of {a['id']} is not the stripped text"
     for p in pairs.values():
         assert p["pair"] in by_id, f"{p['id']} points at a missing item"
         assert not set(p["text"]) & PT_ACCENTED
