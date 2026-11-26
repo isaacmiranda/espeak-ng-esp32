@@ -610,8 +610,8 @@ tests:
     verifies: [FR-MEM-02]
     needs: []
     impl: "tests/host/test_bss.py::test_the_engine_statics_are_placed_in_psram"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 8059eb0, date: 2026-11-26, run: "artifact of 8059eb0 flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host/test_bss.py on research/firmware/build"}
   - id: TC-MEM-04
     title: "The boot line says bss=psram; an init costs the PSRAM 600 KB or more and the internal heap 24 KB at most; init_ms is reported"
     shape: atomic
@@ -621,5 +621,5 @@ tests:
     verifies: [FR-MEM-02, FR-MEM-04, FR-MEM-05]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 8059eb0, date: 2026-11-26, run: "artifact of 8059eb0 flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host/test_bss.py on research/firmware/build"}
