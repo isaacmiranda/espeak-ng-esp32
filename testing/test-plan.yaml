@@ -197,8 +197,8 @@ tests:
     verifies: [FR-COR-01]
     needs: []
     impl: "tests/host/test_corpus_verify.py::test_size_and_categories"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 9ba5ca3, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-COR-02
     title: "Every accented pt-BR verification item has an unaccented pair"
     shape: atomic
@@ -208,5 +208,5 @@ tests:
     verifies: [FR-COR-02]
     needs: []
     impl: "tests/host/test_corpus_verify.py::test_accented_items_have_unaccented_pairs"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 9ba5ca3, date: 2026-11-26, run: "local pytest tests/host"}
