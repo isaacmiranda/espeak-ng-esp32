@@ -709,8 +709,8 @@ tests:
     verifies: [FR-CFG-01]
     needs: []
     impl: "tests/host/test_kconfig.py::test_the_kconfig_has_every_catalogue_option_with_its_default"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
   - id: TC-CFG-02
     title: "With another mount point configured the data are read there, nothing at the default point"
     shape: atomic
@@ -720,8 +720,8 @@ tests:
     verifies: [FR-CFG-02]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_variants.py::test_the_configured_mount_point_is_the_one_used"
-    status: not done
-    reason: "not implemented: the mount variant is not built yet (scripts/variants.sh mount)"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "mount variant of c7f023e built by scripts/variants.sh, flashed with bench flash, pytest tests/target/test_variants.py --run-bench"}
   - id: TC-ERR-01
     title: "Hostile console input never resets the board and it still speaks afterwards"
     shape: atomic
@@ -731,8 +731,8 @@ tests:
     verifies: [FR-ERR-01]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_robustness.py::test_hostile_console_input_never_resets_the_board"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
   - id: TC-SEC-01
     title: "A text above the limit is refused on espk_synth() with INVALID_SIZE and the next synthesis equals R1"
     shape: atomic
@@ -742,8 +742,8 @@ tests:
     verifies: [FR-SEC-01, FR-ERR-02]
     needs: [dut, bench-flash, bench-command, r1-host-reference]
     impl: "tests/target/test_robustness.py::test_a_text_over_the_limit_is_refused_on_the_sync_entry_and_the_next_synthesis_is_clean"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
   - id: TC-LOG-01
     title: "Every marker is one ESPK line of key=value fields and keeps its field order (new fields only at the end)"
     shape: atomic
@@ -753,8 +753,8 @@ tests:
     verifies: [FR-LOG-01]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_robustness.py::test_the_markers_keep_their_format_and_field_order"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
   - id: TC-LOG-02
     title: "The component logs each espk_init() error with its code and reason under the tag espk"
     shape: atomic
@@ -764,5 +764,5 @@ tests:
     verifies: [FR-LOG-02]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_data.py::test_a_corrupted_image_gets_invalid_crc_and_the_engine_is_not_started"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: c7f023e, date: 2026-11-26, run: "artifact of c7f023e flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}
