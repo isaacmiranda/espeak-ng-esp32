@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-DAT-01: a variant that looks for the right label with another subtype (0x41, the table has 0x40).
+CONFIG_ESPK_PARTITION_SUBTYPE=0x41

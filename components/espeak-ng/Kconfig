@@ -22,6 +22,7 @@ menu "eSpeak NG (espk)"
     config ESPK_BSS_IN_PSRAM
         bool "Place the engine's .bss in PSRAM (about 60 KB of internal RAM freed)"
         default y
+        depends on SPIRAM
         select SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
         help
             Done by a linker fragment over the upstream's objects; the sources stay untouched.

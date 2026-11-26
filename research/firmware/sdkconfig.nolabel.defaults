@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-DAT-02: a variant that looks for a partition label the table does not have.
+CONFIG_ESPK_PARTITION_LABEL="nope"

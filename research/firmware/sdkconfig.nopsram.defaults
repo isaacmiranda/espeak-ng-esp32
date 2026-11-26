@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-MEM-01: a variant built without PSRAM (the board has it; the firmware must refuse, not crash).
+# CONFIG_SPIRAM is not set
+# CONFIG_ESPK_BSS_IN_PSRAM is not set

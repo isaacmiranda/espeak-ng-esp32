@@ -1,3 +1,6 @@
 build-intact/
 build-sync/
 build-trace/
+build-nolabel/
+build-nosubtype/
+build-nopsram/

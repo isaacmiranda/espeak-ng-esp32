@@ -632,8 +632,8 @@ tests:
     verifies: [FR-DAT-03]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_data.py::test_a_corrupted_image_gets_invalid_crc_and_the_engine_is_not_started"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ba1ca56, date: 2026-11-26, run: "artifact of ba1ca56 flashed with bench flash; pytest tests/target/test_data.py --run-bench (the artifact is restored by the fixture's cleanup)"}
   - id: TC-DAT-03-magic
     title: "A magic other than ESPK gets ESP_ERR_INVALID_CRC"
     shape: atomic
@@ -643,8 +643,8 @@ tests:
     verifies: [FR-DAT-03]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_data.py::test_a_wrong_magic_gets_invalid_crc"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ba1ca56, date: 2026-11-26, run: "artifact of ba1ca56 flashed with bench flash; pytest tests/target/test_data.py --run-bench (the artifact is restored by the fixture's cleanup)"}
   - id: TC-DAT-04
     title: "An image for another engine version gets ESP_ERR_INVALID_VERSION"
     shape: atomic
@@ -654,8 +654,8 @@ tests:
     verifies: [FR-DAT-04]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_data.py::test_another_engine_version_gets_invalid_version"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ba1ca56, date: 2026-11-26, run: "artifact of ba1ca56 flashed with bench flash; pytest tests/target/test_data.py --run-bench (the artifact is restored by the fixture's cleanup)"}
   - id: TC-DAT-05
     title: "The VFS serves open, fstat, read, lseek and close with the image's bytes; write and create fail with EROFS"
     shape: atomic
@@ -665,5 +665,38 @@ tests:
     verifies: [FR-DAT-05, FR-DAT-06]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_data.py::test_the_vfs_serves_every_file_of_the_image_read_only"
+    status: successful
+    result: {commit: ba1ca56, date: 2026-11-26, run: "artifact of ba1ca56 flashed with bench flash; pytest tests/target/test_data.py --run-bench (the artifact is restored by the fixture's cleanup)"}
+  - id: TC-DAT-02
+    title: "Without the configured partition label espk_init() gives ESP_ERR_NOT_FOUND and nothing is loaded"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-02, FR-DAT-01]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_variants.py::test_a_missing_partition_label_gets_not_found"
     status: not done
-    reason: "not implemented: the test has not run yet"
+    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
+  - id: TC-DAT-01
+    title: "The partition is found by label and subtype: the right label with another subtype is not found"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-DAT-01]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_variants.py::test_a_wrong_partition_subtype_gets_not_found"
+    status: not done
+    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
+  - id: TC-MEM-01
+    title: "A build without PSRAM: espk_init() gives ESP_ERR_NOT_SUPPORTED, nothing is loaded, no panic"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-MEM-01]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_variants.py::test_a_build_without_psram_is_refused_without_loading_the_engine"
+    status: not done
+    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
