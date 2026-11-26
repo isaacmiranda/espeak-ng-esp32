@@ -164,8 +164,8 @@ tests:
     verifies: [CON-ENG-01]
     needs: []
     impl: "tests/host/test_upstream.py::test_wrong_tarball_is_refused_before_extraction"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-ENG-02
     title: "Running the regeneration script again leaves components/espeak-ng/upstream/ byte-identical (git diff empty)"
     shape: atomic
@@ -175,8 +175,8 @@ tests:
     verifies: [CON-ENG-02]
     needs: []
     impl: "tests/host/test_upstream.py::test_regeneration_is_idempotent"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-REF-01
     title: "R1 gives one PCM SHA-256 and one phoneme transcription per item x language, from the tarball-built upstream"
     shape: atomic
@@ -186,5 +186,5 @@ tests:
     verifies: [FR-REF-01]
     needs: []
     impl: "tests/host/test_r1.py::test_r1_hash_and_phonemes_per_item_and_language"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
