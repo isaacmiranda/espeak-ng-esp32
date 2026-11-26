@@ -66,3 +66,17 @@ def test_unknown_command_gets_a_marker(flashed):
     board.boot()
     m, _p = board.command("xyzzy", r"^ESPK error")
     assert m.fields == {"code": "unknown_command"}
+
+
+def test_default_volume_5_and_ceiling_10(flashed):
+    """FR-RES-07, FR-RES-08 on the board: after a reset the volume is 5; 11 is refused and changes nothing."""
+    ms, p = board.boot()
+    assert "ready" in ms, p.stdout
+    m, _p = board.command("volume", r"^ESPK volume")
+    assert m.fields == {"ok": "5"}
+    m, _p = board.command("volume 10", r"^ESPK volume")
+    assert m.fields == {"ok": "10"}
+    m, _p = board.command("volume 11", r"^ESPK volume")
+    assert m.fields == {"err": "ceiling"}
+    m, _p = board.command("volume", r"^ESPK volume")
+    assert m.fields == {"ok": "10"}

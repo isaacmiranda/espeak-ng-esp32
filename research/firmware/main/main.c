@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Composition root of the research firmware (FSD §5): the component, the console and the
-// markers. Cancel, the volume commands and load profiles arrive with their requirements.
+// markers. Cancel and load profiles arrive with their requirements.
 #include <stdio.h>
 #include <string.h>
 
@@ -8,6 +8,7 @@
 #include "driver/usb_serial_jtag_vfs.h"
 #include "esp_app_desc.h"
 #include "espk_audio.h"
+#include "espk_volume.h"
 #include "esp_heap_caps.h"
 #include "esp_idf_version.h"
 #include "esp_timer.h"
@@ -20,7 +21,6 @@
 #define CONSOLE_LINE_MAX 1100  // FR-RES-16: texts up to 1 024 bytes plus the command word
 #define SYNTH_STACK (64 * 1024)  // CONFIG_ESPK_TASK_STACK default (FSD §19), in PSRAM
 
-#define DEFAULT_VOLUME 5  // FR-RES-08 (the volume command and the ceiling come with FR-RES-07)
 
 typedef struct {
     mbedtls_sha256_context sha;
@@ -31,6 +31,7 @@ typedef struct {
 
 static unsigned s_id;
 static bool s_audio_ok;
+static espk_vol_t s_vol;  // FR-RES-07, 08, 09
 
 static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
 {
@@ -61,7 +62,7 @@ static void cmd_say(const char *text, bool sound)
         return;
     }
     say_ctx_t c = {.sound = sound};
-    if (sound && (!s_audio_ok || espk_aud_open(DEFAULT_VOLUME, espk_sample_rate()) != ESP_OK)) {
+    if (sound && (!s_audio_ok || espk_aud_open(s_vol.vol, espk_sample_rate()) != ESP_OK)) {
         printf("ESPK error code=no_audio\n");
         return;
     }
@@ -95,7 +96,10 @@ static void cmd_say(const char *text, bool sound)
 
 static void dispatch(char *line)
 {
-    if (strncmp(line, "say --mute ", 11) == 0) {
+    char reply[64];
+    if (espk_vol_handle(&s_vol, line, reply, sizeof reply)) {
+        printf("%s\n", reply);
+    } else if (strncmp(line, "say --mute ", 11) == 0) {
         cmd_say(line + 11, false);
     } else if (strncmp(line, "say ", 4) == 0) {
         cmd_say(line + 4, true);
@@ -150,6 +154,7 @@ void app_main(void)
     usb_serial_jtag_vfs_use_driver();
     setvbuf(stdin, NULL, _IONBF, 0);
 
+    espk_vol_init(&s_vol);
     s_audio_ok = espk_aud_init() == ESP_OK;  // FR-ERR-01: a missing codec is reported, not fatal
     int64_t t0 = esp_timer_get_time();
     esp_err_t err = espk_init(NULL);

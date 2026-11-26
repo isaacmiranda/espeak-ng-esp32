@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-idf_component_register(SRCS "main.c"
+idf_component_register(SRCS "main.c" "espk_volume.c"
                        PRIV_REQUIRES espeak-ng audio_es8311 esp_app_format esp_driver_usb_serial_jtag esp_timer mbedtls heap)
 # The short commit the artifact was built from goes into the boot marker (FSD FR-RES-01).
 execute_process(COMMAND git rev-parse --short=7 HEAD
