@@ -522,8 +522,8 @@ tests:
     verifies: [FR-SYN-04]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_a_second_init_is_refused_and_changes_nothing"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-05
     title: "espk_synth() before espk_init() (after espk_deinit()) gives ESP_ERR_INVALID_STATE; init brings it back"
     shape: atomic
@@ -533,8 +533,8 @@ tests:
     verifies: [FR-SYN-05]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_synth_without_init_is_refused_and_init_brings_it_back"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-11
     title: "espk_deinit() then espk_init(): ready, the PCM equals R1 from a clean start, the heap cost per cycle is bounded (1 500 B)"
     shape: atomic
@@ -544,8 +544,8 @@ tests:
     verifies: [FR-SYN-11]
     needs: [dut, bench-flash, bench-command, r1-host-reference]
     impl: "tests/target/test_core.py::test_deinit_then_init_is_ready_and_says_what_r1_says"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-11-heap
     title: "espk_deinit() then espk_init() returns the internal heap to its previous level within 1 KB"
     shape: atomic
@@ -555,8 +555,8 @@ tests:
     verifies: [FR-SYN-11]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_deinit_then_init_returns_the_internal_heap_within_1_kb"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: failed
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench", cause: "upstream espeak-ng 1.52.0 leaks one voice_t (1344 B) per init/deinit cycle (DoVoiceChange in synthesize.c, never freed by espeak_ng_Terminate); measured 1348 B per cycle with and without the async layer (heap trace, 2026-11-26); the xfail(strict) flips if upstream fixes it"}
   - id: TC-SYN-03
     title: "The callback returning false at the 3rd block stops the synthesis with ESPK_ERR_CANCELLED after exactly 3 calls"
     shape: atomic
@@ -566,8 +566,8 @@ tests:
     verifies: [FR-SYN-03]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_the_callback_returning_false_stops_the_synthesis"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-07
     title: "Defaults after boot: 175 ppm, pitch 50, 22 050 Hz, volume 5; info complete and coherent with boot; a refused rate changes nothing; rate 220 is faster"
     shape: atomic
@@ -577,8 +577,8 @@ tests:
     verifies: [FR-SYN-07, FR-SYN-02, FR-SYN-08, FR-RES-06, FR-RES-13]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_defaults_info_and_rate"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-14
     title: "mem reports four numbers in bytes"
     shape: atomic
@@ -588,8 +588,8 @@ tests:
     verifies: [FR-RES-14]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_mem_reports_four_numbers"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-10
     title: "espk_synth() during a synthesis in progress gives ESP_ERR_INVALID_STATE"
     shape: atomic
@@ -599,5 +599,5 @@ tests:
     verifies: [FR-SYN-10]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_a_sync_synth_during_a_say_is_refused"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
