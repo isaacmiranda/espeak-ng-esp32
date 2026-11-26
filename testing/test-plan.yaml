@@ -66,16 +66,19 @@ capabilities:
     available: yes
     observed: {date: 2026-11-26, found: "alertalergo 0.0.1-dev.309+g60b6894", left: "espk_research 225e9f8 (CI run 45861574416 artifact)", psram: "8MB octal (AP)"}
     note: "shared with alertalergo-v3-firmware: record the firmware found before flashing and the one left after"
+    data: "ESPK ready with the ESPK image (pt-br, en; 904 477 B) at 0x620000, init_ms=168"
     limitation: "every open of the port used to reset the board (DTR lowered before RTS); fixed in tools/bench/bench/ports.py — a reset during a test is a bench fault first"
   audio-out:
     what: "ES8311/I2S plays a test tone at bench volume 5 and the firmware reports underrun=0"
     available: unproven
   pcm-capture:
     what: "the firmware hashes the PCM delivered to the callback (ESPK done … sha256=) — the R3 seam"
-    available: unproven
+    available: yes
+    observed: {date: 2026-11-26, commit: cbfa055, evidence: "fresh boot, en, same text 3x: board 4b81fb1cace6/05bf1174dec5/1264807fb7a6 = host R1 sequence; unaccented pt-BR first: 8eea77ff7591 = R1"}
   r1-host-reference:
     what: "upstream 1.52.0 built on the host from the pinned tarball produces PCM hashes and phonemes"
-    available: unproven
+    available: yes
+    observed: {date: 2026-11-26, commit: 4d2fd9a, evidence: "TC-REF-01 successful; R1 CLI = Ubuntu espeak-ng CLI bit for bit"}
   espeak-ng-system:
     what: "Ubuntu package espeak-ng 1.52.0+dfsg-5build1 installed on the bench notebook and in CI (R2)"
     available: yes
@@ -96,8 +99,8 @@ tests:
     verifies: [FR-RES-01, FR-BLD-04]
     needs: [dut, bench-flash, bench-wait-event, release-verification]
     impl: "tests/bench/test_journey.py::test_jrn_01_boot_carries_the_artifact_commit"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: JRN-02
     title: "ESPK ready: the data image is valid"
     shape: workflow
@@ -107,8 +110,8 @@ tests:
     verifies: [FR-RES-02, FR-DAT-03]
     needs: [dut, bench-wait-event]
     impl: "tests/bench/test_journey.py::test_jrn_02_ready"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: JRN-03
     title: "say a pt-BR verification item: ESPK start, then ESPK done underrun=0"
     shape: workflow
@@ -129,8 +132,8 @@ tests:
     verifies: [FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/bench/test_journey.py::test_jrn_04_pt_br_hash_equals_r1"
-    status: not done
-    reason: not implemented
+    status: failed
+    result: {commit: cbfa055, date: 2026-11-26, note: "the board's PCM differs from R1 for accented pt-BR text (#1611 confirmed on target); the test also compares out of sequence, a spec defect: the upstream carries state between utterances"}
   - id: JRN-05
     title: "voice en; say an en item; hash equals R1"
     shape: workflow
@@ -140,8 +143,8 @@ tests:
     verifies: [FR-RES-05, FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/bench/test_journey.py::test_jrn_05_en_hash_equals_r1"
-    status: not done
-    reason: not implemented
+    status: failed
+    result: {commit: cbfa055, date: 2026-11-26, note: "compared out of sequence: the upstream carries state between utterances, so the k-th utterance must be compared with R1's k-th; in sequence from a fresh boot the board equals R1 bit for bit"}
   - id: JRN-06
     title: "cancel during a long utterance: ESPK cancelled within 100 ms"
     shape: workflow
@@ -241,8 +244,8 @@ tests:
     verifies: [FR-RES-01, FR-MEM-05]
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_boot_marker_fields"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: TC-RES-02
     title: "ESPK ready follows ESPK boot when the data are valid"
     shape: atomic
@@ -252,8 +255,8 @@ tests:
     verifies: [FR-RES-02]
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_ready_follows_boot"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: TC-SYN-02
     title: "The engine reports 22 050 Hz after init"
     shape: atomic
@@ -263,8 +266,8 @@ tests:
     verifies: [FR-SYN-02]
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_sample_rate_is_22050"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: TC-RES-03
     title: "say --mute reports ESPK done with id, samples, timings, heap_min and the PCM SHA-256"
     shape: atomic
@@ -274,8 +277,8 @@ tests:
     verifies: [FR-RES-03]
     needs: [dut, bench-flash, bench-command, pcm-capture]
     impl: "tests/target/test_research_fw.py::test_say_mute_reports_the_pcm_hash"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
   - id: TC-RES-05
     title: "voice switches among the image's voices; an absent voice is refused and the previous one kept"
     shape: atomic
@@ -285,5 +288,5 @@ tests:
     verifies: [FR-RES-05, FR-SYN-06]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_research_fw.py::test_voice_switch_and_unknown_voice"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
