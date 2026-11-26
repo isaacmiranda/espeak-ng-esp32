@@ -536,14 +536,25 @@ tests:
     status: not done
     reason: "not implemented: the test has not run yet"
   - id: TC-SYN-11
-    title: "espk_deinit() then espk_init(): ready, internal heap within 1 KB, the PCM equals R1 from a clean start"
+    title: "espk_deinit() then espk_init(): ready, the PCM equals R1 from a clean start, the heap cost per cycle is bounded (1 500 B)"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-11]
+    needs: [dut, bench-flash, bench-command, r1-host-reference]
+    impl: "tests/target/test_core.py::test_deinit_then_init_is_ready_and_says_what_r1_says"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-11-heap
+    title: "espk_deinit() then espk_init() returns the internal heap to its previous level within 1 KB"
     shape: atomic
     kind: standard
     tier: target
     wave: 1
     verifies: [FR-SYN-11]
     needs: [dut, bench-flash, bench-command]
-    impl: "tests/target/test_core.py::test_deinit_then_init_is_ready_with_the_same_heap_within_1_kb"
+    impl: "tests/target/test_core.py::test_deinit_then_init_returns_the_internal_heap_within_1_kb"
     status: not done
     reason: "not implemented: the test has not run yet"
   - id: TC-SYN-03
