@@ -8,7 +8,10 @@
 
 #include "config.h"
 #include "esp_log.h"
+#include "sdkconfig.h"
+#ifdef CONFIG_SPIRAM
 #include "esp_psram.h"
+#endif
 #include "espeak-ng/espeak_ng.h"
 #include "espeak-ng/speak_lib.h"
 #include "espk_async.h"
@@ -55,7 +58,12 @@ static esp_err_t select_voice(const char *voice)
 esp_err_t espk_init(const espk_config_t *cfg)
 {
     if (s_ready) return ESP_ERR_INVALID_STATE;
-    if (!esp_psram_is_initialized()) {
+#ifdef CONFIG_SPIRAM
+    bool psram = esp_psram_is_initialized();
+#else
+    bool psram = false;  // no PSRAM configured: the esp_psram component is not even linked (FR-MEM-01)
+#endif
+    if (!psram) {
         ESP_LOGE(TAG, "init: ESP_ERR_NOT_SUPPORTED (no PSRAM)");
         return ESP_ERR_NOT_SUPPORTED;
     }
