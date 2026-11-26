@@ -188,3 +188,25 @@ tests:
     impl: "tests/host/test_r1.py::test_r1_hash_and_phonemes_per_item_and_language"
     status: successful
     result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
+  - id: TC-COR-01
+    title: "Verification corpus pt-BR and en: 45-55 items each, every category of FR-COR-01 present"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-01]
+    needs: []
+    impl: "tests/host/test_corpus_verify.py::test_size_and_categories"
+    status: not done
+    reason: not implemented
+  - id: TC-COR-02
+    title: "Every accented pt-BR verification item has an unaccented pair"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-02]
+    needs: []
+    impl: "tests/host/test_corpus_verify.py::test_accented_items_have_unaccented_pairs"
+    status: not done
+    reason: not implemented

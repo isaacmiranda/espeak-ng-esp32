@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Verification corpus pt-BR (FSD FR-COR-01, FR-COR-02): id	category	pair	text
+A01	accent	-	Atenção: a bateria está fraca.
+U01	accent	A01	Atencao: a bateria esta fraca.
+A02	accent	-	A conexão foi perdida às três horas.
+U02	accent	A02	A conexao foi perdida as tres horas.
+A03	accent	-	Você já pôs o carregador na tomada?
+U03	accent	A03	Voce ja pos o carregador na tomada?
+A04	accent	-	O avô e a avó chegaram à estação.
+U04	accent	A04	O avo e a avo chegaram a estacao.
+A05	accent	-	Ação, emoção e informação não faltam.
+U05	accent	A05	Acao, emocao e informacao nao faltam.
+A06	accent	-	Os pães e as mães estão na padaria.
+U06	accent	A06	Os paes e as maes estao na padaria.
+A07	accent	-	Público, música e ônibus são palavras proparoxítonas.
+U07	accent	A07	Publico, musica e onibus sao palavras proparoxitonas.
+A08	accent	-	Ele lê o jornal e vê a previsão do tempo.
+U08	accent	A08	Ele le o jornal e ve a previsao do tempo.
+A09	accent	-	O país tem açúcar, café e pêssego.
+U09	accent	A09	O pais tem acucar, cafe e pessego.
+A10	accent	-	Útil, fácil e difícil terminam em consoante.
+U10	accent	A10	Util, facil e dificil terminam em consoante.
+A11	accent	-	Põe o relógio no pulso e ajusta o horário.
+U11	accent	A11	Poe o relogio no pulso e ajusta o horario.
+A12	accent	-	À noite, a temperatura cai até três graus.
+U12	accent	A12	A noite, a temperatura cai ate tres graus.
+A13	accent	-	ATENÇÃO: NÍVEL CRÍTICO DE ENERGIA.
+U13	accent	A13	ATENCAO: NIVEL CRITICO DE ENERGIA.
+A14	accent	-	ÁGUA, ÉGUA, ÍNDIO, ÓRGÃO E ÚMIDO.
+U14	accent	A14	AGUA, EGUA, INDIO, ORGAO E UMIDO.
+A15	accent	-	ÂNCORA, ÊXITO, ÔNIBUS, MÃE, PÕE, À TARDE.
+U15	accent	A15	ANCORA, EXITO, ONIBUS, MAE, POE, A TARDE.
+A16	accent	-	Não há conexão com a rede sem fio.
+U16	accent	A16	Nao ha conexao com a rede sem fio.
+A17	accent	-	Pressione o botão até a lâmpada acender.
+U17	accent	A17	Pressione o botao ate a lampada acender.
+A18	accent	-	Leia as instruções antes de usar o aparelho.
+U18	accent	A18	Leia as instrucoes antes de usar o aparelho.
+N01	number	-	Faltam 3 dias, 15 horas e 42 minutos.
+N02	number	-	Contei 0, 1, 2, 10, 11, 100, 101 e 1000.
+N03	number	-	A temperatura caiu para 36,5 graus.
+N04	time	-	O alarme toca 7:05 e 19:45.
+N05	time	-	Lembrete marcado para 14h30.
+N06	date	-	A consulta foi marcada para 26/11/2026.
+N07	date	-	Prazo final: 2027-05-26.
+N08	money	-	O produto custa R$ 1.250,99.
+N09	money	-	Recebemos R$ 0,50 de troco.
+N10	punctuation	-	Tudo certo? Sim; vamos continuar!
+N11	punctuation	-	Espere... (um momento) - e depois, continue.
+N12	abbreviation	-	O SUS, o INSS e a UFC abriram vagas.
+N13	abbreviation	-	O Dr. Silva atende na Av. Brasil, n. 100, apto 2.
+L01	long	-	Este é um texto longo para verificar a síntese contínua. O aparelho lê a mensagem inteira sem pausa artificial, respeitando a pontuação: vírgulas, pontos e pontos de interrogação. Você consegue acompanhar? A frase seguinte traz números, como 2026 e 3,14, e uma hora, 08:15. Depois vêm palavras com acento, como ação, café, ônibus e você. O objetivo é medir o tempo de síntese, o tempo até a primeira amostra e a igualdade do áudio entre o computador e a placa, item por item, sem exceção. Por fim, a mensagem termina aqui, com um ponto final.
+L02	long	L01	Este e um texto longo para verificar a sintese continua. O aparelho le a mensagem inteira sem pausa artificial, respeitando a pontuacao: virgulas, pontos e pontos de interrogacao. Voce consegue acompanhar? A frase seguinte traz numeros, como 2026 e 3,14, e uma hora, 08:15. Depois vem palavras com acento, como acao, cafe, onibus e voce. O objetivo e medir o tempo de sintese, o tempo ate a primeira amostra e a igualdade do audio entre o computador e a placa, item por item, sem excecao. Por fim, a mensagem termina aqui, com um ponto final.

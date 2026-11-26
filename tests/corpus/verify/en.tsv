@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Verification corpus en (FSD FR-COR-01): id	category	pair	text
+E01	accent	-	The café on the corner serves crème brûlée.
+E02	accent	-	Her résumé lists a naïve façade project.
+E03	accent	-	They held a piñata party at the São Paulo office.
+E04	accent	-	The fiancée met her protégé at the soirée.
+E05	accent	-	Attention: the battery is low.
+E06	accent	-	The connection was lost at three o'clock.
+E07	accent	-	Press the button until you hear the beep.
+E08	accent	-	Read the instructions before using the device.
+E09	accent	-	The wireless network is not available.
+E10	accent	-	Please plug in the charger now.
+E11	accent	-	The screen will turn off in a moment.
+E12	accent	-	Your appointment has been confirmed.
+E13	accent	-	Turn left at the next intersection.
+E14	accent	-	The door is open; please close it.
+E15	accent	-	Low signal: move closer to the router.
+E16	accent	-	The update finished without errors.
+E17	accent	-	Volume up, volume down, mute.
+E18	accent	-	Good morning, the weather today is sunny.
+E19	number	-	Three days, 15 hours and 42 minutes remain.
+E20	number	-	I counted 0, 1, 2, 10, 11, 100, 101 and 1000.
+E21	number	-	The temperature dropped to 36.5 degrees.
+E22	number	-	Room 1204 is on the 12th floor.
+E23	number	-	The total is 1,234,567 points.
+E24	number	-	Pi is about 3.14159.
+E25	time	-	The alarm rings at 7:05 and 19:45.
+E26	time	-	Reminder set for 2:30 pm.
+E27	time	-	The meeting starts at 9 am sharp.
+E28	date	-	The appointment is on 11/26/2026.
+E29	date	-	Deadline: 2027-05-26.
+E30	date	-	Born on January 1st, 1990.
+E31	money	-	The product costs US$ 1,250.99.
+E32	money	-	You get $0.50 back in change.
+E33	money	-	Tickets cost $12 each or $40 for four.
+E34	punctuation	-	All good? Yes; let's continue!
+E35	punctuation	-	Wait... (one moment) - then go on.
+E36	punctuation	-	"Stop," she said, "and listen."
+E37	punctuation	-	Is it raining? No, it is not.
+E38	punctuation	-	Warning! Warning! Leave the building.
+E39	abbreviation	-	NASA, the FBI and the UN issued statements.
+E40	abbreviation	-	Dr. Smith lives at 100 Main St., Apt. 2.
+E41	abbreviation	-	The USB port supports Wi-Fi and BLE devices.
+E42	abbreviation	-	Mr. and Mrs. Jones arrived at 5 p.m.
+E43	abbreviation	-	The CPU runs at 240 MHz with 8 MB of PSRAM.
+E44	abbreviation	-	Contact info@example.org for help.
+E45	abbreviation	-	See e.g. chapter 3, i.e. the last one.
+E46	number	-	Call 555-0199 after 6.
+E47	time	-	It is a quarter past four.
+E48	date	-	Today is Thursday, November 26.
+E49	long	-	This is a long text to check continuous synthesis. The device reads the whole message without an artificial pause, following the punctuation: commas, full stops and question marks. Can you follow it? The next sentence has numbers, such as 2026 and 3.14, and a time, 8:15. Then come borrowed words with accents, such as café and naïve. The goal is to measure the synthesis time, the time to the first sample and the identity of the audio between the computer and the board, item by item, without exception. Finally, the message ends here, with a full stop.
