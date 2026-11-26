@@ -34,7 +34,7 @@ def test_say_mute_reports_the_pcm_hash(flashed):
     board.boot()
     m, p = board.command("say --mute Atenção: a bateria está fraca.", r"^ESPK (done|error)")
     assert m and m.event == "done", p.stdout
-    for k in ("id", "samples", "synth_ms", "first_ms", "audio_ms", "heap_min", "sha256"):
+    for k in ("id", "samples", "synth_ms", "first_ms", "audio_ms", "heap_min", "sha256", "bytes"):
         assert k in m.fields
     assert int(m.fields["samples"]) > 0 and re.fullmatch(r"[0-9a-f]{64}", m.fields["sha256"])
 
@@ -47,3 +47,22 @@ def test_voice_switch_and_unknown_voice(flashed):
     assert m.fields == {"err": "not_found"}
     m, _ = board.command("say --mute The battery is low.", r"^ESPK (done|error)")
     assert m.event == "done", "the previous voice is kept after a refused one"
+
+
+def test_text_limit_1024_bytes(flashed):
+    """FR-RES-16: 1 024 bytes are spoken; 1 025 are refused with too_long, and the console lives on."""
+    board.boot()
+    base = "The battery is low. "
+    ok = (base * 60)[:1024]
+    m, p = board.command(f"say --mute {ok}", r"^ESPK (done|error)", timeout=90)
+    assert m and m.event == "done" and int(m.fields["bytes"]) == 1024, p.stdout
+    m, p = board.command(f"say --mute {ok + 'x'}", r"^ESPK error")
+    assert m and m.fields.get("code") == "too_long", p.stdout
+    m, _p = board.command("say --mute The battery is low.", r"^ESPK (done|error)")
+    assert m.event == "done"
+
+
+def test_unknown_command_gets_a_marker(flashed):
+    board.boot()
+    m, _p = board.command("xyzzy", r"^ESPK error")
+    assert m.fields == {"code": "unknown_command"}

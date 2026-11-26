@@ -1,11 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""R1 — the eSpeak NG upstream built on the host from the pinned tarball (FSD FR-REF-01).
+"""R1 — the eSpeak NG upstream built on the host from the pinned tarball (FSD §7, FR-REF-01).
 
-    python tools/ref/r1.py --voice pt-br --corpus <texts.txt> --out <records.jsonl> [--rate 175]
+    python tools/ref/r1.py --script <script.txt> --out <records.jsonl>
+    python tools/ref/r1.py --voice pt-br --corpus <texts.txt> --out <records.jsonl>
 
-One JSON record per line of the corpus: voice, item, text, sha256 and samples of the PCM,
-rate, the phoneme transcription (espeak-ng -x) and the upstream version. The build lives
-in the cache (ESPK_CACHE, default ~/.cache/espk), never in the repository.
+A script is an ordered list of steps: `init <voice>` first, then `voice <voice>`, `rate <wpm>`
+and `say <text>`. The engine keeps state between utterances, so the PCM of a `say` depends on
+the steps before it: R1 runs the whole script from a clean start and gives one JSON record
+per `say`: voice, step, item (the k-th say), text, sha256 and samples of the PCM, rate, the
+phoneme transcription (espeak-ng -x, a fresh process) and the upstream version. `--corpus`
+is the script `init en`, `voice <voice>`, one `say` per line: the same steps the research
+firmware takes from a reset to a voice and a corpus. The build lives in the cache
+(ESPK_CACHE, default ~/.cache/espk), never in the repository.
 """
 
 from __future__ import annotations
@@ -63,29 +69,34 @@ def tarball(up: dict[str, str]) -> Path:
 
 
 def build(up: dict[str, str], jobs: int = 2) -> Path:
-    """Build the upstream (library, CLI, all languages' data) once; return the build dir."""
+    """Build the upstream (library, CLI, all languages' data) once, and the PCM harness
+    whenever its source changes; return the build dir."""
     ver = up["ESPEAK_VER"]
     b = cache_dir() / f"r1-{ver}-{up['ESPEAK_SHA256'][:12]}"
     stamp = b / "r1.ok"
-    if stamp.exists():
-        return b
-    tgz = tarball(up)
     src_root = cache_dir() / f"src-{ver}"
-    if not (src_root / f"espeak-ng-{ver}").exists():
-        src_root.mkdir(parents=True, exist_ok=True)
-        with tarfile.open(tgz) as tf:
-            tf.extractall(src_root, filter="data")
     src = src_root / f"espeak-ng-{ver}"
-    off = ["-DUSE_MBROLA=OFF", "-DUSE_LIBSONIC=OFF", "-DUSE_LIBPCAUDIO=OFF", "-DUSE_ASYNC=OFF",
-           "-DUSE_KLATT=OFF", "-DUSE_SPEECHPLAYER=OFF", "-DESPEAK_BUILD_MANPAGES=OFF"]
-    subprocess.run(["cmake", "-S", str(src), "-B", str(b), "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release", *off],
-                   check=True, stdout=subprocess.DEVNULL)
-    subprocess.run([*NICE, "cmake", "--build", str(b), "-j", str(jobs)],
-                   check=True, stdout=subprocess.DEVNULL)
-    subprocess.run(["cc", "-O2", "-I", str(src / "src/include"), str(ROOT / "tools/ref/pcm_dump.c"),
-                    str(b / "src/libespeak-ng/libespeak-ng.a"), str(b / "src/ucd-tools/libucd.a"),
-                    "-lm", "-lpthread", "-o", str(b / "pcm_dump")], check=True)
-    stamp.write_text(ver + "\n")
+    if not stamp.exists():
+        tgz = tarball(up)
+        if not src.exists():
+            src_root.mkdir(parents=True, exist_ok=True)
+            with tarfile.open(tgz) as tf:
+                tf.extractall(src_root, filter="data")
+        off = ["-DUSE_MBROLA=OFF", "-DUSE_LIBSONIC=OFF", "-DUSE_LIBPCAUDIO=OFF", "-DUSE_ASYNC=OFF",
+               "-DUSE_KLATT=OFF", "-DUSE_SPEECHPLAYER=OFF", "-DESPEAK_BUILD_MANPAGES=OFF"]
+        subprocess.run(["cmake", "-S", str(src), "-B", str(b), "-G", "Ninja",
+                        "-DCMAKE_BUILD_TYPE=Release", *off], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run([*NICE, "cmake", "--build", str(b), "-j", str(jobs)],
+                       check=True, stdout=subprocess.DEVNULL)
+        stamp.write_text(ver + "\n")
+    harness = ROOT / "tools/ref/pcm_script.c"
+    want = sha256_file(harness)
+    marker = b / "pcm_script.sha256"
+    if not (b / "pcm_script").exists() or not marker.exists() or marker.read_text().strip() != want:
+        subprocess.run(["cc", "-O2", "-I", str(src / "src/include"), str(harness),
+                        str(b / "src/libespeak-ng/libespeak-ng.a"), str(b / "src/ucd-tools/libucd.a"),
+                        "-lm", "-lpthread", "-o", str(b / "pcm_script")], check=True)
+        marker.write_text(want + "\n")
     return b
 
 
@@ -98,38 +109,73 @@ def phonemes(b: Path, voice: str, text: str, rate: int | None) -> str:
     return p.stdout.strip()
 
 
-def run(voice: str, corpus: Path, rate: int | None = None) -> list[dict]:
+def parse_script(text: str) -> list[tuple[str, str]]:
+    steps = []
+    for n, line in enumerate(text.splitlines(), 1):
+        if not line.strip():
+            continue
+        cmd, _, arg = line.partition(" ")
+        if cmd not in ("init", "voice", "rate", "say") or not arg:
+            sys.exit(f"FATAL: script line {n}: {line!r}")
+        steps.append((cmd, arg))
+    if not steps or steps[0][0] != "init":
+        sys.exit("FATAL: a script starts with `init <voice>`")
+    return steps
+
+
+def corpus_script(voice: str, corpus: Path, rate: int | None = None) -> str:
+    lines = ["init en", f"voice {voice}"]
+    if rate:
+        lines.append(f"rate {rate}")
+    lines += [f"say {t}" for t in corpus.read_text(encoding="utf-8").splitlines()]
+    return "\n".join(lines) + "\n"
+
+
+def run(script: str) -> list[dict]:
     up = upstream()
+    steps = parse_script(script)
     b = build(up)
-    texts = corpus.read_text(encoding="utf-8").splitlines()
+    rate = None
+    voice = None
+    says = []
+    for step, (cmd, arg) in enumerate(steps):
+        if cmd in ("init", "voice"):
+            voice = arg
+        elif cmd == "rate":
+            rate = int(arg)
+        else:
+            says.append((step, voice, rate, arg))
     with tempfile.TemporaryDirectory() as tmp:
-        argv = [str(b / "pcm_dump"), str(b / "espeak-ng-data"), voice, str(corpus), tmp]
-        if rate:
-            argv.append(str(rate))
-        p = subprocess.run(argv, capture_output=True, text=True)
+        sp = Path(tmp, "script.txt")
+        sp.write_text(script, encoding="utf-8")
+        p = subprocess.run([str(b / "pcm_script"), str(b / "espeak-ng-data"), str(sp), tmp],
+                           capture_output=True, text=True)
         if p.returncode != 0:
-            sys.exit(f"FATAL: pcm_dump exited {p.returncode}: {p.stderr.strip()}")
+            sys.exit(f"FATAL: pcm_script exited {p.returncode}: {p.stderr.strip()}")
         sample_rate = int(p.stdout.strip().split("=")[1])
         recs = []
-        for i, text in enumerate(texts):
-            pcm = Path(tmp, f"{i:04d}.pcm").read_bytes()
-            recs.append({"voice": voice, "item": i, "text": text,
+        for k, (step, v, r, text) in enumerate(says):
+            pcm = Path(tmp, f"{k:04d}.pcm").read_bytes()
+            recs.append({"voice": v, "step": step, "item": k, "text": text,
                          "sha256": hashlib.sha256(pcm).hexdigest(), "samples": len(pcm) // 2,
-                         "rate": sample_rate, "phonemes": phonemes(b, voice, text, rate),
+                         "rate": sample_rate, "phonemes": phonemes(b, v, text, r),
                          "espeak": up["ESPEAK_VER"]})
     return recs
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--voice", required=True)
-    ap.add_argument("--corpus", type=Path, required=True)
-    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--script", type=Path)
+    ap.add_argument("--voice")
+    ap.add_argument("--corpus", type=Path)
     ap.add_argument("--rate", type=int)
+    ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args(argv)
-    recs = run(a.voice, a.corpus, a.rate)
+    if bool(a.script) == bool(a.voice and a.corpus):
+        ap.error("give --script, or --voice with --corpus")
+    script = a.script.read_text(encoding="utf-8") if a.script else corpus_script(a.voice, a.corpus, a.rate)
     with open(a.out, "w", encoding="utf-8") as fh:
-        for r in recs:
+        for r in run(script):
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
     return 0
 

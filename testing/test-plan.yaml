@@ -181,14 +181,14 @@ tests:
     status: successful
     result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-REF-01
-    title: "R1 gives one PCM SHA-256 and one phoneme transcription per item x language, from the tarball-built upstream"
+    title: "R1 runs a script from a clean start: one PCM SHA-256, sample count and phoneme transcription per say; same script same hashes; order changes the hashes"
     shape: atomic
     kind: standard
     tier: host
     wave: 1
     verifies: [FR-REF-01]
     needs: []
-    impl: "tests/host/test_r1.py::test_r1_hash_and_phonemes_per_item_and_language"
+    impl: "tests/host/test_r1.py::test_r1_hash_and_phonemes_per_say_and_language"
     status: successful
     result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-COR-01
@@ -290,3 +290,58 @@ tests:
     impl: "tests/target/test_research_fw.py::test_voice_switch_and_unknown_voice"
     status: successful
     result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+  - id: TC-REF-03
+    title: "From a reset, the board's PCM equals R1's say by say over the pt-BR and en verification corpus (R3 = R1)"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-REF-03, FR-ENG-04]
+    needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
+    impl: "tests/target/test_equivalence.py::test_board_pcm_equals_r1_over_the_verification_corpus"
+    status: not done
+    reason: not implemented
+  - id: TC-REF-03-noaccent
+    title: "The part of R3 = R1 that holds without the wrap: English and unaccented text, in sequence"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-REF-03]
+    needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
+    impl: "tests/target/test_equivalence.py::test_board_equals_r1_without_accents"
+    status: not done
+    reason: not implemented
+  - id: TC-RES-16
+    title: "A 1 024-byte text is spoken; a 1 025-byte text gets ESPK error code=too_long and the console keeps working"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-16, FR-SYN-09]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_research_fw.py::test_text_limit_1024_bytes"
+    status: not done
+    reason: not implemented
+  - id: TC-RES-15
+    title: "An unknown console line gets ESPK error code=unknown_command"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-15]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_research_fw.py::test_unknown_command_gets_a_marker"
+    status: not done
+    reason: not implemented
+  - id: TC-ENG-04
+    title: "ucd-tools and the desktop libc agree on Latin, Greek, Cyrillic and Latin Extended Additional except the listed code points"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ENG-04]
+    needs: []
+    impl: "tests/host/test_ucd_agreement.py::test_ucd_tools_agree_with_the_desktop_libc_except_the_listed_code_points"
+    status: not done
+    reason: not implemented

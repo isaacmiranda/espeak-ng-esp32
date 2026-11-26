@@ -19,6 +19,16 @@ menu "eSpeak NG (espk)"
         string "Initial voice"
         default "en"
 
+    config ESPK_UCD_WRAP
+        bool "Classify wide characters with ucd-tools (issue espeak-ng#1611)"
+        default y
+        help
+            The ESP32 libc knows no letter beyond ASCII, so accented text is spelled out
+            letter by letter. With this option the linker redirects the engine's isw*
+            calls to the upstream's ucd-tools (the engine's sources stay untouched).
+            Note that --wrap acts on the whole application's link, not only on the engine.
+            Turn it off to get the upstream's behaviour on the ESP32 libc as it is.
+
     config ESPK_MAX_TEXT_LEN
         int "Longest text accepted, in bytes"
         default 1024

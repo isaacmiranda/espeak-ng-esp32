@@ -4,8 +4,6 @@
 JRN-03 (audio) and JRN-06 (cancel) arrive with those features.
 """
 
-import json
-import subprocess
 import sys
 
 import pytest
@@ -16,15 +14,6 @@ import board
 pytestmark = pytest.mark.bench
 PT = "Atenção: a bateria está fraca."
 EN = "Attention: the battery is low."
-
-
-def r1_hash(voice, text, tmp_path):
-    c = tmp_path / f"{voice}.txt"
-    c.write_text(text + "\n", encoding="utf-8")
-    out = tmp_path / f"{voice}.jsonl"
-    subprocess.run([sys.executable, str(board.ROOT / "tools/ref/r1.py"), "--voice", voice,
-                    "--corpus", str(c), "--out", str(out)], check=True)
-    return json.loads(out.read_text(encoding="utf-8").splitlines()[0])["sha256"]
 
 
 @pytest.fixture(scope="module")
@@ -48,16 +37,11 @@ def test_jrn_02_ready(flashed):
     assert "ready" in ms, p.stdout
 
 
-def test_jrn_04_pt_br_hash_equals_r1(flashed, tmp_path):
-    board.boot()
-    m, p = board.command(f"say --mute {PT}", r"^ESPK (done|error)")
-    assert m.event == "done", p.stdout
-    assert m.fields["sha256"] == r1_hash("pt-br", PT, tmp_path)
+def test_jrn_04_pt_br_hash_equals_r1(flashed):
+    script = f"init en\nvoice pt-br\nsay {PT}\n"
+    assert not board.compare(board.board_run(script), board.r1_run(script))
 
 
-def test_jrn_05_en_hash_equals_r1(flashed, tmp_path):
-    m, _ = board.command("voice en", r"^ESPK voice")
-    assert m.fields == {"ok": "en"}
-    m, p = board.command(f"say --mute {EN}", r"^ESPK (done|error)")
-    assert m.event == "done", p.stdout
-    assert m.fields["sha256"] == r1_hash("en", EN, tmp_path)
+def test_jrn_05_en_hash_equals_r1(flashed):
+    script = f"init en\nvoice pt-br\nsay {PT}\nvoice en\nsay {EN}\n"
+    assert not board.compare(board.board_run(script), board.r1_run(script))

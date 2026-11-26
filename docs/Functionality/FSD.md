@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.2.2
+fsd_version: 0.3.2
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -20,6 +20,12 @@ change_history:
     SoftAP com pareamento (FR-LST-19). Decisões do responsável sobre OD-03, OD-04 e OD-05
   - 0.2.2 (2026-11-26): R2 compara pelo mesmo ponto de entrada (FR-REF-05): o CLI e a API síncrona dão PCM
     diferentes para o mesmo texto (achado do /build; o CLI do sistema é bit a bit igual ao CLI de R1)
+  - 0.3.0 (2026-11-26): equivalência por sequência (§7, FR-REF-01..03, FR-ASY-07, FR-ERR-02): o motor guarda estado
+    entre sínteses; F2 confirmou a divergência por acento no alvo (#1611), sem divergência de ponto flutuante; FR-ENG-04 e
+    FR-UPS-01 deixam de ser condicionais
+  - 0.3.1 (2026-11-26): `ESPK done` ganha `bytes=` (FR-RES-03): bytes se perdiam na linha de console com texto longo
+  - 0.3.2 (2026-11-26): FR-ENG-04 lista as sete funções isw* e as faixas Unicode em que o ucd-tools e a libc de desktop
+    concordam (medido no host); o motor não chama `towlower`
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -200,7 +206,8 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 - **Escopo:** o primeiro experimento. Compara R3 com R1 sobre o corpus de verificação pt-BR e en, e decide o wrap
   da #1611 (§17).
 - **Entregas:** relatório de equivalência; FR-ENG-04 e FR-ENG-05 decididos; corpus de verificação (§8).
-- **Saída:** FR-REF-03 verde para pt-BR e en, com ou sem wrap, conforme o resultado registrado.
+- **Saída:** FR-REF-03 verde para pt-BR e en com o wrap (FR-ENG-04); a divergência sem o wrap fica registrada
+  (o experimento de 2026-11-26: acentos divergem, inglês e pt-BR sem acento não).
 - **Depende de:** F1 (firmware com hash, R1).
 
 ### 3.3 Fase F3 — Componente
@@ -288,8 +295,9 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 - **FR-RES-02** [Must · derived · v0.1] Com dados válidos, o firmware deve emitir `ESPK ready` depois de
   `ESPK boot` e antes de aceitar qualquer comando de fala.
 - **FR-RES-03** [Must · user · v0.1] O comando `say <texto>` deve sintetizar o texto e emitir
-  `ESPK done id=<n> samples=<n> synth_ms=<n> first_ms=<n> audio_ms=<n> heap_min=<B> sha256=<hex>`, em que `sha256` é
-  o SHA-256 dos bytes PCM entregues pelo callback, em ordem.
+  `ESPK done id=<n> samples=<n> synth_ms=<n> first_ms=<n> audio_ms=<n> heap_min=<B> sha256=<hex> bytes=<n>`, em que
+  `sha256` é o SHA-256 dos bytes PCM entregues pelo callback, em ordem, e `bytes` é o tamanho em bytes do texto recebido,
+  para o driver detectar byte perdido na linha de console.
 - **FR-RES-04** [Must · derived · v0.1] O comando `say` deve aceitar a opção `--mute`. Com ela, o PCM é só
   calculado e resumido no hash, sem ir ao I2S. O hash é igual com e sem `--mute`.
 - **FR-RES-05** [Must · user · v0.1] O comando `voice <nome>` deve trocar a voz e responder `ESPK voice ok=<nome>`. Um
@@ -321,7 +329,7 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 |---|---|---|---|---|
 | FR-RES-01 | artefato do CI gravado · `bench reset` | linha `ESPK boot` com todos os campos; `commit` = commit do artefato | campo ausente; commit de outro build | target |
 | FR-RES-02 | idem | `ESPK ready` depois de `ESPK boot`; `say` antes de `ready` recusado | `ready` com dados corrompidos | target |
-| FR-RES-03 | `ready` · `say` com texto do corpus | `ESPK done` com os campos; `samples` > 0 | `sha256` calculado sobre buffer que não é o entregue ao callback | target |
+| FR-RES-03 | `ready` · `say` com texto do corpus | `ESPK done` com os campos; `samples` > 0; `bytes` = tamanho do texto enviado | `sha256` calculado sobre buffer que não é o entregue ao callback; texto truncado na linha de console sem que o campo `bytes` mostre | target |
 | FR-RES-04 | `ready` · `say --mute T` e `say T` | hashes iguais; nada no I2S com `--mute` | hashes diferentes | target |
 | FR-RES-05 | imagem com `pt` e `en` · `voice en`, `voice xx` | `ok=en`; `err=not_found` | travamento; voz anterior perdida após o erro | target |
 | FR-RES-06 | `ready` · `rate 220` e `say` | `ok=220`; `audio_ms` menor que a 175 ppm para o mesmo texto | `rate` ignorado | target |
@@ -386,7 +394,13 @@ componente** [user].
 
 ### 7.1 Propósito
 
-Prova que o porte não altera o motor. Há três referências [user]:
+Prova que o porte não altera o motor. O motor do upstream **guarda estado entre uma síntese e a seguinte**: o PCM
+de um texto depende do que foi falado antes (medido em 2026-11-26: o mesmo texto repetido dá 38 848, 38 851 e 38 855
+amostras no host e na placa, e a placa repete a sequência do host bit a bit). Por isso a equivalência é por
+**sequência**: um **roteiro** é uma lista ordenada de passos (`init <voz>`, `voice <voz>`, `rate <ppm>`,
+`say <texto>`), e a fala de ordem k da placa, executada a partir de uma inicialização limpa, deve ser igual à fala de
+ordem k de R1 executando o mesmo roteiro. Não existe "o hash de um texto" fora de um roteiro. Há três referências
+[user]:
 
 | Ref. | Fonte | Critério |
 |---|---|---|
@@ -396,12 +410,14 @@ Prova que o porte não altera o motor. Há três referências [user]:
 
 ### 7.2 Requisitos
 
-- **FR-REF-01** [Must · user · v0.1] A ferramenta R1 deve produzir, para cada item de um corpus e cada idioma, o
-  SHA-256 do PCM e a transcrição fonêmica (`-x`) do upstream compilado no host.
+- **FR-REF-01** [Must · user · v0.1] A ferramenta R1 deve executar um roteiro no upstream compilado no host, a
+  partir de uma inicialização limpa, e produzir, para cada passo `say`, o SHA-256 e o número de amostras do PCM, e a
+  transcrição fonêmica (`-x`) do texto na voz ativa naquele passo.
 - **FR-REF-02** [Must · user · v0.1] Com o componente compilado no host (mesmas fontes, mesmos dados, mesma
-  configuração de voz), o SHA-256 do PCM de cada item do corpus de verificação deve ser igual ao de R1.
-- **FR-REF-03** [Must · user · v0.1] Na placa, o SHA-256 do PCM (R3) de cada item do corpus de verificação pt-BR e en
-  deve ser igual ao de R1.
+  configuração de voz), executando o roteiro do corpus de verificação, o SHA-256 do PCM de cada `say` deve ser igual
+  ao do `say` de mesma ordem em R1.
+- **FR-REF-03** [Must · user · v0.1] Na placa, partindo de um reinício, executando o roteiro do corpus de verificação
+  pt-BR e en, o SHA-256 do PCM (R3) de cada `say` deve ser igual ao do `say` de mesma ordem em R1.
 - **FR-REF-04** [Must · user · v0.1] Uma divergência entre R3 e R1 que não seja explicada pelo defeito da #1611 deve
   ser registrada com o item, o primeiro índice de amostra divergente, a diferença máxima por amostra e a SNR, e deve
   bloquear a release até uma emenda desta FSD decidir o critério.
@@ -426,13 +442,14 @@ verification:
     - Artefato do CI gravado com imagem contendo pt e en; ESPK ready.
     - Hashes R1 do mesmo commit disponíveis (artefato do CI).
   stimulus:
-    - Para cada item do corpus de verificação pt-BR e en: voice <idioma>; say --mute <item>.
+    - bench reset; depois, na ordem do roteiro do corpus de verificação pt-BR e en: voice <idioma>; say --mute <item>.
   expected_observations:
-    - sha256 de cada ESPK done igual ao hash R1 do mesmo item.
+    - sha256 de cada ESPK done igual ao hash R1 do say de mesma ordem, executando o mesmo roteiro.
   timing: nenhum
   tolerance: nenhuma (bit a bit)
   prohibited_outcomes:
     - Hashes R1 gerados pelo próprio firmware ou copiados de uma execução anterior do alvo.
+    - Comparar o hash de um item com o de R1 fora da sequência (R1 sem os passos anteriores, ou o contrário).
     - Itens pulados por erro ou tempo esgotado contados como iguais.
     - Comparar só os itens sem acento.
   tier: target
@@ -445,8 +462,8 @@ verification:
 
 | ID | Pré-condição · estímulo | Esperado | Não pode acontecer | Nível |
 |---|---|---|---|---|
-| FR-REF-01 | tarball verificado · corpus | um hash e uma transcrição por item × idioma | tarball sem conferência do SHA-256 | host |
-| FR-REF-02 | componente e R1 compilados no host · corpus de verificação | hashes iguais | comparar o componente consigo mesmo | host |
+| FR-REF-01 | tarball verificado · roteiro | um hash, uma contagem de amostras e uma transcrição por `say`; o mesmo roteiro dá os mesmos hashes; a ordem dos passos muda os hashes | hash de um texto sem roteiro | host |
+| FR-REF-02 | componente e R1 compilados no host · roteiro do corpus de verificação | hashes iguais, `say` por `say` | comparar o componente consigo mesmo | host |
 | FR-REF-04 | divergência injetada (item com PCM alterado no teste da ferramenta) | linha com índice, diferença e SNR; status de bloqueio | divergência só no log, sem bloquear | host |
 | FR-REF-05 | eSpeak NG do sistema instalado · todos os idiomas | relatório com versão do pacote e comparação por item e por ponto de entrada | pacote ausente tratado como igual; PCM do CLI comparado com PCM da API | host |
 | FR-REF-06 | divergência conhecida (pacote com patch) | linha com causa; build verde | build vermelho; divergência omitida | host |
@@ -830,7 +847,8 @@ verification:
   expected_observations:
     - espk_synth() devolve ESPK_ERR_CANCELLED.
     - O callback foi chamado exatamente 3 vezes.
-    - Uma espk_synth() seguinte com outro texto dá o hash R1 desse texto.
+    - Uma espk_synth() seguinte com outro texto dá o hash do say de mesma ordem em R1 executando o mesmo roteiro,
+      com o cancelamento no mesmo bloco.
   timing: o retorno ocorre em até 100 ms depois do callback que devolveu false
   tolerance: nenhuma
   prohibited_outcomes:
@@ -905,8 +923,8 @@ Estados: `UNINIT`, `IDLE`, `SPEAKING`, `CANCELLING`.
   65 536 B [seed:alertalergo]) e ficar na PSRAM quando `CONFIG_ESPK_TASK_STACK_PSRAM` estiver ligado (padrão ligado).
 - **FR-ASY-06** [Must · derived · v0.1] O build deve falhar com `CONFIG_ESPK_TASK_STACK` abaixo de 49 152 B
   (o uso medido na semente, ~39 KB, mais 25 %).
-- **FR-ASY-07** [Must · derived · v0.1] O PCM entregue pela camada assíncrona deve ser igual, bit a bit, ao do núcleo
-  síncrono para o mesmo texto e a mesma voz.
+- **FR-ASY-07** [Must · derived · v0.1] Com o mesmo roteiro, partindo de uma inicialização limpa, o PCM entregue pela
+  camada assíncrona deve ser igual, bit a bit, ao do núcleo síncrono.
 - **FR-ASY-08** [Must · derived · v0.1] Com `CONFIG_ESPK_ASYNC` desligado, `espk_say()` e `espk_cancel()` devem
   devolver `ESP_ERR_NOT_SUPPORTED`, e nenhuma tarefa deve ser criada.
 - **FR-ASY-09** [Must · derived · v0.1] Cada par (estado × evento) da tabela 15.2 deve produzir o estado, a ação e o
@@ -985,9 +1003,14 @@ verification:
   do tarball. O script de regeneração, rodado de novo, deve dar `git diff` vazio.
 - **CON-ENG-03** [Must · seed:alertalergo · v0.1] Só o runtime síncrono deve ser compilado: sem MBROLA, Klatt, sonic
   nem o modo assíncrono do upstream.
-- **FR-ENG-04** [Must · user · v0.1] Se a F2 confirmar a divergência por acento (#1611), o componente deve
-  redirecionar no link (`-Wl,--wrap`) as funções `isw*` e `tow*` usadas pelo motor para as funções equivalentes do
-  `ucd-tools` do próprio upstream, com `CONFIG_ESPK_UCD_WRAP` ligado por padrão.
+- **FR-ENG-04** [Must · user · v0.1] O componente deve redirecionar no link (`-Wl,--wrap`) as funções `isw*` que o
+  motor chama (`iswalpha`, `iswalnum`, `iswupper`, `iswlower`, `iswpunct`, `iswspace`, `iswdigit`) para as funções
+  equivalentes do `ucd-tools` do próprio upstream, com `CONFIG_ESPK_UCD_WRAP` ligado por padrão. (O motor já passa
+  pelo `ucd-tools` para minúsculas, em `towlower2`.) A F2 confirmou em 2026-11-26 que, sem o redirecionamento, a placa
+  diverge de R1 em textos com acento (#1611). O `ucd-tools` e a libc de desktop concordam em Latim, grego, cirílico e
+  Latim Estendido Adicional (U+0000–U+052F, U+1E00–U+1EFF), exceto nos pontos de código U+0085, U+00A0, U+00AD, U+00B2,
+  U+00B3, U+00B9, U+00BC–U+00BE, U+0295 e U+0363–U+036F; fora dessas faixas (por exemplo árabe, devanágari, CJK) a
+  equivalência com a libc de desktop não é garantida. O redirecionamento vale para o link da aplicação inteira.
 - **FR-ENG-05** [Must · user · v0.1] Com `CONFIG_ESPK_UCD_WRAP` desligado (o modo "intacto"), o componente deve
   compilar e funcionar sem o redirecionamento.
 - **FR-ENG-06** [Should · user · futuro] Quando a 1.53.0 sair, a migração deve regenerar as fontes e os dados e
@@ -1000,7 +1023,7 @@ verification:
 | CON-ENG-01 | CI | SHA-256 do tarball conferido antes de extrair | tarball sem conferência | host |
 | CON-ENG-02 | rodar o script de regeneração | `git diff --exit-code` sem diferença | qualquer diferença em `upstream/` | host |
 | CON-ENG-03 | build | nenhum objeto de MBROLA, Klatt, sonic ou async no `.map` | símbolo presente | host |
-| FR-ENG-04 | F2 confirmou · corpus com acento | R3 = R1 com o wrap | fonte do upstream editada | host · target |
+| FR-ENG-04 | wrap ligado · roteiro do corpus de verificação pt-BR com acento · `ucd-tools` × libc de desktop nas faixas listadas | R3 = R1 em todos os `say`; `nm` da imagem mostra os sete `__wrap_isw*`; as únicas diferenças nas faixas são as listadas | fonte do upstream editada; divergência restante atribuída à #1611 sem prova; faixa nova de diferença sem mudar a lista | host · target |
 | FR-ENG-05 | wrap desligado | build verde; divergência de acentos registrada como esperada | falha de build | host · target |
 | FR-ENG-06 | tag 1.53.0 | R1, R2 e R3 verdes na nova versão | migração sem refazer as referências | host · target |
 
@@ -1045,7 +1068,7 @@ verification:
 | `CONFIG_ESPK_PSRAM_BUDGET_KB` | 2 048 | [user] |
 | `CONFIG_ESPK_CAPACITY_WARN_PCT` | 90 | [user] |
 | `CONFIG_ESPK_BSS_IN_PSRAM` | ligado | [user] |
-| `CONFIG_ESPK_UCD_WRAP` | ligado se a F2 confirmar a #1611 | [user] |
+| `CONFIG_ESPK_UCD_WRAP` | ligado (a F2 confirmou a #1611) | [user] |
 | `CONFIG_ESPK_ASYNC` | ligado | [user] |
 | `CONFIG_ESPK_TASK_STACK` | 65 536 | [seed:alertalergo] |
 | `CONFIG_ESPK_TASK_STACK_PSRAM` | ligado | [user] |
@@ -1083,13 +1106,14 @@ Os códigos estão no Apêndice B. As regras gerais:
 
 - **FR-ERR-01** [Must · derived · v0.1] Nenhuma função pública do componente deve causar pânico, reinício ou
   `abort()` por erro de entrada ou de recurso. Ela devolve um código do Apêndice B.
-- **FR-ERR-02** [Must · derived · v0.1] Depois de qualquer erro de `espk_synth()` ou da camada assíncrona, a síntese
-  seguinte de um texto válido deve dar o hash R1 desse texto.
+- **FR-ERR-02** [Must · derived · v0.1] Depois de qualquer erro de `espk_synth()` ou da camada assíncrona recusado
+  antes de o motor ser chamado, a síntese seguinte de um texto válido deve dar o hash de R1 executando o mesmo roteiro
+  sem o passo recusado.
 
 | ID | Pré-condição · estímulo | Esperado | Não pode acontecer | Nível |
 |---|---|---|---|---|
 | FR-ERR-01 | cada caminho de erro dos capítulos 12 a 16 | código do Apêndice B | pânico; reinício | host · target |
-| FR-ERR-02 | erro provocado · synth válido | hash R1 | estado residual | host · target |
+| FR-ERR-02 | passo recusado (texto grande, voz ausente) no meio de um roteiro · synth válido | hash de R1 no mesmo roteiro sem o passo recusado | estado residual; hash de R1 sem a sequência | host · target |
 
 ## 22. Segurança
 
@@ -1169,7 +1193,7 @@ Os códigos estão no Apêndice B. As regras gerais:
 - **FR-REL-05** [Must · user · v0.1] Antes da primeira publicação no Registro, uma issue ou discussion deve estar
   aberta no repositório `dfxpto-cyber/eSpeak-NG-.-Esp32`, propondo colaboração, com o texto aprovado pelo
   responsável. A release não espera resposta.
-- **FR-UPS-01** [Must · user · v0.1] Se a F2 confirmar a #1611, um PR ao `espeak-ng/espeak-ng` deve estar aberto, com
+- **FR-UPS-01** [Must · user · v0.1] Um PR ao `espeak-ng/espeak-ng` deve estar aberto, com
   teste, trocando `iswalpha` e funções parecidas pelas do `ucd-tools`, e o link registrado no `ORIGIN.md`.
 - **FR-UPS-02** [Should · user · v0.2] As correções de pronúncia pt-BR que valem para qualquer falante, encontradas na
   escuta interna ou no ASR, devem ser propostas ao `dictsource/pt_list` do upstream, cada uma com caso `test_phon`,
@@ -1184,7 +1208,7 @@ Os códigos estão no Apêndice B. As regras gerais:
 | FR-REL-03 | upload ao *staging* | aceito | publicação real sem o teste | other |
 | FR-REL-04 | pacote gerado | lista sem as pastas proibidas | pasta proibida presente | host |
 | FR-REL-05 | antes da tag | link da issue registrado; texto aprovado | publicação antes do contato | other |
-| FR-UPS-01 | F2 confirmou | link do PR no `ORIGIN.md` | PR sem teste | other |
+| FR-UPS-01 | antes da tag | link do PR no `ORIGIN.md`; o texto do PR aprovado pelo responsável | PR sem teste | other |
 | FR-UPS-02 | entradas candidatas | PR com `test_phon` por entrada | entrada sem conferência no `master` | other |
 | FR-AIU-01 | release | arquivo presente nos dois idiomas | ausente | host |
 

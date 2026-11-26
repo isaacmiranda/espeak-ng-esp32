@@ -39,6 +39,11 @@ static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
 // say --mute <text>: synthesise, hash the PCM delivered to the callback (FR-RES-03, FR-RES-04)
 static void cmd_say_mute(const char *text)
 {
+    size_t bytes = strlen(text);
+    if (bytes > CONFIG_ESPK_MAX_TEXT_LEN) {  // FR-RES-16
+        printf("ESPK error code=too_long\n");
+        return;
+    }
     say_ctx_t c = {0};
     mbedtls_sha256_init(&c.sha);
     mbedtls_sha256_starts(&c.sha, 0);
@@ -56,10 +61,10 @@ static void cmd_say_mute(const char *text)
     char hex[65];
     for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", d[i]);
     int rate = espk_sample_rate();
-    printf("ESPK done id=%u samples=%u synth_ms=%lld first_ms=%lld audio_ms=%llu heap_min=%u sha256=%s\n", id,
+    printf("ESPK done id=%u samples=%u synth_ms=%lld first_ms=%lld audio_ms=%llu heap_min=%u sha256=%s bytes=%u\n", id,
            (unsigned)c.samples, synth_us / 1000, c.first_us / 1000,
            (unsigned long long)c.samples * 1000ULL / (unsigned long long)rate,
-           (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL), hex);
+           (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL), hex, (unsigned)bytes);
 }
 
 static void dispatch(char *line)
@@ -110,7 +115,9 @@ static void console_task(void *arg)
 
 void app_main(void)
 {
-    usb_serial_jtag_driver_config_t cfg = USB_SERIAL_JTAG_DRIVER_CONFIG_DEFAULT();
+    // A 1 024-byte text arrives in a burst faster than the console task drains the default
+    // 256-byte ring: bytes were lost on the bench (the `bytes=` field of ESPK done shows it).
+    usb_serial_jtag_driver_config_t cfg = {.tx_buffer_size = 1024, .rx_buffer_size = 4096};
     ESP_ERROR_CHECK(usb_serial_jtag_driver_install(&cfg));
     usb_serial_jtag_vfs_use_driver();
     setvbuf(stdin, NULL, _IONBF, 0);

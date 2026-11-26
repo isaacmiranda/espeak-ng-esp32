@@ -21,7 +21,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/espk
-          key: espk-r1-${{ hashFiles('components/espeak-ng/tools/upstream.env', 'tools/ref/pcm_dump.c') }}
+          key: espk-r1-${{ hashFiles('components/espeak-ng/tools/upstream.env', 'tools/ref/pcm_script.c') }}
       - run: ruff check components tools tests conftest.py
       - run: reuse lint
       - run: pytest -q tools/bench tests/host

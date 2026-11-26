@@ -51,3 +51,49 @@ def command(line: str, expect: str = r"^ESPK ", timeout: float = 30):
         pytest.skip(f"not done (precondition): {p.stderr.strip()}")
     ms = markers(p.stdout)
     return (ms[-1] if ms else None), p
+
+
+def r1_run(script: str) -> list[dict]:
+    """R1 (the upstream on the host) running the same script."""
+    sys.path.insert(0, str(ROOT / "tools/ref"))
+    import r1
+    return r1.run(script)
+
+
+def verify_script() -> str:
+    """The verification corpus as a script: the steps the board takes from a reset (FSD §7)."""
+    lines = ["init en"]
+    for voice in ("pt-br", "en"):
+        lines.append(f"voice {voice}")
+        for row in (ROOT / f"tests/corpus/verify/{voice}.tsv").read_text(encoding="utf-8").splitlines():
+            if row and not row.startswith("#"):
+                lines.append("say " + row.split("\t")[3])
+    return "\n".join(lines) + "\n"
+
+
+def board_run(script: str, timeout: float = 30) -> list[dict]:
+    """Reset the board, then take the script's steps one by one; one record per `say`."""
+    ms, p = boot(timeout)
+    assert "ready" in ms, p.stdout
+    steps = [ln.partition(" ") for ln in script.splitlines() if ln.strip()]
+    assert steps[0][0] == "init", "a script starts with init"
+    records = []
+    for cmd, _, arg in steps[1:]:
+        if cmd == "voice":
+            m, _p = command(f"voice {arg}", r"^ESPK voice")
+            assert m and m.fields == {"ok": arg}, f"voice {arg}: {m}"
+        elif cmd == "say":
+            m, _p = command(f"say --mute {arg}", r"^ESPK (done|error)")
+            assert m and m.event == "done", f"say {arg!r}: {m}"
+            assert int(m.fields["bytes"]) == len(arg.encode()), f"bytes lost on the console line: {m.fields}"
+            records.append({"text": arg, "sha256": m.fields["sha256"], "samples": int(m.fields["samples"])})
+        else:
+            raise AssertionError(f"the board has no step {cmd!r} yet")
+    return records
+
+
+def compare(board_recs: list[dict], r1_recs: list[dict]) -> list[dict]:
+    """Say by say: the items where the board's PCM differs from R1's."""
+    assert len(board_recs) == len(r1_recs)
+    return [{"item": k, "text": b["text"][:50], "board_samples": b["samples"], "r1_samples": r["samples"]}
+            for k, (b, r) in enumerate(zip(board_recs, r1_recs, strict=True)) if b["sha256"] != r["sha256"]]

@@ -13,7 +13,7 @@ set(UPSTREAM_SRCS
     ${U}/synthdata.c ${U}/synthesize.c ${U}/tr_languages.c ${U}/translate.c
     ${U}/translateword.c ${U}/voices.c ${U}/wavegen.c ${U}/speech.c ${U}/espeak_api.c
     ${D}/case.c ${D}/categories.c ${D}/ctype.c ${D}/proplist.c ${D}/scripts.c ${D}/tostring.c)
-idf_component_register(SRCS src/espk.c src/espk_part.c ${UPSTREAM_SRCS}
+idf_component_register(SRCS src/espk.c src/espk_part.c src/espk_wrap.c ${UPSTREAM_SRCS}
                        INCLUDE_DIRS include
                        PRIV_INCLUDE_DIRS config upstream/src/include ${U} ${D}/include
                        REQUIRES esp_common
@@ -22,3 +22,11 @@ idf_component_register(SRCS src/espk.c src/espk_part.c ${UPSTREAM_SRCS}
 set_source_files_properties(${UPSTREAM_SRCS} PROPERTIES COMPILE_OPTIONS "-w;-fwrapv;-fno-exceptions")
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LIBESPEAK_NG_EXPORT=1
                            PATH_ESPEAK_DATA="${CONFIG_ESPK_MOUNT_POINT}")
+
+# FR-ENG-04: send the engine's wide-character classification to ucd-tools (see src/espk_wrap.c).
+# The flags go on the final link, where the engine's objects call the libc.
+if(CONFIG_ESPK_UCD_WRAP)
+    foreach(fn iswalpha iswalnum iswupper iswlower iswpunct iswspace iswdigit)
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${fn}")
+    endforeach()
+endif()
