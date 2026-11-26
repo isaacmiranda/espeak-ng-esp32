@@ -19,7 +19,7 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 38 de 38 declarados `successful` (a onda 1 só fecha com os testes ainda por declarar da lista abaixo) (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). 
+- **Testes:** 45 de 46 declarados `successful`; 1 `failed` (TC-SYN-11-heap, vazamento do upstream). Camada assíncrona (FR-ASY-01..09) e núcleo (FR-SYN-*) cobertos; faltam os grupos de "Próximos atos".
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
@@ -31,28 +31,44 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 ## Próximos atos, em ordem
 
-1. **Registrar posição e ruído da escuta de 2026-11-26** (o responsável ouviu a fala em 70, baixa; em 30 não ouviu) e
-   decidir o **nível de saída**: o PCM do eSpeak não tem ganho, e o AlertAlergo subiu +4 dB com compressão suave. Um ganho só
-   pode entrar depois do hash (R3 = R1 exige o PCM intacto); é proposta minha, sem requisito (NFR-AUD?). `audio-out` já é `yes`.
-   Falta a metade de FR-RES-07/09 na placa com `--listening` (`volume 60` aceito dentro da sessão, recusado depois).
-2. **Sobra da camada assíncrona (§15):** `espk_deinit` (FR-SYN-11, e o `UNINIT` da tabela) e o passo de cancelamento no R1
-   (`pcm_script.c`: repetir o cancelamento no mesmo bloco) para o hash do `say` depois de cancelar (FR-SYN-03, FR-ASY-03).
-   Feitos e verdes: FR-ASY-01 (5 ms), -02, -04, -05, -06, -07, -08, -09 e JRN-06.
-3. **Comandos que faltam no console:** `rate`, `info`, `mem`, `load` (FR-RES-06, 13, 14; `load` é v0.2).
-4. **Parte B restante:** `espk_deinit`, `espk_set_rate`, relatório de capacidade e falhas de build (§13), `Kconfig`
-   completo (§19), erros do Apêndice B, FR-DAT-01 a 06 com partição trocada ou corrompida (precisa de gravação de imagem
-   ruim: `bench flash` de uma imagem com CRC errado e depois regravar o artefato).
-5. **R2 como ferramenta (FR-REF-05 a 07).** Hoje só houve uma comparação exploratória (CLI do Ubuntu = CLI do R1, bit a
+O levantamento de lacunas é gerado, não escrito à mão: requisitos Must/Should da v0.1 da FSD cujo id não aparece em
+nenhum `verifies:` de `testing/test-plan.yaml` (na sessão de 2026-11-26 eram ~70 depois do núcleo e da camada assíncrona).
+Em ordem de dependência:
+
+1. **Escuta e nível de saída.** Registrar posição e ruído da escuta de 2026-11-26 (o responsável ouviu a fala em 70, baixa;
+   em 30 não ouviu). O PCM do eSpeak não tem ganho e o AlertAlergo subiu +4 dB com compressão suave; um ganho só pode entrar
+   depois do hash (R3 = R1 exige o PCM intacto). Proposta minha, sem requisito. Falta a metade de FR-RES-07/09 na placa com
+   `--listening` (`volume 60` aceito dentro da sessão, recusado depois).
+2. **Cancelamento no R1** (`tools/ref/pcm_script.c`: repetir o cancelamento no mesmo bloco) para comparar com R1 o hash do
+   `say` depois de cancelar (FR-SYN-03, FR-ASY-03; hoje só se prova que o núcleo continua falando).
+3. **Parte B restante:** FR-DAT-01 a 06 com partição trocada ou corrompida (precisa de `bench flash` de imagem ruim e depois
+   regravar o artefato), FR-MEM-01/02/04, relatório de capacidade e falhas de build (§13, FR-CAP), `Kconfig` completo
+   (§19, FR-CFG), erros do Apêndice B (FR-ERR), FR-LOG, FR-SEC, NFR-SYN (RTF, primeira amostra, watchdog, 50 sínteses).
+4. **R2 como ferramenta (FR-REF-05 a 07).** Hoje só houve uma comparação exploratória (CLI do Ubuntu = CLI do R1, bit a
    bit). Falta `tools/ref/r2.py`: API × API e CLI × CLI, todos os idiomas, relatório com a versão do pacote.
-6. **Corpora e ASR (FR-COR-03 a 07, FR-ASR-*).** Corpus automático para todos os idiomas, lista de frequência Leipzig
+5. **Corpora e ASR (FR-COR-03 a 07, FR-ASR-*).** Corpus automático para todos os idiomas, lista de frequência Leipzig
    (CC BY 4.0, versão fixada por SHA-256), frases imprevisíveis geradas por semente, `whisper.cpp` no CI.
-7. **Empacotamento e publicação (F4):** dados de todos os idiomas gerados pelo CI (fora do git), `phsource/` e
+6. **Empacotamento e publicação (F4):** dados de todos os idiomas gerados pelo CI (fora do git), `phsource/` e
    `dictsource/`, `idf_component.yml`, README e traduções (`source-revision`), `AI-USE.md`, exemplo `hello` e
    `waveshare-s3-rlcd`. **Upload de teste ao *staging* do Registro antes de tudo** (OD-02: o `espeak-ng-data` completo
    tem ≈ 24 MB instalado e o Registro não publica limite).
 
 A v0.2 (convivência, os dois modos de `.bss`, comparação de portes, ferramenta guiada de escuta) só abre depois do
 portão da v0.1.
+
+## Pedido de aceite ao responsável (um só, reunido)
+
+Valores e comportamentos que **eu propus** (não estão na FSD; entram como requisito só com o aceite dele):
+- marcadores e comandos de pesquisa na forma atual do console: `ESPK queued id= queue_us=`, `cancel_ms=` em `cancelled`,
+  `taskinfo`, `init`/`deinit`/`cut`/`synth`/`mem`/`info`/`rate`; `volume` sem argumento responde o valor atual, argumento
+  ruim dá `err=range`, `listen close` volta ao 5; pedidos tirados da fila também recebem `cancelled`; um `say` durante
+  `CANCELLING` fala depois do `CANCELLED`; `SAY_TOO_BIG` dá `INVALID_SIZE` em todo estado vivo; o `underrun` é estimado
+  (escrita que chega com o alto-falante já seco).
+- **FR-SYN-11 (decisão):** o upstream vaza 1 344 B por ciclo `espk_deinit`/`espk_init` (`DoVoiceChange` não é liberado por
+  `espeak_ng_Terminate`). Opções: (a) afrouxar a tolerância de 1 KB para o vazamento medido e registrar a limitação,
+  (b) levar a correção ao upstream (a regra do projeto) e manter o xfail até ela entrar, (c) as duas. Recomendo (c).
+- **Armadilha nova (já aplicada):** `esp_partition_mmap`/`munmap` afirmam que a pilha de quem chama está na RAM interna;
+  o componente mantém o mapeamento entre `deinit` e `init` e nunca desmapeia.
 
 ## Ações que são do responsável (peça, não faça)
 
