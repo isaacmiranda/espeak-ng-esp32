@@ -28,7 +28,11 @@ static const espk_entry_t *s_tab;
 static uint32_t s_count;
 static const uint8_t *s_payload;
 static uint32_t s_image_bytes, s_image_crc;
+// The mapping is made once and kept: esp_partition_mmap/munmap freeze the flash cache and assert when the
+// calling task's stack is in PSRAM, which an application may well use (the research firmware's console does).
+// A kept mapping costs address space, not heap, so espk_deinit()/espk_init() cycles do not grow anything.
 static esp_partition_mmap_handle_t s_map;
+static const void *s_map_ptr;
 
 static struct {
     const espk_entry_t *e;
@@ -168,13 +172,16 @@ esp_err_t espk_part_mount(const char *label, uint8_t subtype, const char *base, 
         *reason = "no_partition";
         return ESP_ERR_NOT_FOUND;
     }
-    const void *map;
-    esp_err_t err = esp_partition_mmap(p, 0, p->size, ESP_PARTITION_MMAP_DATA, &map, &s_map);
-    if (err != ESP_OK) {
-        *reason = "mmap";
-        return err;
+    esp_err_t err = ESP_OK;
+    if (!s_map_ptr) {
+        err = esp_partition_mmap(p, 0, p->size, ESP_PARTITION_MMAP_DATA, &s_map_ptr, &s_map);
+        if (err != ESP_OK) {
+            s_map_ptr = NULL;
+            *reason = "mmap";
+            return err;
+        }
     }
-    const uint8_t *b = map;
+    const uint8_t *b = s_map_ptr;
     header_t h;
     memcpy(&h, b, sizeof h);
     err = ESP_ERR_INVALID_CRC;
@@ -221,7 +228,6 @@ esp_err_t espk_part_mount(const char *label, uint8_t subtype, const char *base, 
     }
     return ESP_OK;
 fail:
-    esp_partition_munmap(s_map);
     s_count = 0;
     s_tab = NULL;
     return err;
@@ -238,7 +244,6 @@ void espk_part_info(uint32_t *bytes, uint32_t *crc)
 void espk_part_unmount(const char *base)
 {
     esp_vfs_unregister(base);
-    if (s_tab) esp_partition_munmap(s_map);
     s_tab = NULL;
     s_count = 0;
     s_payload = NULL;

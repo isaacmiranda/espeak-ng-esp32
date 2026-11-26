@@ -14,7 +14,7 @@ def _ready():
 
 
 def test_a_second_init_is_refused_and_changes_nothing(flashed):
-    """FR-SYN-04: espk_init() twice without espk_deinit() -> ESP_ERR_INVALID_STATE; synthesis keeps working."""
+    """FR-SYN-04: espk_init() twice without espk_deinit() -> ESP_ERR_INVALID_STATE; synthesis keeps going."""
     _ready()
     m, _p = board.command("init", r"^ESPK init")
     assert m.fields["result"] == "ESP_ERR_INVALID_STATE", m.fields
