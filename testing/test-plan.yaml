@@ -72,7 +72,7 @@ capabilities:
   audio-out:
     what: "ES8311/I2S plays a test tone at bench volume 5 and the firmware reports underrun=0"
     available: yes
-    observed: {date: 2026-11-26, commit: cc478df, evidence: "listening session with the responsible present: say of the pt-BR item at listen open 30 not heard; at 70 heard but quiet (the eSpeak PCM carries no gain: volume 5 is inaudible by design); underrun=0, audio_ms=2150, volume back to 5 after listen close. Listener position and background noise not recorded (bancada.md risk 2)"}
+    observed: {date: 2026-11-26, commit: cc478df, evidence: "listening session with the responsible present: say of the pt-BR item at listen open 30 not heard; at 70 heard but quiet (the eSpeak PCM carries no gain: volume 5 is inaudible by design); underrun=0, audio_ms=2150, volume back to 5 after listen close. Listener seated in front of the board, which rested on a table (distance not measured); background noise not measured: the board's own microphones (ES7210) could measure it, a capability not built yet (bancada.md risk 2)"}
     proven_by: [tests/bench/test_journey.py::test_jrn_03_say_speaks_through_the_codec]
   pcm-capture:
     what: "the firmware hashes the PCM delivered to the callback (ESPK done … sha256=) — the R3 seam"
@@ -425,3 +425,14 @@ tests:
     impl: "tests/target/test_research_fw.py::test_default_volume_5_and_10_accepted"
     status: successful
     result: {commit: 03d9fb6, date: 2026-11-26, run: "artifact of 03d9fb6 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
+  - id: TC-ASY-09
+    title: "Every (state x event) pair of the async state table gives the table's state, action and return code; pairs outside it change nothing"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASY-09]
+    needs: []
+    impl: "tests/host/test_async_fsm.py::test_every_row_of_the_table"
+    status: successful
+    result: {commit: 8d42171, date: 2026-11-26, run: "local pytest tests/host (code committed right after this record)"}
