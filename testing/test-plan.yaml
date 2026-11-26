@@ -436,3 +436,80 @@ tests:
     impl: "tests/host/test_async_fsm.py::test_every_row_of_the_table"
     status: successful
     result: {commit: 8d42171, date: 2026-11-26, run: "local pytest tests/host (code committed right after this record)"}
+  - id: TC-ASY-01
+    title: "espk_say() of a long text returns in 5 ms or less and the say keeps speaking"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-01]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_async.py::test_say_returns_in_5_ms_and_the_say_is_still_speaking"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-02
+    title: "START and DONE carry the request id; DONE carries samples, synth_ms and first_ms"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-02]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_async.py::test_start_and_done_carry_the_id_and_the_fields"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-04
+    title: "With the queue full espk_say() returns ESP_ERR_NO_MEM; the queued requests never speak after a cancel"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-04, FR-RES-10]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_async.py::test_a_full_queue_refuses_with_no_mem_and_the_queued_ones_never_speak"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-05
+    title: "The synthesis task has a 65 536-byte stack in PSRAM"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-05]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_async.py::test_the_task_stack_is_65536_bytes_in_psram"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-06
+    title: "A build with CONFIG_ESPK_TASK_STACK=32768 fails at the 49 152 B floor; the floor itself configures"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASY-06]
+    needs: []
+    impl: "tests/host/test_async_config.py::test_a_stack_below_the_floor_fails_the_build"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-07
+    title: "The same text through espk_say() and through espk_synth(), each from a clean init, gives the same PCM hash"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-07]
+    needs: [dut, bench-flash, bench-command, pcm-capture]
+    impl: "tests/target/test_async.py::test_the_async_path_gives_the_same_hash_as_the_sync_core"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-ASY-08
+    title: "With CONFIG_ESPK_ASYNC off: say and cancel are ESP_ERR_NOT_SUPPORTED, no task exists, the sync core works"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ASY-08]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_async_off.py::test_say_and_cancel_are_not_supported_and_there_is_no_task"
+    status: not done
+    reason: "not implemented: the test has not run yet"

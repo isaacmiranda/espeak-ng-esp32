@@ -30,3 +30,8 @@ if(CONFIG_ESPK_UCD_WRAP)
         target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${fn}")
     endforeach()
 endif()
+
+# FR-ASY-06: the engine's deepest call chain measured ~39 KB on the AlertAlergo port; 49 152 B is the floor.
+if(CONFIG_ESPK_ASYNC AND CONFIG_ESPK_TASK_STACK LESS 49152)
+    message(FATAL_ERROR "CONFIG_ESPK_TASK_STACK=${CONFIG_ESPK_TASK_STACK} is below the 49152 B floor (FR-ASY-06)")
+endif()

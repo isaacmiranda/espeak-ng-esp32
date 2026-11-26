@@ -17,6 +17,11 @@ esp_err_t espk_say(const char *utf8, espk_pcm_cb_t cb, void *ctx, uint32_t *id)
     return ESP_ERR_NOT_SUPPORTED;
 }
 esp_err_t espk_cancel(void) { return ESP_ERR_NOT_SUPPORTED; }
+esp_err_t espk_task_info(espk_task_info_t *out)
+{
+    (void)out;
+    return ESP_ERR_NOT_SUPPORTED;
+}
 #else
 
 #include <stdatomic.h>
@@ -24,6 +29,7 @@ esp_err_t espk_cancel(void) { return ESP_ERR_NOT_SUPPORTED; }
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_memory_utils.h"
 #include "esp_timer.h"
 #include "espk_fsm.h"
 #include "freertos/FreeRTOS.h"
@@ -43,6 +49,7 @@ typedef struct {
 } item_t;
 
 static SemaphoreHandle_t s_lock, s_wake;
+static TaskHandle_t s_task;
 static espk_fsm_t s_fsm = {.state = ESPK_ST_UNINIT, .capacity = CONFIG_ESPK_QUEUE_LEN};
 static item_t s_q[RING];
 static int s_head, s_count;
@@ -155,12 +162,23 @@ esp_err_t espk_async_start(const espk_config_t *cfg)
     s_wake = xSemaphoreCreateBinary();
     if (!s_lock || !s_wake) return ESP_ERR_NO_MEM;
     UBaseType_t caps = CONFIG_ESPK_TASK_STACK_PSRAM ? MALLOC_CAP_SPIRAM : MALLOC_CAP_INTERNAL;
-    if (xTaskCreatePinnedToCoreWithCaps(task, "espk", CONFIG_ESPK_TASK_STACK, NULL, CONFIG_ESPK_TASK_PRIORITY, NULL,
+    if (xTaskCreatePinnedToCoreWithCaps(task, "espk", CONFIG_ESPK_TASK_STACK, NULL, CONFIG_ESPK_TASK_PRIORITY, &s_task,
                                         tskNO_AFFINITY, caps) != pdPASS) {
         ESP_LOGE(TAG, "task: ESP_ERR_NO_MEM (stack %d)", CONFIG_ESPK_TASK_STACK);
         return ESP_ERR_NO_MEM;
     }
     espk_fsm_step(&s_fsm, ESPK_EV_INIT_OK);
+    return ESP_OK;
+}
+
+esp_err_t espk_task_info(espk_task_info_t *out)
+{
+    if (!s_task) return ESP_ERR_NOT_SUPPORTED;
+    TaskStatus_t ti;
+    vTaskGetInfo(s_task, &ti, pdTRUE, eRunning);
+    out->stack_bytes = CONFIG_ESPK_TASK_STACK;
+    out->stack_in_psram = esp_ptr_external_ram(ti.pxStackBase);
+    out->stack_hwm_bytes = ti.usStackHighWaterMark * sizeof(StackType_t);
     return ESP_OK;
 }
 

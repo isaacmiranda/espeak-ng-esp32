@@ -120,10 +120,50 @@ static void cmd_say(const char *text, bool sound)
     mbedtls_sha256_init(&c->sha);
     mbedtls_sha256_starts(&c->sha, 0);
     uint32_t id;
+    int64_t t0 = esp_timer_get_time();
     esp_err_t err = espk_say(text, on_pcm, c, &id);
+    unsigned queue_us = (unsigned)(esp_timer_get_time() - t0);  // FR-ASY-01
     if (err != ESP_OK) {
         printf("ESPK error code=%s\n", esp_err_to_name(err));
         end_request(c);
+    } else {
+        printf("ESPK queued id=%u queue_us=%u\n", (unsigned)id, queue_us);
+    }
+}
+
+// The synchronous path, for FR-ASY-07: the same text through espk_synth(), hash only
+static bool on_hash(const int16_t *pcm, size_t n, void *arg)
+{
+    mbedtls_sha256_update(arg, (const unsigned char *)pcm, n * sizeof *pcm);
+    return true;
+}
+
+static void cmd_synth(const char *text)
+{
+    mbedtls_sha256_context sha;
+    mbedtls_sha256_init(&sha);
+    mbedtls_sha256_starts(&sha, 0);
+    esp_err_t err = espk_synth(text, on_hash, &sha);
+    unsigned char d[32];
+    mbedtls_sha256_finish(&sha, d);
+    mbedtls_sha256_free(&sha);
+    char hex[65];
+    for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", d[i]);
+    if (err != ESP_OK) {
+        printf("ESPK error code=%s\n", esp_err_to_name(err));
+    } else {
+        printf("ESPK sync sha256=%s bytes=%u\n", hex, (unsigned)strlen(text));
+    }
+}
+
+static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
+{
+    espk_task_info_t ti;
+    if (espk_task_info(&ti) != ESP_OK) {
+        printf("ESPK taskinfo none\n");
+    } else {
+        printf("ESPK taskinfo stack=%u psram=%d hwm=%u\n", (unsigned)ti.stack_bytes, ti.stack_in_psram,
+               (unsigned)ti.stack_hwm_bytes);
     }
 }
 
@@ -137,7 +177,12 @@ static void dispatch(char *line)
     } else if (strncmp(line, "say ", 4) == 0) {
         cmd_say(line + 4, true);
     } else if (strcmp(line, "cancel") == 0) {  // FR-RES-10: the answer is the cancelled event, if one follows
-        espk_cancel();
+        esp_err_t err = espk_cancel();
+        if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
+    } else if (strncmp(line, "synth ", 6) == 0) {
+        cmd_synth(line + 6);
+    } else if (strcmp(line, "taskinfo") == 0) {
+        cmd_taskinfo();
     } else if (strncmp(line, "voice ", 6) == 0) {
         if (espk_set_voice(line + 6) == ESP_OK) {
             printf("ESPK voice ok=%s\n", line + 6);

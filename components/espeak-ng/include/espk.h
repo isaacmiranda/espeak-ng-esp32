@@ -67,6 +67,15 @@ esp_err_t espk_synth(const char *utf8, espk_pcm_cb_t cb, void *ctx);
 // the queue is full; ESP_ERR_INVALID_SIZE: text above CONFIG_ESPK_MAX_TEXT_LEN; ESP_ERR_INVALID_STATE: not
 // initialised. espk_cancel() stops the request being spoken, drops the queued ones and returns at once; the
 // CANCELLED event follows. With the layer off both return ESP_ERR_NOT_SUPPORTED.
+typedef struct {
+    uint32_t stack_bytes;      // CONFIG_ESPK_TASK_STACK
+    bool stack_in_psram;       // where the task's stack really is
+    uint32_t stack_hwm_bytes;  // least free stack seen so far
+} espk_task_info_t;
+
+// About the synthesis task (FR-ASY-05); ESP_ERR_NOT_SUPPORTED when there is none (layer off, FR-ASY-08).
+esp_err_t espk_task_info(espk_task_info_t *out);
+
 esp_err_t espk_say(const char *utf8, espk_pcm_cb_t cb, void *ctx, uint32_t *id);
 esp_err_t espk_cancel(void);
 

@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-ASY-08: the variant without the asynchronous layer.
+# CONFIG_ESPK_ASYNC is not set
