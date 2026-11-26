@@ -513,3 +513,80 @@ tests:
     impl: "tests/target/test_async_off.py::test_say_and_cancel_are_not_supported_and_there_is_no_task"
     status: successful
     result: {commit: 5b2ba73, date: 2026-11-26, run: "sync variant (sdkconfig.sync.defaults) of 5b2ba73 built locally, flashed with bench flash; ESPK_SYNC_BUILD=research/firmware/build-sync ESPK_ARTIFACT=/tmp/fw-sync pytest tests/target/test_async_off.py --run-bench"}
+  - id: TC-SYN-04
+    title: "A second espk_init() without espk_deinit() gives ESP_ERR_INVALID_STATE and changes nothing"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-04]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_a_second_init_is_refused_and_changes_nothing"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-05
+    title: "espk_synth() before espk_init() (after espk_deinit()) gives ESP_ERR_INVALID_STATE; init brings it back"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-05]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_synth_without_init_is_refused_and_init_brings_it_back"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-11
+    title: "espk_deinit() then espk_init(): ready, internal heap within 1 KB, the PCM equals R1 from a clean start"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-11]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_deinit_then_init_is_ready_with_the_same_heap_within_1_kb"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-03
+    title: "The callback returning false at the 3rd block stops the synthesis with ESPK_ERR_CANCELLED after exactly 3 calls"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-03]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_the_callback_returning_false_stops_the_synthesis"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-07
+    title: "Defaults after boot: 175 ppm, pitch 50, 22 050 Hz, volume 5; info complete and coherent with boot; a refused rate changes nothing; rate 220 is faster"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-07, FR-SYN-02, FR-SYN-08, FR-RES-06, FR-RES-13]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_defaults_info_and_rate"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-RES-14
+    title: "mem reports four numbers in bytes"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-14]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_mem_reports_four_numbers"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-SYN-10
+    title: "espk_synth() during a synthesis in progress gives ESP_ERR_INVALID_STATE"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-SYN-10]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_a_sync_synth_during_a_say_is_refused"
+    status: not done
+    reason: "not implemented: the test has not run yet"

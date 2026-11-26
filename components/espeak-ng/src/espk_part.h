@@ -13,5 +13,9 @@ typedef struct __attribute__((packed)) {
 
 esp_err_t espk_part_mount(const char *label, uint8_t subtype, const char *base, const char *engine_version,
                           const char **reason);
+// Detaches the VFS and the mapping (espk_deinit).
+void espk_part_unmount(const char *base);
+// Size in bytes and CRC32 of the mounted image's body (header excluded).
+void espk_part_info(uint32_t *bytes, uint32_t *crc);
 uint32_t espk_part_count(void);
 const espk_entry_t *espk_part_entry(uint32_t i);

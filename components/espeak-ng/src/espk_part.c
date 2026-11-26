@@ -27,6 +27,7 @@ typedef struct __attribute__((packed)) {
 static const espk_entry_t *s_tab;
 static uint32_t s_count;
 static const uint8_t *s_payload;
+static uint32_t s_image_bytes, s_image_crc;
 static esp_partition_mmap_handle_t s_map;
 
 static struct {
@@ -193,6 +194,8 @@ esp_err_t espk_part_mount(const char *label, uint8_t subtype, const char *base, 
     }
     s_tab = (const espk_entry_t *)(b + HEADER_LEN);
     s_count = h.count;
+    s_image_bytes = (uint32_t)body;
+    s_image_crc = h.crc32;
     s_payload = b + HEADER_LEN + h.count * sizeof(espk_entry_t);
     for (uint32_t i = 0; i < s_count; i++) {
         if (s_tab[i].name[sizeof s_tab[i].name - 1] != '\0' ||
@@ -225,3 +228,19 @@ fail:
 }
 
 uint32_t espk_part_count(void) { return s_count; }
+
+void espk_part_info(uint32_t *bytes, uint32_t *crc)
+{
+    *bytes = s_image_bytes;
+    *crc = s_image_crc;
+}
+
+void espk_part_unmount(const char *base)
+{
+    esp_vfs_unregister(base);
+    if (s_tab) esp_partition_munmap(s_map);
+    s_tab = NULL;
+    s_count = 0;
+    s_payload = NULL;
+    memset(s_fd, 0, sizeof s_fd);
+}

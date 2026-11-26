@@ -11,6 +11,7 @@ esp_err_t espk_async_start(const espk_config_t *cfg)
     (void)cfg;
     return ESP_OK;  // FR-ASY-08: no task is created
 }
+void espk_async_stop(void) {}
 esp_err_t espk_say(const char *utf8, espk_pcm_cb_t cb, void *ctx, uint32_t *id)
 {
     (void)utf8, (void)cb, (void)ctx, (void)id;
@@ -50,6 +51,8 @@ typedef struct {
 
 static SemaphoreHandle_t s_lock, s_wake;
 static TaskHandle_t s_task;
+static SemaphoreHandle_t s_exited;
+static atomic_bool s_quit;
 static volatile bool s_stack_in_psram;  // set by the task from the address of its own stack
 static espk_fsm_t s_fsm = {.state = ESPK_ST_UNINIT, .capacity = CONFIG_ESPK_QUEUE_LEN};
 static item_t s_q[RING];
@@ -102,6 +105,7 @@ static void task(void *arg)
     for (;;) {
         xSemaphoreTake(s_wake, portMAX_DELAY);
         for (;;) {
+            if (atomic_load(&s_quit)) break;
             xSemaphoreTake(s_lock, portMAX_DELAY);
             if (s_count == 0) {
                 xSemaphoreGive(s_lock);
@@ -117,6 +121,15 @@ static void task(void *arg)
             int64_t end_us = esp_timer_get_time();
 
             xSemaphoreTake(s_lock, portMAX_DELAY);
+            if (atomic_load(&s_quit)) {  // espk_deinit(): the request in hand is cancelled, not DONE
+                s_head = (s_head + 1) % RING;
+                s_count--;
+                xSemaphoreGive(s_lock);
+                free(it.text);
+                emit(&(espk_evt_t){.type = ESPK_EVT_CANCELLED, .id = it.id, .pcm_ctx = it.ctx,
+                                   .cancel_ms = (uint32_t)((end_us - s_cancel_t0) / 1000)});
+                break;
+            }
             espk_ev_t ev;
             if (s_fsm.state == ESPK_ST_CANCELLING) {
                 ev = ESPK_EV_SYNTH_STOPPED;  // even if the text ended first: a cancelled request is never DONE
@@ -154,6 +167,10 @@ static void task(void *arg)
                 free(dropped[i].text);
             }
         }
+        if (atomic_load(&s_quit)) {  // park: espk_async_stop() deletes the task
+            xSemaphoreGive(s_exited);
+            vTaskSuspend(NULL);
+        }
     }
 }
 
@@ -163,7 +180,12 @@ esp_err_t espk_async_start(const espk_config_t *cfg)
     s_evt_ctx = cfg ? cfg->evt_ctx : NULL;
     s_lock = xSemaphoreCreateMutex();
     s_wake = xSemaphoreCreateBinary();
-    if (!s_lock || !s_wake) return ESP_ERR_NO_MEM;
+    s_exited = xSemaphoreCreateBinary();
+    if (!s_lock || !s_wake || !s_exited) return ESP_ERR_NO_MEM;
+    atomic_store(&s_quit, false);
+    atomic_store(&s_stop, false);
+    s_head = s_count = 0;
+    s_fsm = (espk_fsm_t){.state = ESPK_ST_UNINIT, .capacity = CONFIG_ESPK_QUEUE_LEN};
     UBaseType_t caps = CONFIG_ESPK_TASK_STACK_PSRAM ? MALLOC_CAP_SPIRAM : MALLOC_CAP_INTERNAL;
     if (xTaskCreatePinnedToCoreWithCaps(task, "espk", CONFIG_ESPK_TASK_STACK, NULL, CONFIG_ESPK_TASK_PRIORITY, &s_task,
                                         tskNO_AFFINITY, caps) != pdPASS) {
@@ -181,6 +203,32 @@ esp_err_t espk_task_info(espk_task_info_t *out)
     out->stack_in_psram = s_stack_in_psram;
     out->stack_hwm_bytes = uxTaskGetStackHighWaterMark(s_task) * sizeof(StackType_t);
     return ESP_OK;
+}
+
+void espk_async_stop(void)
+{
+    if (!s_task) return;
+    item_t dropped[RING];
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool busy = s_count > 0;
+    espk_fsm_step(&s_fsm, ESPK_EV_DEINIT);
+    s_cancel_t0 = esp_timer_get_time();
+    atomic_store(&s_stop, true);
+    atomic_store(&s_quit, true);
+    int nd = drop_waiting(dropped, busy ? 1 : 0);
+    xSemaphoreGive(s_lock);
+    xSemaphoreGive(s_wake);
+    xSemaphoreTake(s_exited, portMAX_DELAY);  // the task has finished the request in hand and is parked
+    vTaskDeleteWithCaps(s_task);
+    s_task = NULL;
+    for (int i = nd - 1; i >= 0; i--) {
+        emit(&(espk_evt_t){.type = ESPK_EVT_CANCELLED, .id = dropped[i].id, .pcm_ctx = dropped[i].ctx});
+        free(dropped[i].text);
+    }
+    vSemaphoreDelete(s_lock);
+    vSemaphoreDelete(s_wake);
+    vSemaphoreDelete(s_exited);
+    s_lock = s_wake = s_exited = NULL;
 }
 
 static esp_err_t to_err(espk_res_t r)

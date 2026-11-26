@@ -156,6 +156,77 @@ static void cmd_synth(const char *text)
     }
 }
 
+// --- the component's API on the console, for the core's requirements (FR-SYN-03, 04, 05, 08, 11; FR-RES-06, 13, 14)
+static espk_config_t s_cfg = {.evt_cb = on_event};
+
+static unsigned heap_internal_free(void) { return (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL); }
+
+static void cmd_init(bool deinit)
+{
+    esp_err_t err = deinit ? espk_deinit() : espk_init(&s_cfg);
+    printf("ESPK %s result=%s heap=%u\n", deinit ? "deinit" : "init", esp_err_to_name(err), heap_internal_free());
+}
+
+static void cmd_rate(const char *arg)
+{
+    int ppm = atoi(arg);
+    esp_err_t err = espk_set_rate(ppm);
+    if (err == ESP_OK) {
+        printf("ESPK rate ok=%d\n", ppm);
+    } else {
+        printf("ESPK rate err=%s\n", esp_err_to_name(err));
+    }
+}
+
+static void cmd_info(void)
+{
+    espk_info_t i;
+    if (espk_get_info(&i) != ESP_OK) {
+        printf("ESPK error code=ESP_ERR_INVALID_STATE\n");
+        return;
+    }
+    static char langs[256];
+    espk_list_voices(langs, sizeof langs);
+    const esp_app_desc_t *app = esp_app_get_description();
+    printf("ESPK info fw=%s idf=%s espeak=1.52.0 rate=%d image_bytes=%u image_crc=%08x langs=%s voice=%s "
+           "rate_ppm=%d pitch=%d volume=%d\n",
+           app->version, esp_get_idf_version(), i.sample_rate, (unsigned)i.image_bytes, (unsigned)i.image_crc, langs,
+           i.voice, i.rate_ppm, i.pitch, s_vol.vol);
+}
+
+static void cmd_mem(void)
+{
+    printf("ESPK mem internal_free=%u internal_min=%u psram_free=%u psram_min=%u\n", heap_internal_free(),
+           (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL),
+           (unsigned)heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
+           (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_SPIRAM));
+}
+
+typedef struct {
+    int calls, limit;
+} cut_t;
+
+static bool on_cut(const int16_t *pcm, size_t n, void *arg)
+{
+    (void)pcm, (void)n;
+    cut_t *c = arg;
+    c->calls++;
+    return c->calls < c->limit;  // false on the limit-th block
+}
+
+static void cmd_cut(const char *arg)  // cut <n> <text>: the callback returns false at the n-th block (FR-SYN-03)
+{
+    char *end;
+    long limit = strtol(arg, &end, 10);
+    if (end == arg || *end != ' ') {
+        printf("ESPK error code=usage\n");
+        return;
+    }
+    cut_t c = {.limit = (int)limit};
+    esp_err_t err = espk_synth(end + 1, on_cut, &c);
+    printf("ESPK cut calls=%d result=0x%x\n", c.calls, (unsigned)err);
+}
+
 static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
 {
     espk_task_info_t ti;
@@ -183,6 +254,16 @@ static void dispatch(char *line)
         cmd_synth(line + 6);
     } else if (strcmp(line, "taskinfo") == 0) {
         cmd_taskinfo();
+    } else if (strcmp(line, "init") == 0 || strcmp(line, "deinit") == 0) {
+        cmd_init(line[0] == 'd');
+    } else if (strncmp(line, "rate ", 5) == 0) {
+        cmd_rate(line + 5);
+    } else if (strcmp(line, "info") == 0) {
+        cmd_info();
+    } else if (strcmp(line, "mem") == 0) {
+        cmd_mem();
+    } else if (strncmp(line, "cut ", 4) == 0) {
+        cmd_cut(line + 4);
     } else if (strncmp(line, "voice ", 6) == 0) {
         if (espk_set_voice(line + 6) == ESP_OK) {
             printf("ESPK voice ok=%s\n", line + 6);
@@ -237,8 +318,7 @@ void app_main(void)
     espk_vol_init(&s_vol);
     s_audio_ok = espk_aud_init() == ESP_OK;  // FR-ERR-01: a missing codec is reported, not fatal
     int64_t t0 = esp_timer_get_time();
-    espk_config_t cfg = {.evt_cb = on_event};
-    esp_err_t err = espk_init(&cfg);
+    esp_err_t err = espk_init(&s_cfg);
     int64_t init_ms = (esp_timer_get_time() - t0) / 1000;
     static char langs[256] = "";
     if (err == ESP_OK) espk_list_voices(langs, sizeof langs);

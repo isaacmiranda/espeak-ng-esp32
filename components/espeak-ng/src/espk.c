@@ -88,6 +88,36 @@ esp_err_t espk_init(const espk_config_t *cfg)
     return ESP_OK;
 }
 
+esp_err_t espk_deinit(void)
+{
+    if (!s_ready) return ESP_ERR_INVALID_STATE;
+    espk_async_stop();
+    espeak_ng_Terminate();
+    espk_part_unmount(CONFIG_ESPK_MOUNT_POINT);
+    s_ready = false;
+    s_voice[0] = '\0';
+    return ESP_OK;
+}
+
+esp_err_t espk_get_info(espk_info_t *out)
+{
+    if (!s_ready) return ESP_ERR_INVALID_STATE;
+    if (!out) return ESP_ERR_INVALID_ARG;
+    out->sample_rate = espeak_ng_GetSampleRate();
+    espk_part_info(&out->image_bytes, &out->image_crc);
+    strlcpy(out->voice, s_voice, sizeof out->voice);
+    out->rate_ppm = espeak_GetParameter(espeakRATE, 1);
+    out->pitch = espeak_GetParameter(espeakPITCH, 1);
+    return ESP_OK;
+}
+
+esp_err_t espk_set_pitch(int pitch)
+{
+    if (!s_ready) return ESP_ERR_INVALID_STATE;
+    if (pitch < 0 || pitch > 100) return ESP_ERR_INVALID_ARG;
+    return espeak_ng_SetParameter(espeakPITCH, pitch, 0) == ENS_OK ? ESP_OK : ESP_FAIL;
+}
+
 int espk_sample_rate(void) { return s_ready ? espeak_ng_GetSampleRate() : 0; }
 
 esp_err_t espk_set_voice(const char *voice)

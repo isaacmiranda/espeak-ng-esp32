@@ -50,6 +50,25 @@ esp_err_t espk_init(const espk_config_t *cfg);
 // Sample rate the engine produces (0 before espk_init).
 int espk_sample_rate(void);
 
+// Terminates the engine, ends the synthesis task (cancelling what is in progress, FSD 15.2) and unmounts the
+// data. ESP_ERR_INVALID_STATE when not initialised. A new espk_init() then starts clean (FR-SYN-11).
+esp_err_t espk_deinit(void);
+
+typedef struct {
+    int sample_rate;
+    uint32_t image_bytes;  // size of the mounted data image's body
+    uint32_t image_crc;    // its CRC32
+    char voice[48];
+    int rate_ppm;          // speech rate in words per minute
+    int pitch;             // 0..100
+} espk_info_t;
+
+// What the component is running with. ESP_ERR_INVALID_STATE when not initialised.
+esp_err_t espk_get_info(espk_info_t *out);
+
+// Pitch 0..100 (the upstream's range); ESP_ERR_INVALID_ARG outside it.
+esp_err_t espk_set_pitch(int pitch);
+
 // Switches to a voice present in the image; ESP_ERR_NOT_FOUND keeps the previous one.
 esp_err_t espk_set_voice(const char *voice);
 
