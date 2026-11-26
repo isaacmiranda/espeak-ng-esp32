@@ -346,3 +346,36 @@ tests:
     impl: "tests/host/test_ucd_agreement.py::test_ucd_tools_agree_with_the_desktop_libc_except_the_listed_code_points"
     status: successful
     result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
+  - id: TC-ENG-05-elf
+    title: "Intact mode (CONFIG_ESPK_UCD_WRAP=n) builds, and its ELF has no __wrap_isw* symbol"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ENG-05]
+    needs: []
+    impl: "tests/target/test_intact.py::test_intact_elf_has_no_wrap_symbols"
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "intact variant (sdkconfig.intact.defaults) built locally, flashed with bench flash; ESPK_INTACT_BUILD=research/firmware/build-intact ESPK_ARTIFACT=/tmp/fw-intact pytest tests/target/test_intact.py --run-bench"}
+  - id: TC-ENG-05
+    title: "Intact mode on the board: the PCM diverges from R1 starting at the first accented item"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ENG-05]
+    needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
+    impl: "tests/target/test_intact.py::test_intact_board_diverges_from_r1_starting_at_the_first_accented_item"
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "intact variant (sdkconfig.intact.defaults) built locally, flashed with bench flash; ESPK_INTACT_BUILD=research/firmware/build-intact ESPK_ARTIFACT=/tmp/fw-intact pytest tests/target/test_intact.py --run-bench"}
+  - id: TC-ENG-05-noaccent
+    title: "Intact mode on the board: English text from a reset equals R1"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-ENG-05]
+    needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
+    impl: "tests/target/test_intact.py::test_intact_board_equals_r1_without_accents"
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "intact variant (sdkconfig.intact.defaults) built locally, flashed with bench flash; ESPK_INTACT_BUILD=research/firmware/build-intact ESPK_ARTIFACT=/tmp/fw-intact pytest tests/target/test_intact.py --run-bench"}

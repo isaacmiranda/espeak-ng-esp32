@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-ENG-05: the "intact" variant — the engine on the ESP32 libc as it is, no isw* redirection.
+CONFIG_ESPK_UCD_WRAP=n

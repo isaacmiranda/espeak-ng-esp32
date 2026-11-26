@@ -3,15 +3,15 @@
 Documento de **retomada**: onde o trabalho está e o que fazer a seguir, para uma sessão nova começar sem perguntar.
 A posição **derivada** (testes, requisitos, portões) está em [`testing/test-plan.yaml`](../../../testing/test-plan.yaml) e
 na [FSD](../../Functionality/FSD.md); este arquivo só aponta e lista o que o plano não diz. **Quem encerra uma sessão
-atualiza este arquivo.** Última atualização: 2026-11-26, commit `9946bf8`.
+atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 ## Como abrir a sessão
 
 1. Leia `CLAUDE.md` e [`AI-Workflow.md`](../AI-Workflow.md).
 2. Abra a sessão dizendo onde o projeto está (skill `/build`, §0): Fase 3, **onda 1** (só testes `standard` e
    funcionalidades; deviation e negative ficam travados).
-3. Confira a árvore: `git status`, `git log --oneline -5`, `gh run list -w ci -L 1` (o último CI verde foi `9946bf8`).
-4. A placa está no notebook com o firmware de pesquisa (build local de `6951a9e`). Antes de gravar outra coisa, leia o
+3. Confira a árvore: `git status`, `git log --oneline -5`, `gh run list -w ci -L 1` (o último CI verde conhecido foi `9946bf8`).
+4. A placa está no notebook com o firmware de pesquisa normal (build local de `6951a9e`, regravado depois da variante intacta). Antes de gravar outra coisa, leia o
    que está nela (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`); ela é compartilhada com o
    AlertAlergo V3.
 
@@ -19,36 +19,33 @@ atualiza este arquivo.** Última atualização: 2026-11-26, commit `9946bf8`.
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 21 de 23 declarados `successful` no commit `6951a9e` (jornada 1, 2, 4 e 5 verdes). Faltam **JRN-03**
+- **Testes:** 24 de 26 declarados `successful` (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). Faltam **JRN-03**
   (áudio pelo alto-falante) e **JRN-06** (cancelar no meio da fala).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
+- **FR-ENG-05 (modo intacto) feito:** variante `research/firmware/sdkconfig.intact.defaults` (`-B build-intact -D SDKCONFIG=build-intact/sdkconfig "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.intact.defaults"`); ELF sem `__wrap_isw*`; na placa a divergência de R1 começa no primeiro item acentuado e **se espalha** (100 de 100 itens divergem, inclusive inglês depois do primeiro acento, pelo estado do motor); inglês sem acento desde um reset é igual a R1.
 - **Capacidades ainda `unproven`:** `audio-out` (ES8311/I2S) e `release-verification` (o runner).
 
 ## Próximos atos, em ordem
 
-1. **FR-ENG-05, modo "intacto".** Build com `CONFIG_ESPK_UCD_WRAP=n` (`-D` no `sdkconfig` ou
-   `sdkconfig.defaults` de uma variante): deve compilar e funcionar. Teste primeiro (`xfail` enquanto não existe):
-   `nm` do ELF sem `__wrap_isw*` e, na placa, a divergência de R1 **só** nos itens acentuados (o
-   `tests/target/test_equivalence.py` já grava `test-results/equivalence-report.json`). Entra no plano como `TC-ENG-05`.
-2. **Áudio pelo ES8311 (JRN-03, capacidade `audio-out`).** Portar `seed/alertalergo-port/firmware/components/l1_audio/`
+1. **Áudio pelo ES8311 (JRN-03, capacidade `audio-out`).** Portar `seed/alertalergo-port/firmware/components/l1_audio/`
    (`audio_es8311.c`: I2C `0x18`, I2S 0, `esp_codec_dev`) para o firmware de pesquisa, adaptado ao PCM a 22 050 Hz mono,
    e escrever o comando `say` sem `--mute`, `volume`, `listen open|close` (FR-RES-04, 07, 08, 09, 12). **Faz som na
    placa:** volume padrão 5, teto de bancada 10 (o driver recusa mais, `bancada.md`); alguém presente, sem alto-falante
    junto ao ouvido. Escrever o `JRN-03` antes do código.
-3. **Cancelar (JRN-06) e a camada assíncrona (§15, FR-RES-10 e 11, FR-ASY-*).** Tarefa de síntese com fila, pilha de
+2. **Cancelar (JRN-06) e a camada assíncrona (§15, FR-RES-10 e 11, FR-ASY-*).** Tarefa de síntese com fila, pilha de
    64 KB na PSRAM, `espk_say`/`espk_cancel`, eventos START/DONE/CANCELLED. A tabela de estados da §15.2 é testável no host
    como função pura. O R1 precisa passar a repetir o cancelamento no mesmo bloco (passo novo no roteiro de `pcm_script.c`).
-4. **Comandos que faltam no console:** `rate`, `info`, `mem`, `load` (FR-RES-06, 13, 14; `load` é v0.2).
-5. **Parte B restante:** `espk_deinit`, `espk_set_rate`, relatório de capacidade e falhas de build (§13), `Kconfig`
+3. **Comandos que faltam no console:** `rate`, `info`, `mem`, `load` (FR-RES-06, 13, 14; `load` é v0.2).
+4. **Parte B restante:** `espk_deinit`, `espk_set_rate`, relatório de capacidade e falhas de build (§13), `Kconfig`
    completo (§19), erros do Apêndice B, FR-DAT-01 a 06 com partição trocada ou corrompida (precisa de gravação de imagem
    ruim: `bench flash` de uma imagem com CRC errado e depois regravar o artefato).
-6. **R2 como ferramenta (FR-REF-05 a 07).** Hoje só houve uma comparação exploratória (CLI do Ubuntu = CLI do R1, bit a
+5. **R2 como ferramenta (FR-REF-05 a 07).** Hoje só houve uma comparação exploratória (CLI do Ubuntu = CLI do R1, bit a
    bit). Falta `tools/ref/r2.py`: API × API e CLI × CLI, todos os idiomas, relatório com a versão do pacote.
-7. **Corpora e ASR (FR-COR-03 a 07, FR-ASR-*).** Corpus automático para todos os idiomas, lista de frequência Leipzig
+6. **Corpora e ASR (FR-COR-03 a 07, FR-ASR-*).** Corpus automático para todos os idiomas, lista de frequência Leipzig
    (CC BY 4.0, versão fixada por SHA-256), frases imprevisíveis geradas por semente, `whisper.cpp` no CI.
-8. **Empacotamento e publicação (F4):** dados de todos os idiomas gerados pelo CI (fora do git), `phsource/` e
+7. **Empacotamento e publicação (F4):** dados de todos os idiomas gerados pelo CI (fora do git), `phsource/` e
    `dictsource/`, `idf_component.yml`, README e traduções (`source-revision`), `AI-USE.md`, exemplo `hello` e
    `waveshare-s3-rlcd`. **Upload de teste ao *staging* do Registro antes de tudo** (OD-02: o `espeak-ng-data` completo
    tem ≈ 24 MB instalado e o Registro não publica limite).
