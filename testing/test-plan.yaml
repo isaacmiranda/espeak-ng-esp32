@@ -676,8 +676,8 @@ tests:
     verifies: [FR-DAT-02, FR-DAT-01]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_variants.py::test_a_missing_partition_label_gets_not_found"
-    status: not done
-    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
+    status: successful
+    result: {commit: 5db89d8, date: 2026-11-26, run: "variant (sdkconfig.<name>.defaults) of 5db89d8 built by scripts/variants.sh, flashed with bench flash, pytest tests/target/test_variants.py --run-bench"}
   - id: TC-DAT-01
     title: "The partition is found by label and subtype: the right label with another subtype is not found"
     shape: atomic
@@ -687,8 +687,8 @@ tests:
     verifies: [FR-DAT-01]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_variants.py::test_a_wrong_partition_subtype_gets_not_found"
-    status: not done
-    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
+    status: successful
+    result: {commit: 5db89d8, date: 2026-11-26, run: "variant (sdkconfig.<name>.defaults) of 5db89d8 built by scripts/variants.sh, flashed with bench flash, pytest tests/target/test_variants.py --run-bench"}
   - id: TC-MEM-01
     title: "A build without PSRAM: espk_init() gives ESP_ERR_NOT_SUPPORTED, nothing is loaded, no panic"
     shape: atomic
@@ -698,5 +698,5 @@ tests:
     verifies: [FR-MEM-01]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_variants.py::test_a_build_without_psram_is_refused_without_loading_the_engine"
-    status: not done
-    reason: "not implemented: the variant is not built yet (scripts/variants.sh)"
+    status: successful
+    result: {commit: 5db89d8, date: 2026-11-26, run: "variant (sdkconfig.<name>.defaults) of 5db89d8 built by scripts/variants.sh, flashed with bench flash, pytest tests/target/test_variants.py --run-bench"}
