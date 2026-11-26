@@ -143,7 +143,7 @@ def test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported(flashed):
 
 
 def test_init_with_too_little_psram_is_refused_and_nothing_is_loaded(flashed):
-    """FR-CAP-10: with the PSRAM taken (a test seam) below the report's peak, espk_init() gives ESP_ERR_NO_MEM,
+    """FR-CAP-10: with the PSRAM taken (a test seam) below the peak, espk_init() gives ESP_ERR_NO_MEM,
     the component stays UNINIT, and once the PSRAM is back it starts."""
     _ready()
     m, _p = board.command("deinit", r"^ESPK deinit")
