@@ -8,12 +8,12 @@
 # A capability with available: unproven counts as unavailable and is a debugging-agenda item.
 
 fsd: docs/Functionality/FSD.md
-phase: 1            # 0 definition · 1 harness · 2 commissioning · 3 build
+phase: 2            # 0 definition · 1 harness · 2 commissioning · 3 build
 wave: 1             # 1 standard · 2 deviation · 3 negative + security (locked until the previous is green)
 
 gates:
   load-defined:   {verdict: null, date: null, commit: null}
-  ai-harnessed:   {verdict: null, date: null, commit: null}
+  ai-harnessed:   {verdict: OPEN, date: 2026-11-26, commit: bc2927a}   # fresh checker; note: tests/bench/ must exist before the first tag
   dut-ready:      {verdict: null, date: null, commit: null}
   ready-for-shipment: {verdict: null, date: null, commit: null}
   shipped:        {verdict: null, date: null, commit: null}
