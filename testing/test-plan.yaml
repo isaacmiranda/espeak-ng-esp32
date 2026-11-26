@@ -219,8 +219,8 @@ tests:
     verifies: [FR-DAT-07]
     needs: [r1-host-reference]
     impl: "tests/host/test_image.py::test_image_is_deterministic"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 5482045, date: 2026-11-26, run: "local pytest tests/host"}
   - id: TC-DAT-05-host
     title: "The reference reader gets back every file of the image byte for byte; header and table follow FSD Appendix A"
     shape: atomic
@@ -230,5 +230,5 @@ tests:
     verifies: [FR-DAT-05]
     needs: [r1-host-reference]
     impl: "tests/host/test_image.py::test_image_round_trip_and_layout"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 5482045, date: 2026-11-26, run: "local pytest tests/host"}
