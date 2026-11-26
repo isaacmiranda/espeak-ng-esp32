@@ -19,13 +19,14 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 31 de 31 declarados `successful` (a onda 1 só fecha com os testes de FR-ASY-01/02/04..08 e o resto da lista abaixo, ainda por declarar) (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). 
+- **Testes:** 38 de 38 declarados `successful` (a onda 1 só fecha com os testes ainda por declarar da lista abaixo) (jornada 1, 2, 4 e 5 verdes; TC-ENG-05 em três partes, sobre o `6951a9e`). 
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
 - **FR-ENG-05 (modo intacto) feito:** variante `research/firmware/sdkconfig.intact.defaults` (`-B build-intact -D SDKCONFIG=build-intact/sdkconfig "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.intact.defaults"`); ELF sem `__wrap_isw*`; na placa a divergência de R1 começa no primeiro item acentuado e **se espalha** (100 de 100 itens divergem, inclusive inglês depois do primeiro acento, pelo estado do motor); inglês sem acento desde um reset é igual a R1.
 - **Volume (FR-RES-07, 08, 09):** `volume` sem argumento responde `ESPK volume ok=<n>`, argumento ruim `err=range`, `listen close` volta ao padrão 5 (propostas minhas, ainda sem aceite). O guarda do driver barra `volume` > 10 antes da placa; o teste de 11 é do host.
-- **Cancelar (JRN-06) verde** (`a55a70d`): `cancel` no meio de uma fala de 985 bytes → `ESPK cancelled id=<n> cancel_ms=5`; `cancel_ms` é proposta minha (medida no chip, da chamada ao evento). Os pedidos tirados da fila também recebem `cancelled` (para o dono liberar o contexto); um `say` durante `CANCELLING` fala logo depois do `CANCELLED` (a tabela não diz; proposta).\n- **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5 é inaudível; a escuta do responsável (30 não, 70 sim, baixa) provou o caminho: `audio-out: yes`. A placa tem o firmware de `174a978`.
+- **Cancelar (JRN-06) verde** (`a55a70d`): `cancel` no meio de uma fala de 985 bytes → `ESPK cancelled id=<n> cancel_ms=5`; `cancel_ms` é proposta minha (medida no chip, da chamada ao evento). Os pedidos tirados da fila também recebem `cancelled` (para o dono liberar o contexto); um `say` durante `CANCELLING` fala logo depois do `CANCELLED` (a tabela não diz; proposta).\n- **Marcadores e comandos de pesquisa novos (propostas minhas):** `ESPK queued id= queue_us=` (resposta do `say`), `synth <texto>` → `ESPK sync sha256=` (caminho síncrono), `taskinfo` → `stack= psram= hwm=` ou `task=none`, `cancel` → `ESPK cancel err=` só em erro. Variantes de build: `sdkconfig.intact.defaults`, `sdkconfig.sync.defaults` (`-B build-intact` / `-B build-sync`, mesmo formato do intacto).
+- **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5 é inaudível; a escuta do responsável (30 não, 70 sim, baixa) provou o caminho: `audio-out: yes`. A placa tem o firmware de `174a978`.
 - **Capacidades ainda `unproven`:** `release-verification` (o runner).
 
 ## Próximos atos, em ordem
@@ -34,11 +35,9 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
    decidir o **nível de saída**: o PCM do eSpeak não tem ganho, e o AlertAlergo subiu +4 dB com compressão suave. Um ganho só
    pode entrar depois do hash (R3 = R1 exige o PCM intacto); é proposta minha, sem requisito (NFR-AUD?). `audio-out` já é `yes`.
    Falta a metade de FR-RES-07/09 na placa com `--listening` (`volume 60` aceito dentro da sessão, recusado depois).
-2. **Fechar a camada assíncrona (§15).** A tarefa, a fila, `espk_say`, `espk_cancel`, os eventos e o `cancel` do console
-   existem (`components/espeak-ng/src/espk_async.c`, tabela em `espk_fsm.c`) e o JRN-06 está verde (`cancel_ms=5`). Faltam os
-   testes declarados de FR-ASY-01 (retorno ≤ 5 ms), -02, -04 (fila cheia → `NO_MEM`), -05 (pilha 65 536 B na PSRAM), -06 (build
-   falha abaixo de 49 152 B, ainda sem a verificação), -07 (R3 já passa pelo caminho assíncrono, falta o teste que o diga),
-   -08 (`CONFIG_ESPK_ASYNC=n`), `espk_deinit` (FR-SYN-11) e o passo de cancelamento no R1 (`pcm_script.c`) para o hash depois de cancelar (FR-SYN-03, FR-ASY-03).
+2. **Sobra da camada assíncrona (§15):** `espk_deinit` (FR-SYN-11, e o `UNINIT` da tabela) e o passo de cancelamento no R1
+   (`pcm_script.c`: repetir o cancelamento no mesmo bloco) para o hash do `say` depois de cancelar (FR-SYN-03, FR-ASY-03).
+   Feitos e verdes: FR-ASY-01 (5 ms), -02, -04, -05, -06, -07, -08, -09 e JRN-06.
 3. **Comandos que faltam no console:** `rate`, `info`, `mem`, `load` (FR-RES-06, 13, 14; `load` é v0.2).
 4. **Parte B restante:** `espk_deinit`, `espk_set_rate`, relatório de capacidade e falhas de build (§13), `Kconfig`
    completo (§19), erros do Apêndice B, FR-DAT-01 a 06 com partição trocada ou corrompida (precisa de gravação de imagem
