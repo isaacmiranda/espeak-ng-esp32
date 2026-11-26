@@ -863,8 +863,8 @@ tests:
     verifies: [FR-CAP-01]
     needs: []
     impl: "tests/host/test_capacity.py::test_the_menuconfig_offers_the_language_list_and_the_all_option"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-02
     title: "An unknown language fails with the list of valid names"
     shape: atomic
@@ -874,8 +874,8 @@ tests:
     verifies: [FR-CAP-02]
     needs: []
     impl: "tests/host/test_capacity.py::test_an_unknown_language_fails_with_the_valid_names"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-03
     title: "With no list the image has English only"
     shape: atomic
@@ -885,8 +885,8 @@ tests:
     verifies: [FR-CAP-03]
     needs: []
     impl: "tests/host/test_capacity.py::test_the_default_list_is_english_only"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-04
     title: "An initial voice outside the language list fails"
     shape: atomic
@@ -896,8 +896,8 @@ tests:
     verifies: [FR-CAP-04]
     needs: []
     impl: "tests/host/test_capacity.py::test_the_initial_voice_must_be_in_the_list"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-05
     title: "The report has image and partition size, PSRAM peak, internal static RAM, task stack and where"
     shape: atomic
@@ -907,8 +907,8 @@ tests:
     verifies: [FR-CAP-05]
     needs: []
     impl: "tests/host/test_capacity.py::test_the_report_has_the_four_items"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-06
     title: "An image larger than the partition fails and says the sizes and the difference"
     shape: atomic
@@ -918,8 +918,8 @@ tests:
     verifies: [FR-CAP-06]
     needs: []
     impl: "tests/host/test_capacity.py::test_an_image_larger_than_the_partition_fails_with_the_sizes"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-07
     title: "A PSRAM peak above the budget fails"
     shape: atomic
@@ -929,8 +929,8 @@ tests:
     verifies: [FR-CAP-07]
     needs: []
     impl: "tests/host/test_capacity.py::test_a_peak_above_the_budget_fails"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-08
     title: "At 91 % of the partition the build warns and goes on; at 80 % it is silent"
     shape: atomic
@@ -940,8 +940,8 @@ tests:
     verifies: [FR-CAP-08]
     needs: []
     impl: "tests/host/test_capacity.py::test_a_partition_91_percent_full_warns_and_builds"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
   - id: TC-CAP-09
     title: "Growing a dictionary by 100 000 bytes grows the image and the peak by exactly that"
     shape: atomic
@@ -951,5 +951,5 @@ tests:
     verifies: [FR-CAP-09]
     needs: []
     impl: "tests/host/test_capacity.py::test_the_report_follows_the_files_not_a_table"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3daf5c0, date: 2026-11-26, run: "local pytest tests/host/test_capacity.py on the R1 data of the pinned upstream (map of research/firmware/build for the report)"}
