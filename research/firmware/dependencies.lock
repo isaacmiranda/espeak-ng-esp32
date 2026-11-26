@@ -16,6 +16,6 @@ dependencies:
 direct_dependencies:
 - espressif/esp_codec_dev
 - idf
-manifest_hash: d55dae4cf83279c9d462de6d490712657dd4a774be5686c1c45b387b66fc7130
+manifest_hash: 61bfd5b74b7757628f7fd60193bf174d56b3bedbb1716fc9a91ef23f8889ea80
 target: esp32s3
 version: 2.0.0

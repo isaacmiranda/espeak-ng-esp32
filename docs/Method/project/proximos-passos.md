@@ -66,6 +66,7 @@ Valores e comportamentos que **eu propus** (não estão na FSD; entram como requ
   ruim dá `err=range`, `listen close` volta ao 5; pedidos tirados da fila também recebem `cancelled`; um `say` durante
   `CANCELLING` fala depois do `CANCELLED`; `SAY_TOO_BIG` dá `INVALID_SIZE` em todo estado vivo; o `underrun` é estimado
   (escrita que chega com o alto-falante já seco).
+- **NFR-SYN-04, leitura minha:** "heap interna livre final a até 1 KB da inicial" virou "não encolhe mais de 1 KB" (a primeira síntese depois de trocar de voz libera 2 436 B transitórios, a heap termina acima da inicial) mais "constante a partir da segunda síntese". Desempenho medido: RTF máximo 0,225 e primeiro bloco ≤ 29 ms em todo o corpus pt-BR, com a `.bss` na PSRAM.
 - **FR-SYN-11 (decisão):** o upstream vaza 1 344 B por ciclo `espk_deinit`/`espk_init` (`DoVoiceChange` não é liberado por
   `espeak_ng_Terminate`). Opções: (a) afrouxar a tolerância de 1 KB para o vazamento medido e registrar a limitação,
   (b) levar a correção ao upstream (a regra do projeto) e manter o xfail até ela entrar, (c) as duas. Recomendo (c).

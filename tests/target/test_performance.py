@@ -70,7 +70,7 @@ def test_the_longest_text_does_not_trigger_the_watchdog(flashed):
 def test_fifty_syntheses_in_a_row_leave_the_internal_heap_where_it_was(flashed):
     """NFR-SYN-04: 50 corpus items, no reset, and the internal heap free at the end no more than 1 KB below
     the start. (Read as "no leak": the first synthesis after a voice change frees 2 436 B of transient
-    allocations, so the heap ends higher, which is not a violation.) From the second synthesis on it is flat."""
+    allocations, so the heap ends higher, which is no violation.) From the second synthesis on it is flat."""
     _start_pt_br()
     m, _p = board.command("mem", r"^ESPK mem")
     before = int(m.fields["internal_free"])
