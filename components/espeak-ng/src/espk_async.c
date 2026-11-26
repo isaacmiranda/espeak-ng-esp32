@@ -188,7 +188,7 @@ esp_err_t espk_async_start(const espk_config_t *cfg)
     s_fsm = (espk_fsm_t){.state = ESPK_ST_UNINIT, .capacity = CONFIG_ESPK_QUEUE_LEN};
     UBaseType_t caps = CONFIG_ESPK_TASK_STACK_PSRAM ? MALLOC_CAP_SPIRAM : MALLOC_CAP_INTERNAL;
     if (xTaskCreatePinnedToCoreWithCaps(task, "espk", CONFIG_ESPK_TASK_STACK, NULL, CONFIG_ESPK_TASK_PRIORITY, &s_task,
-                                        tskNO_AFFINITY, caps) != pdPASS) {
+                                        CONFIG_ESPK_TASK_CORE < 0 ? tskNO_AFFINITY : CONFIG_ESPK_TASK_CORE, caps) != pdPASS) {
         ESP_LOGE(TAG, "task: ESP_ERR_NO_MEM (stack %d)", CONFIG_ESPK_TASK_STACK);
         return ESP_ERR_NO_MEM;
     }

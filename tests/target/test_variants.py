@@ -46,3 +46,16 @@ def test_a_build_without_psram_is_refused_without_loading_the_engine(flashed):
     """FR-MEM-01: espk_init() without initialised PSRAM -> ESP_ERR_NOT_SUPPORTED, nothing loaded."""
     _variant("nopsram", "# CONFIG_SPIRAM is not set")
     _refused("ESP_ERR_NOT_SUPPORTED")
+
+
+def test_the_configured_mount_point_is_the_one_used(flashed):
+    """FR-CFG-02: with CONFIG_ESPK_MOUNT_POINT="/voice" the data are read there and /espeak is empty."""
+    _variant("mount", 'CONFIG_ESPK_MOUNT_POINT="/voice"')
+    ms, p = board.boot()
+    assert "ready" in ms, p.stdout
+    m, _p = board.command("say --mute Hello there.", r"^ESPK (done|error)", timeout=30)
+    assert m.event == "done", m
+    m, _p = board.command("vfs /voice/phontab", r"^ESPK vfs")
+    assert "err" not in m.fields and int(m.fields["size"]) > 0, m.fields
+    m, _p = board.command("vfs /espeak/phontab", r"^ESPK vfs")
+    assert m.fields == {"err": "2"}, m.fields  # ENOENT: nothing is mounted at the default point

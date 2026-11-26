@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-CFG-02: a variant with another mount point (the default is /espeak).
+CONFIG_ESPK_MOUNT_POINT="/voice"

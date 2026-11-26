@@ -7,13 +7,14 @@
 #   nolabel   a partition label the table lacks   FR-DAT-02      tests/target/test_variants.py
 #   nosubtype the right label, another subtype    FR-DAT-01      tests/target/test_variants.py
 #   nopsram   built without PSRAM                 FR-MEM-01      tests/target/test_variants.py
+#   mount     another VFS mount point             FR-CFG-02      tests/target/test_variants.py
 #   scripts/variants.sh [name...]      (default: all). Needs /tmp/espeak.img (scripts/build-image.sh) and a board.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 img=${ESPK_IMAGE:-/tmp/espeak.img}
 [ -f "$img" ] || { echo "no data image at $img: run scripts/build-image.sh $img" >&2; exit 1; }
-names=("$@"); [ ${#names[@]} -gt 0 ] || names=(intact sync nolabel nosubtype nopsram)
-declare -A test_file=([intact]=test_intact [sync]=test_async_off [nolabel]=test_variants [nosubtype]=test_variants [nopsram]=test_variants)
+names=("$@"); [ ${#names[@]} -gt 0 ] || names=(intact sync nolabel nosubtype nopsram mount)
+declare -A test_file=([intact]=test_intact [sync]=test_async_off [nolabel]=test_variants [nosubtype]=test_variants [nopsram]=test_variants [mount]=test_variants)
 for n in "${names[@]}"; do
   b=research/firmware/build-$n
   echo "== $n: build"

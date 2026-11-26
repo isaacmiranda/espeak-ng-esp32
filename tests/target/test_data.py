@@ -6,6 +6,7 @@ artifact afterwards (P2 of the testing standard): a board left with a broken ima
 """
 
 import errno
+import re
 import shutil
 import struct
 import zlib
@@ -58,11 +59,15 @@ def broken(flashed, tmp_path):
 def _boot_error():
     ms, p = board.boot(timeout=20)
     assert "error" in ms and "ready" not in ms, p.stdout
-    return ms["error"].fields["code"], ms["boot"].fields
+    code = ms["error"].fields["code"]
+    # FR-LOG-02: the component logs the error with its code and reason (tag espk)
+    assert re.search(rf"espk: init: {code} \(\w+\)", p.stdout), p.stdout
+    return code, ms["boot"].fields
 
 
 def test_a_corrupted_image_gets_invalid_crc_and_the_engine_is_not_started(broken):
-    """FR-DAT-03: a flipped payload byte -> ESP_ERR_INVALID_CRC, no languages loaded, no engine."""
+    """FR-DAT-03: a flipped payload byte -> ESP_ERR_INVALID_CRC, no languages loaded, no engine.
+    FR-LOG-02: the same run shows the component's log line with the code and the reason."""
     broken(lambda img: img.__setitem__(len(img) - 100, img[len(img) - 100] ^ 0xFF))
     code, boot = _boot_error()
     assert code == "ESP_ERR_INVALID_CRC" and boot["langs"] == "none", (code, boot)

@@ -15,6 +15,26 @@ menu "eSpeak NG (espk)"
         string "Read-only VFS mount point of the data"
         default "/espeak"
 
+    config ESPK_LANGUAGES
+        string "Languages in the data image (space separated, e.g. \"en pt-br\")"
+        default "en"
+        help
+            Names of the upstream's languages. An unknown name fails the build with the list of valid ones
+            (FR-CAP-02); the first name should be the initial voice (FR-CAP-04).
+
+    config ESPK_LANGUAGES_ALL
+        bool "Every language of the upstream (large image, see the capacity report)"
+        default n
+
+    config ESPK_PSRAM_BUDGET_KB
+        int "PSRAM budget for the engine, KB (the build fails above it)"
+        default 2048
+
+    config ESPK_CAPACITY_WARN_PCT
+        int "Warn when the image or the PSRAM peak passes this percentage of its limit"
+        default 90
+        range 1 100
+
     config ESPK_DEFAULT_VOICE
         string "Initial voice"
         default "en"
@@ -49,6 +69,11 @@ menu "eSpeak NG (espk)"
         int "Synthesis task priority"
         depends on ESPK_ASYNC
         default 5
+
+    config ESPK_TASK_CORE
+        int "Core of the synthesis task (-1: no affinity)"
+        depends on ESPK_ASYNC
+        default -1
 
     config ESPK_QUEUE_LEN
         int "Requests that can wait behind the one being spoken"

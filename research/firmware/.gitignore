@@ -4,3 +4,4 @@ build-trace/
 build-nolabel/
 build-nosubtype/
 build-nopsram/
+build-mount/
