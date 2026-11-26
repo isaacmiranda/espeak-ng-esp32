@@ -71,7 +71,9 @@ capabilities:
     limitation: "every open of the port used to reset the board (DTR lowered before RTS); fixed in tools/bench/bench/ports.py — a reset during a test is a bench fault first"
   audio-out:
     what: "ES8311/I2S plays a test tone at bench volume 5 and the firmware reports underrun=0"
-    available: unproven
+    available: yes
+    observed: {date: 2026-11-26, commit: cc478df, evidence: "listening session with the responsible present: say of the pt-BR item at listen open 30 not heard; at 70 heard but quiet (the eSpeak PCM carries no gain: volume 5 is inaudible by design); underrun=0, audio_ms=2150, volume back to 5 after listen close. Listener position and background noise not recorded (bancada.md risk 2)"}
+    proven_by: [tests/bench/test_journey.py::test_jrn_03_say_speaks_through_the_codec]
   pcm-capture:
     what: "the firmware hashes the PCM delivered to the callback (ESPK done … sha256=) — the R3 seam"
     available: yes

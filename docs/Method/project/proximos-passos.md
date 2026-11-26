@@ -25,14 +25,15 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
   placa soletra as letras acentuadas (#1611).
 - **FR-ENG-05 (modo intacto) feito:** variante `research/firmware/sdkconfig.intact.defaults` (`-B build-intact -D SDKCONFIG=build-intact/sdkconfig "-DSDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.intact.defaults"`); ELF sem `__wrap_isw*`; na placa a divergência de R1 começa no primeiro item acentuado e **se espalha** (100 de 100 itens divergem, inclusive inglês depois do primeiro acento, pelo estado do motor); inglês sem acento desde um reset é igual a R1.
 - **Volume (FR-RES-07, 08, 09):** `volume` sem argumento responde `ESPK volume ok=<n>`, argumento ruim `err=range`, `listen close` volta ao padrão 5 (propostas minhas, ainda sem aceite). O guarda do driver barra `volume` > 10 antes da placa; o teste de 11 é do host.
-- **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5, inaudível: a capacidade `audio-out` segue `unproven` até a escuta do responsável. A placa tem o firmware de `174a978`.
-- **Capacidades ainda `unproven`:** `audio-out` (ES8311/I2S) e `release-verification` (o runner).
+- **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5 é inaudível; a escuta do responsável (30 não, 70 sim, baixa) provou o caminho: `audio-out: yes`. A placa tem o firmware de `174a978`.
+- **Capacidades ainda `unproven`:** `release-verification` (o runner).
 
 ## Próximos atos, em ordem
 
-1. **Confirmar o som de ouvido (`audio-out`) e fechar FR-RES-07/09 na placa.** `volume`, `listen open|close` e o teto 10
-   existem (`espk_volume.c`, host verde). Falta a metade na placa que exige `--listening` (pessoas presentes): `listen open
-   60`, `volume 60`, `say`, `listen close`. O responsável ouve; só então `audio-out: yes`. O volume 5 é inaudível.
+1. **Registrar posição e ruído da escuta de 2026-11-26** (o responsável ouviu a fala em 70, baixa; em 30 não ouviu) e
+   decidir o **nível de saída**: o PCM do eSpeak não tem ganho, e o AlertAlergo subiu +4 dB com compressão suave. Um ganho só
+   pode entrar depois do hash (R3 = R1 exige o PCM intacto); é proposta minha, sem requisito (NFR-AUD?). `audio-out` já é `yes`.
+   Falta a metade de FR-RES-07/09 na placa com `--listening` (`volume 60` aceito dentro da sessão, recusado depois).
 2. **Cancelar (JRN-06) e a camada assíncrona (§15, FR-RES-10 e 11, FR-ASY-*).** Tarefa de síntese com fila, pilha de
    64 KB na PSRAM, `espk_say`/`espk_cancel`, eventos START/DONE/CANCELLED. A tabela de estados da §15.2 é testável no host
    como função pura. O R1 precisa passar a repetir o cancelamento no mesmo bloco (passo novo no roteiro de `pcm_script.c`).
