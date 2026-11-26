@@ -66,6 +66,7 @@ capabilities:
     available: yes
     observed: {date: 2026-11-26, found: "alertalergo 0.0.1-dev.309+g60b6894", left: "espk_research 225e9f8 (CI run 45861574416 artifact)", psram: "8MB octal (AP)"}
     note: "shared with alertalergo-v3-firmware: record the firmware found before flashing and the one left after"
+    equivalence: "R3 = R1: 100 of 100 says equal over the pt-BR and en verification corpus in sequence (6951a9e); without the wrap every say after the first accented one differs"
     data: "ESPK ready with the ESPK image (pt-br, en; 904 477 B) at 0x620000, init_ms=168"
     limitation: "every open of the port used to reset the board (DTR lowered before RTS); fixed in tools/bench/bench/ports.py — a reset during a test is a bench fault first"
   audio-out:
@@ -100,7 +101,7 @@ tests:
     needs: [dut, bench-flash, bench-wait-event, release-verification]
     impl: "tests/bench/test_journey.py::test_jrn_01_boot_carries_the_artifact_commit"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: JRN-02
     title: "ESPK ready: the data image is valid"
     shape: workflow
@@ -111,7 +112,7 @@ tests:
     needs: [dut, bench-wait-event]
     impl: "tests/bench/test_journey.py::test_jrn_02_ready"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: JRN-03
     title: "say a pt-BR verification item: ESPK start, then ESPK done underrun=0"
     shape: workflow
@@ -132,8 +133,8 @@ tests:
     verifies: [FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/bench/test_journey.py::test_jrn_04_pt_br_hash_equals_r1"
-    status: failed
-    result: {commit: cbfa055, date: 2026-11-26, note: "the board's PCM differs from R1 for accented pt-BR text (#1611 confirmed on target); the test also compares out of sequence, a spec defect: the upstream carries state between utterances"}
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: JRN-05
     title: "voice en; say an en item; hash equals R1"
     shape: workflow
@@ -143,8 +144,8 @@ tests:
     verifies: [FR-RES-05, FR-REF-03]
     needs: [dut, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/bench/test_journey.py::test_jrn_05_en_hash_equals_r1"
-    status: failed
-    result: {commit: cbfa055, date: 2026-11-26, note: "compared out of sequence: the upstream carries state between utterances, so the k-th utterance must be compared with R1's k-th; in sequence from a fresh boot the board equals R1 bit for bit"}
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: JRN-06
     title: "cancel during a long utterance: ESPK cancelled within 100 ms"
     shape: workflow
@@ -168,7 +169,7 @@ tests:
     needs: []
     impl: "tests/host/test_upstream.py::test_wrong_tarball_is_refused_before_extraction"
     status: successful
-    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-ENG-02
     title: "Running the regeneration script again leaves components/espeak-ng/upstream/ byte-identical (git diff empty)"
     shape: atomic
@@ -179,7 +180,7 @@ tests:
     needs: []
     impl: "tests/host/test_upstream.py::test_regeneration_is_idempotent"
     status: successful
-    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-REF-01
     title: "R1 runs a script from a clean start: one PCM SHA-256, sample count and phoneme transcription per say; same script same hashes; order changes the hashes"
     shape: atomic
@@ -190,7 +191,7 @@ tests:
     needs: []
     impl: "tests/host/test_r1.py::test_r1_hash_and_phonemes_per_say_and_language"
     status: successful
-    result: {commit: 4d2fd9a, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-COR-01
     title: "Verification corpus pt-BR and en: 45-55 items each, every category of FR-COR-01 present"
     shape: atomic
@@ -201,7 +202,7 @@ tests:
     needs: []
     impl: "tests/host/test_corpus_verify.py::test_size_and_categories"
     status: successful
-    result: {commit: 9ba5ca3, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-COR-02
     title: "Every accented pt-BR verification item has an unaccented pair"
     shape: atomic
@@ -212,7 +213,7 @@ tests:
     needs: []
     impl: "tests/host/test_corpus_verify.py::test_accented_items_have_unaccented_pairs"
     status: successful
-    result: {commit: 9ba5ca3, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-DAT-07
     title: "The image generator gives the same bytes from the same data and voice list"
     shape: atomic
@@ -223,7 +224,7 @@ tests:
     needs: [r1-host-reference]
     impl: "tests/host/test_image.py::test_image_is_deterministic"
     status: successful
-    result: {commit: 5482045, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-DAT-05-host
     title: "The reference reader gets back every file of the image byte for byte; header and table follow FSD Appendix A"
     shape: atomic
@@ -234,7 +235,7 @@ tests:
     needs: [r1-host-reference]
     impl: "tests/host/test_image.py::test_image_round_trip_and_layout"
     status: successful
-    result: {commit: 5482045, date: 2026-11-26, run: "local pytest tests/host"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
   - id: TC-RES-01
     title: "ESPK boot carries fw, commit (the artifact's), idf, espeak, rate, bss, langs and init_ms"
     shape: atomic
@@ -245,7 +246,7 @@ tests:
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_boot_marker_fields"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-02
     title: "ESPK ready follows ESPK boot when the data are valid"
     shape: atomic
@@ -256,7 +257,7 @@ tests:
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_ready_follows_boot"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-SYN-02
     title: "The engine reports 22 050 Hz after init"
     shape: atomic
@@ -267,7 +268,7 @@ tests:
     needs: [dut, bench-flash, bench-wait-event]
     impl: "tests/target/test_research_fw.py::test_sample_rate_is_22050"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-03
     title: "say --mute reports ESPK done with id, samples, timings, heap_min and the PCM SHA-256"
     shape: atomic
@@ -278,7 +279,7 @@ tests:
     needs: [dut, bench-flash, bench-command, pcm-capture]
     impl: "tests/target/test_research_fw.py::test_say_mute_reports_the_pcm_hash"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-05
     title: "voice switches among the image's voices; an absent voice is refused and the previous one kept"
     shape: atomic
@@ -289,7 +290,7 @@ tests:
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_research_fw.py::test_voice_switch_and_unknown_voice"
     status: successful
-    result: {commit: cbfa055, date: 2026-11-26, run: "local build of cbfa055 flashed with bench flash; pytest --run-bench"}
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-REF-03
     title: "From a reset, the board's PCM equals R1's say by say over the pt-BR and en verification corpus (R3 = R1)"
     shape: atomic
@@ -299,8 +300,8 @@ tests:
     verifies: [FR-REF-03, FR-ENG-04]
     needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/target/test_equivalence.py::test_board_pcm_equals_r1_over_the_verification_corpus"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-REF-03-noaccent
     title: "The part of R3 = R1 that holds without the wrap: English and unaccented text, in sequence"
     shape: atomic
@@ -310,8 +311,8 @@ tests:
     verifies: [FR-REF-03]
     needs: [dut, bench-flash, bench-command, pcm-capture, r1-host-reference]
     impl: "tests/target/test_equivalence.py::test_board_equals_r1_without_accents"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-16
     title: "A 1 024-byte text is spoken; a 1 025-byte text gets ESPK error code=too_long and the console keeps working"
     shape: atomic
@@ -321,8 +322,8 @@ tests:
     verifies: [FR-RES-16, FR-SYN-09]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_research_fw.py::test_text_limit_1024_bytes"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-RES-15
     title: "An unknown console line gets ESPK error code=unknown_command"
     shape: atomic
@@ -332,8 +333,8 @@ tests:
     verifies: [FR-RES-15]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_research_fw.py::test_unknown_command_gets_a_marker"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "artifact of 6951a9e flashed with bench flash; pytest tests/target tests/bench --run-bench"}
   - id: TC-ENG-04
     title: "ucd-tools and the desktop libc agree on Latin, Greek, Cyrillic and Latin Extended Additional except the listed code points"
     shape: atomic
@@ -343,5 +344,5 @@ tests:
     verifies: [FR-ENG-04]
     needs: []
     impl: "tests/host/test_ucd_agreement.py::test_ucd_tools_agree_with_the_desktop_libc_except_the_listed_code_points"
-    status: not done
-    reason: not implemented
+    status: successful
+    result: {commit: 6951a9e, date: 2026-11-26, run: "local pytest tests/host tools/bench"}
