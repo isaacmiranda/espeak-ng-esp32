@@ -122,3 +122,21 @@ def test_a_sync_synth_during_a_say_is_refused(flashed):
     assert m.event == "error" and m.fields["code"] == "ESP_ERR_INVALID_STATE", m
     m, _p = board.command("cancel", r"^ESPK (cancelled|done)", timeout=10)
     assert m.event == "cancelled"
+
+
+def test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported(flashed):
+    """FR-MEM-02 (the boot line says where the .bss is), FR-MEM-04 (the engine's copies of the data go to
+    PSRAM: an init costs the PSRAM 600 KB or more, the internal heap 24 KB at most), FR-MEM-05 (init_ms)."""
+    ms = _ready()
+    boot = ms["boot"].fields
+    assert boot["bss"] == "psram" and int(boot["init_ms"]) > 0
+    m, _p = board.command("deinit", r"^ESPK deinit")
+    assert m.fields["result"] == "ESP_OK"
+    m, _p = board.command("mem", r"^ESPK mem")
+    internal0, psram0 = int(m.fields["internal_free"]), int(m.fields["psram_free"])
+    m, _p = board.command("init", r"^ESPK init")
+    assert m.fields["result"] == "ESP_OK"
+    m, _p = board.command("mem", r"^ESPK mem")
+    internal1, psram1 = int(m.fields["internal_free"]), int(m.fields["psram_free"])
+    assert psram0 - psram1 >= 600_000, f"PSRAM cost of init: {psram0 - psram1}"
+    assert internal0 - internal1 <= 24_000, f"internal cost of init: {internal0 - internal1}"

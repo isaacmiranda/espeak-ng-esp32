@@ -601,3 +601,25 @@ tests:
     impl: "tests/target/test_core.py::test_a_sync_synth_during_a_say_is_refused"
     status: successful
     result: {commit: ef27814, date: 2026-11-26, run: "artifact of ef27814 flashed with bench flash; pytest tests/target tests/bench --run-bench"}
+  - id: TC-MEM-02
+    title: "The engine's phoneme_list, frame_pool and echo_buf are placed in PSRAM by the linker, the upstream sources untouched"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-MEM-02]
+    needs: []
+    impl: "tests/host/test_bss.py::test_the_engine_statics_are_placed_in_psram"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-MEM-04
+    title: "The boot line says bss=psram; an init costs the PSRAM 600 KB or more and the internal heap 24 KB at most; init_ms is reported"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-MEM-02, FR-MEM-04, FR-MEM-05]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_core.py::test_bss_and_data_copies_are_in_psram_and_init_ms_is_reported"
+    status: not done
+    reason: "not implemented: the test has not run yet"

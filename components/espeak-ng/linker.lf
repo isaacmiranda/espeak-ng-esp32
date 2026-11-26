@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# FR-MEM-02: the engine's .bss (phoneme_list, frame_pool, echo_buf, ... about 60 KB) goes to PSRAM
+# without touching the upstream sources: only the upstream's objects are mapped, not the component's own.
+[mapping:espeak_ng_bss]
+archive: libespeak-ng.a
+entries:
+    if ESPK_BSS_IN_PSRAM = y:
+        common (extram_bss)
+        mnemonics (extram_bss)
+        error (extram_bss)
+        ieee80 (extram_bss)
+        compiledata (extram_bss)
+        compiledict (extram_bss)
+        dictionary (extram_bss)
+        encoding (extram_bss)
+        intonation (extram_bss)
+        langopts (extram_bss)
+        numbers (extram_bss)
+        phoneme (extram_bss)
+        phonemelist (extram_bss)
+        readclause (extram_bss)
+        setlengths (extram_bss)
+        soundicon (extram_bss)
+        spect (extram_bss)
+        ssml (extram_bss)
+        synthdata (extram_bss)
+        synthesize (extram_bss)
+        tr_languages (extram_bss)
+        translate (extram_bss)
+        translateword (extram_bss)
+        voices (extram_bss)
+        wavegen (extram_bss)
+        speech (extram_bss)
+        espeak_api (extram_bss)
+        case (extram_bss)
+        categories (extram_bss)
+        ctype (extram_bss)
+        proplist (extram_bss)
+        scripts (extram_bss)
+        tostring (extram_bss)

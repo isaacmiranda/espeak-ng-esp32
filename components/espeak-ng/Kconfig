@@ -19,6 +19,14 @@ menu "eSpeak NG (espk)"
         string "Initial voice"
         default "en"
 
+    config ESPK_BSS_IN_PSRAM
+        bool "Place the engine's .bss in PSRAM (about 60 KB of internal RAM freed)"
+        default y
+        select SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
+        help
+            Done by a linker fragment over the upstream's objects; the sources stay untouched.
+            Turn it off to keep the engine's statics in internal RAM (faster, 60 KB dearer).
+
     config ESPK_ASYNC
         bool "Asynchronous layer: espk_say() and espk_cancel() over a synthesis task"
         default y

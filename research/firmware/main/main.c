@@ -324,8 +324,9 @@ void app_main(void)
     if (err == ESP_OK) espk_list_voices(langs, sizeof langs);
 
     const esp_app_desc_t *app = esp_app_get_description();
-    printf("ESPK boot fw=%s commit=%s idf=%s espeak=1.52.0 rate=%d bss=internal langs=%s init_ms=%lld\n",
-           app->version, ESPK_COMMIT, esp_get_idf_version(), espk_sample_rate(), langs[0] ? langs : "none",
+    printf("ESPK boot fw=%s commit=%s idf=%s espeak=1.52.0 rate=%d bss=%s langs=%s init_ms=%lld\n",
+           app->version, ESPK_COMMIT, esp_get_idf_version(), espk_sample_rate(),
+           CONFIG_ESPK_BSS_IN_PSRAM ? "psram" : "internal", langs[0] ? langs : "none",
            init_ms);
     if (err != ESP_OK) {
         printf("ESPK error code=%s\n", esp_err_to_name(err));
