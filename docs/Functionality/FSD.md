@@ -14,7 +14,8 @@ last_updated: 2026-11-26
 change_history:
   - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26; valores propostos aceitos pelo responsável no mesmo dia
   - 0.1.1 (2026-11-26): FR-RES-15 e FR-RES-16 usam `ESPK error code=…`, no formato do FR-LOG-01 (achado do /commission)
-  - 0.2.0 (2026-11-26): ferramenta guiada de escuta (FR-LST-07 a FR-LST-19, NFR-LST-01), pedido do responsável
+  - 0.2.0 (2026-11-26): ferramenta guiada de escuta (FR-LST-07 a FR-LST-19, NFR-LST-01), pedido do responsável;
+    cada item tocado uma única vez, sem repetição (decisão do responsável)
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -548,7 +549,7 @@ pelo driver de bancada; a ligação por rede é um requisito futuro (FR-LST-19) 
   de instruções da versão do protocolo em uso, a duração estimada da sessão e as recomendações de ambiente, e só deve
   avançar depois que o ouvinte confirmar que leu.
 - **FR-LST-09** [Must · derived · v0.2] A duração estimada deve ser a soma das durações dos itens da sessão mais 8 s
-  por item para a resposta (proposto: 8 s), arredondada para o minuto acima.
+  por item para a resposta, arredondada para o minuto acima.
 - **FR-LST-10** [Must · user · v0.2] Antes do primeiro item, a ferramenta deve tocar uma frase de ajuste, que não
   pertence ao corpus, e deixar o ouvinte ajustar o volume dentro da sessão de escuta aberta. O volume final fica
   registrado e não muda até o fim da sessão.
@@ -560,13 +561,13 @@ pelo driver de bancada; a ligação por rede é um requisito futuro (FR-LST-19) 
   ("Excelente", "Boa", "Razoável", "Pobre", "Ruim") e a pergunta "Você entendeu a informação principal?" (sim/não).
 - **FR-LST-14** [Must · user · v0.2] Durante a sessão, a tela não deve mostrar o texto esperado, a condição do item
   (velocidade, com ou sem acento), se a resposta está certa, nem qualquer resultado parcial.
-- **FR-LST-15** [Must · user · v0.2] O número de vezes que um item pode ser ouvido deve vir da versão do protocolo
-  (proposto: 1 vez, sem repetição), e cada repetição concedida deve ser registrada.
+- **FR-LST-15** [Must · user · v0.2] Cada item deve ser tocado uma única vez. A ferramenta não deve oferecer
+  repetição.
 - **FR-LST-16** [Must · user · v0.2] Cada resposta deve ser gravada em disco no momento da confirmação. Uma sessão
   interrompida (navegador fechado, placa desligada, queda de energia) deve retomar no primeiro item sem resposta.
 - **FR-LST-17** [Must · user · v0.2] O registro da sessão deve ser um arquivo JSON com: código pseudônimo do ouvinte,
   versão do protocolo, commit do artefato da placa, volume, semente e ordem dos itens, e, por item, a resposta, o
-  número de reproduções, o tempo de resposta em ms e o horário. Ele não deve conter nome nem outro dado identificável.
+  tempo de resposta em ms e o horário. Ele não deve conter nome nem outro dado identificável.
 - **FR-LST-18** [Must · user · v0.2] O comando de consolidação deve juntar os registros de sessão numa tabela CSV, com
   uma linha por ouvinte × item, e recusar juntar sessões de versões de protocolo diferentes.
 - **NFR-LST-01** [Must · user · v0.2] As telas da ferramenta devem atender aos critérios de nível AA da WCAG 2.2
@@ -592,7 +593,7 @@ pelo driver de bancada; a ligação por rede é um requisito futuro (FR-LST-19) 
 | FR-LST-12 | item 3 de 10 | "item 3 de 10" e tempo restante | progresso ausente | host |
 | FR-LST-13 | um item de cada tipo | campo livre; escala com os cinco rótulos e a pergunta sim/não | rótulos diferentes dos fixados | host |
 | FR-LST-14 | sessão inteira · varrer o HTML de cada tela | nenhum texto esperado, condição, acerto ou parcial | qualquer um deles no HTML, inclusive oculto | host |
-| FR-LST-15 | protocolo com 1 reprodução · pedir repetição | repetição recusada; com protocolo de 2, a segunda registrada | repetição sem registro | host |
+| FR-LST-15 | sessão inteira · varrer as telas e a API local · tentar `play` do mesmo item duas vezes | nenhum controle de repetição; segundo `play` do item recusado | item tocado mais de uma vez | host |
 | FR-LST-16 | matar o processo depois do item 5 · reabrir | retoma no item 6; respostas 1–5 intactas | resposta perdida; item repetido | host |
 | FR-LST-17 | sessão concluída | JSON com todos os campos | nome, e-mail ou outro identificador no arquivo | host |
 | FR-LST-18 | três sessões, uma de outra versão | CSV das duas compatíveis; recusa explícita da terceira | mistura de versões | host |
