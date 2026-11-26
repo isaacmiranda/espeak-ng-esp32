@@ -50,6 +50,7 @@ typedef struct {
 
 static SemaphoreHandle_t s_lock, s_wake;
 static TaskHandle_t s_task;
+static volatile bool s_stack_in_psram;  // set by the task from the address of its own stack
 static espk_fsm_t s_fsm = {.state = ESPK_ST_UNINIT, .capacity = CONFIG_ESPK_QUEUE_LEN};
 static item_t s_q[RING];
 static int s_head, s_count;
@@ -96,6 +97,8 @@ static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
 static void task(void *arg)
 {
     (void)arg;
+    int on_stack = 0;
+    s_stack_in_psram = esp_ptr_external_ram(&on_stack);
     for (;;) {
         xSemaphoreTake(s_wake, portMAX_DELAY);
         for (;;) {
@@ -174,11 +177,9 @@ esp_err_t espk_async_start(const espk_config_t *cfg)
 esp_err_t espk_task_info(espk_task_info_t *out)
 {
     if (!s_task) return ESP_ERR_NOT_SUPPORTED;
-    TaskStatus_t ti;
-    vTaskGetInfo(s_task, &ti, pdTRUE, eRunning);
     out->stack_bytes = CONFIG_ESPK_TASK_STACK;
-    out->stack_in_psram = esp_ptr_external_ram(ti.pxStackBase);
-    out->stack_hwm_bytes = ti.usStackHighWaterMark * sizeof(StackType_t);
+    out->stack_in_psram = s_stack_in_psram;
+    out->stack_hwm_bytes = uxTaskGetStackHighWaterMark(s_task) * sizeof(StackType_t);
     return ESP_OK;
 }
 
