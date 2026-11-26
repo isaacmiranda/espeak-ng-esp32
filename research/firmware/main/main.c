@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Composition root of the research firmware (FSD §5): the component, the console and the
-// markers. Cancel and load profiles arrive with their requirements.
+// markers. Load profiles arrive with their requirements.
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "driver/usb_serial_jtag.h"
@@ -19,27 +20,25 @@
 #include "mbedtls/sha256.h"
 
 #define CONSOLE_LINE_MAX 1100  // FR-RES-16: texts up to 1 024 bytes plus the command word
-#define SYNTH_STACK (64 * 1024)  // CONFIG_ESPK_TASK_STACK default (FSD §19), in PSRAM
+#define CONSOLE_STACK (16 * 1024)  // the console only parses; the synthesis has its own task (FR-ASY-05)
 
 
+// One per say request: allocated by the console, freed by the event that ends the request.
 typedef struct {
     mbedtls_sha256_context sha;
-    size_t samples;
-    int64_t t0, first_us;
-    bool sound;  // false: --mute (FR-RES-04), the PCM only goes to the hash
+    unsigned bytes;  // size of the text received (FR-RES-03)
+    bool sound;      // false: --mute (FR-RES-04), the PCM only goes to the hash
+    bool opened;     // the codec is open for this request
 } say_ctx_t;
 
-static unsigned s_id;
 static bool s_audio_ok;
 static espk_vol_t s_vol;  // FR-RES-07, 08, 09
 
 static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
 {
     say_ctx_t *c = arg;
-    if (c->samples == 0) c->first_us = esp_timer_get_time() - c->t0;
     mbedtls_sha256_update(&c->sha, (const unsigned char *)pcm, n * sizeof *pcm);
-    c->samples += n;
-    if (c->sound) {
+    if (c->sound && c->opened) {
         // the engine delivers mono; the codec path is stereo: write in small stereo chunks
         int16_t st[2 * 256];
         for (size_t i = 0; i < n;) {
@@ -52,8 +51,54 @@ static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
     return true;
 }
 
-// say [--mute] <text>: synthesise, hash the PCM delivered to the callback (FR-RES-03, FR-RES-04);
-// without --mute the PCM also goes to the speaker, counting underruns (FR-RES-12)
+static void end_request(say_ctx_t *c)
+{
+    if (c->opened) espk_aud_close();
+    mbedtls_sha256_free(&c->sha);
+    free(c);
+}
+
+// Events of the asynchronous layer, from the synthesis task (FR-RES-03, 10, 11, 12)
+static void on_event(const espk_evt_t *e, void *arg)
+{
+    (void)arg;
+    say_ctx_t *c = e->pcm_ctx;
+    switch (e->type) {
+    case ESPK_EVT_START:
+        printf("ESPK start id=%u\n", (unsigned)e->id);  // FR-RES-11
+        if (c->sound && espk_aud_open(s_vol.vol, espk_sample_rate()) == ESP_OK) {
+            c->opened = true;
+        } else if (c->sound) {
+            printf("ESPK error id=%u code=no_audio\n", (unsigned)e->id);
+            c->sound = false;
+        }
+        break;
+    case ESPK_EVT_DONE: {
+        unsigned underrun = c->opened ? espk_aud_underruns() : 0;
+        unsigned char d[32];
+        mbedtls_sha256_finish(&c->sha, d);
+        char hex[65];
+        for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", d[i]);
+        printf("ESPK done id=%u samples=%u synth_ms=%u first_ms=%u audio_ms=%llu heap_min=%u sha256=%s bytes=%u "
+               "underrun=%u\n",
+               (unsigned)e->id, (unsigned)e->samples, (unsigned)e->synth_ms, (unsigned)e->first_ms,
+               (unsigned long long)e->samples * 1000ULL / (unsigned long long)espk_sample_rate(),
+               (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL), hex, c->bytes, underrun);
+        end_request(c);
+        break;
+    }
+    case ESPK_EVT_CANCELLED:  // FR-RES-10
+        printf("ESPK cancelled id=%u cancel_ms=%u\n", (unsigned)e->id, (unsigned)e->cancel_ms);
+        end_request(c);
+        break;
+    case ESPK_EVT_ERROR:
+        printf("ESPK error id=%u code=%s\n", (unsigned)e->id, esp_err_to_name(e->err));
+        end_request(c);
+        break;
+    }
+}
+
+// say [--mute] <text>: queue the text; the answer is the events (FR-RES-03, 04, 11)
 static void cmd_say(const char *text, bool sound)
 {
     size_t bytes = strlen(text);
@@ -61,37 +106,25 @@ static void cmd_say(const char *text, bool sound)
         printf("ESPK error code=too_long\n");
         return;
     }
-    say_ctx_t c = {.sound = sound};
-    if (sound && (!s_audio_ok || espk_aud_open(s_vol.vol, espk_sample_rate()) != ESP_OK)) {
+    if (sound && !s_audio_ok) {
         printf("ESPK error code=no_audio\n");
         return;
     }
-    mbedtls_sha256_init(&c.sha);
-    mbedtls_sha256_starts(&c.sha, 0);
-    unsigned id = ++s_id;
-    printf("ESPK start id=%u\n", id);  // FR-RES-11
-    c.t0 = esp_timer_get_time();
-    esp_err_t err = espk_synth(text, on_pcm, &c);
-    int64_t synth_us = esp_timer_get_time() - c.t0;
-    unsigned underrun = 0;
-    if (sound) {
-        underrun = espk_aud_underruns();
-        espk_aud_close();
-    }
-    unsigned char d[32];
-    mbedtls_sha256_finish(&c.sha, d);
-    mbedtls_sha256_free(&c.sha);
-    if (err != ESP_OK) {
-        printf("ESPK error id=%u code=%s\n", id, esp_err_to_name(err));
+    say_ctx_t *c = calloc(1, sizeof *c);
+    if (!c) {
+        printf("ESPK error code=no_mem\n");
         return;
     }
-    char hex[65];
-    for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", d[i]);
-    int rate = espk_sample_rate();
-    printf("ESPK done id=%u samples=%u synth_ms=%lld first_ms=%lld audio_ms=%llu heap_min=%u sha256=%s bytes=%u underrun=%u\n", id,
-           (unsigned)c.samples, synth_us / 1000, c.first_us / 1000,
-           (unsigned long long)c.samples * 1000ULL / (unsigned long long)rate,
-           (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL), hex, (unsigned)bytes, underrun);
+    c->sound = sound;
+    c->bytes = (unsigned)bytes;
+    mbedtls_sha256_init(&c->sha);
+    mbedtls_sha256_starts(&c->sha, 0);
+    uint32_t id;
+    esp_err_t err = espk_say(text, on_pcm, c, &id);
+    if (err != ESP_OK) {
+        printf("ESPK error code=%s\n", esp_err_to_name(err));
+        end_request(c);
+    }
 }
 
 static void dispatch(char *line)
@@ -103,6 +136,8 @@ static void dispatch(char *line)
         cmd_say(line + 11, false);
     } else if (strncmp(line, "say ", 4) == 0) {
         cmd_say(line + 4, true);
+    } else if (strcmp(line, "cancel") == 0) {  // FR-RES-10: the answer is the cancelled event, if one follows
+        espk_cancel();
     } else if (strncmp(line, "voice ", 6) == 0) {
         if (espk_set_voice(line + 6) == ESP_OK) {
             printf("ESPK voice ok=%s\n", line + 6);
@@ -149,15 +184,16 @@ void app_main(void)
 {
     // A 1 024-byte text arrives in a burst faster than the console task drains the default
     // 256-byte ring: bytes were lost on the bench (the `bytes=` field of ESPK done shows it).
-    usb_serial_jtag_driver_config_t cfg = {.tx_buffer_size = 1024, .rx_buffer_size = 4096};
-    ESP_ERROR_CHECK(usb_serial_jtag_driver_install(&cfg));
+    usb_serial_jtag_driver_config_t ucfg = {.tx_buffer_size = 1024, .rx_buffer_size = 4096};
+    ESP_ERROR_CHECK(usb_serial_jtag_driver_install(&ucfg));
     usb_serial_jtag_vfs_use_driver();
     setvbuf(stdin, NULL, _IONBF, 0);
 
     espk_vol_init(&s_vol);
     s_audio_ok = espk_aud_init() == ESP_OK;  // FR-ERR-01: a missing codec is reported, not fatal
     int64_t t0 = esp_timer_get_time();
-    esp_err_t err = espk_init(NULL);
+    espk_config_t cfg = {.evt_cb = on_event};
+    esp_err_t err = espk_init(&cfg);
     int64_t init_ms = (esp_timer_get_time() - t0) / 1000;
     static char langs[256] = "";
     if (err == ESP_OK) espk_list_voices(langs, sizeof langs);
@@ -170,7 +206,7 @@ void app_main(void)
         printf("ESPK error code=%s\n", esp_err_to_name(err));
     } else {
         printf("ESPK ready\n");
-        xTaskCreateWithCaps(console_task, "console", SYNTH_STACK, NULL, 5, NULL, MALLOC_CAP_SPIRAM);
+        xTaskCreateWithCaps(console_task, "console", CONSOLE_STACK, NULL, 5, NULL, MALLOC_CAP_SPIRAM);
     }
     for (unsigned k = 1;; k++) {
         printf("ESPK alive n=%u\n", k);

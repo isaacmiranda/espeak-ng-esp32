@@ -11,6 +11,7 @@
 #include "esp_psram.h"
 #include "espeak-ng/espeak_ng.h"
 #include "espeak-ng/speak_lib.h"
+#include "espk_async.h"
 #include "espk_part.h"
 
 static const char *TAG = "espk";
@@ -79,6 +80,11 @@ esp_err_t espk_init(const espk_config_t *cfg)
         return err;
     }
     s_ready = true;
+    err = espk_async_start(cfg);
+    if (err != ESP_OK) {
+        s_ready = false;
+        return err;
+    }
     return ESP_OK;
 }
 

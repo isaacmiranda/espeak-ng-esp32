@@ -13,11 +13,11 @@ set(UPSTREAM_SRCS
     ${U}/synthdata.c ${U}/synthesize.c ${U}/tr_languages.c ${U}/translate.c
     ${U}/translateword.c ${U}/voices.c ${U}/wavegen.c ${U}/speech.c ${U}/espeak_api.c
     ${D}/case.c ${D}/categories.c ${D}/ctype.c ${D}/proplist.c ${D}/scripts.c ${D}/tostring.c)
-idf_component_register(SRCS src/espk.c src/espk_part.c src/espk_wrap.c ${UPSTREAM_SRCS}
+idf_component_register(SRCS src/espk.c src/espk_async.c src/espk_fsm.c src/espk_part.c src/espk_wrap.c ${UPSTREAM_SRCS}
                        INCLUDE_DIRS include
                        PRIV_INCLUDE_DIRS config upstream/src/include ${U} ${D}/include
                        REQUIRES esp_common
-                       PRIV_REQUIRES esp_partition vfs esp_rom esp_timer esp_psram heap)
+                       PRIV_REQUIRES esp_partition vfs esp_rom esp_timer esp_psram heap freertos)
 # Third-party code: warnings do not become errors (the sources are not edited).
 set_source_files_properties(${UPSTREAM_SRCS} PROPERTIES COMPILE_OPTIONS "-w;-fwrapv;-fno-exceptions")
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LIBESPEAK_NG_EXPORT=1

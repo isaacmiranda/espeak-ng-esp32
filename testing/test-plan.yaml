@@ -154,11 +154,11 @@ tests:
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-RES-10]
+    verifies: [FR-RES-10, FR-RES-11, FR-ASY-03]
     needs: [dut, bench-command, bench-telemetry]
-    impl: ""
+    impl: "tests/bench/test_journey.py::test_jrn_06_cancel_in_the_middle_of_a_long_utterance"
     status: not done
-    reason: not written
+    reason: "not implemented: the console has no cancel and the component no async layer yet"
 
   # --- F1: upstream reproduction and the R1 host reference
   - id: TC-ENG-01

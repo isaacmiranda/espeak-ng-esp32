@@ -19,6 +19,33 @@ menu "eSpeak NG (espk)"
         string "Initial voice"
         default "en"
 
+    config ESPK_ASYNC
+        bool "Asynchronous layer: espk_say() and espk_cancel() over a synthesis task"
+        default y
+
+    config ESPK_TASK_STACK
+        int "Synthesis task stack, bytes"
+        depends on ESPK_ASYNC
+        default 65536
+        help
+            The engine's deepest call chain measured about 39 KB on the AlertAlergo port;
+            49152 is the floor (FR-ASY-06).
+
+    config ESPK_TASK_STACK_PSRAM
+        bool "Place the synthesis task's stack in PSRAM"
+        depends on ESPK_ASYNC
+        default y
+
+    config ESPK_TASK_PRIORITY
+        int "Synthesis task priority"
+        depends on ESPK_ASYNC
+        default 5
+
+    config ESPK_QUEUE_LEN
+        int "Requests that can wait behind the one being spoken"
+        depends on ESPK_ASYNC
+        default 4
+
     config ESPK_UCD_WRAP
         bool "Classify wide characters with ucd-tools (issue espeak-ng#1611)"
         default y
