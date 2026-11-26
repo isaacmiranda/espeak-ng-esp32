@@ -157,8 +157,8 @@ tests:
     verifies: [FR-RES-10, FR-RES-11, FR-ASY-03]
     needs: [dut, bench-command, bench-telemetry]
     impl: "tests/bench/test_journey.py::test_jrn_06_cancel_in_the_middle_of_a_long_utterance"
-    status: not done
-    reason: "not implemented: the console has no cancel and the component no async layer yet"
+    status: successful
+    result: {commit: a55a70d, date: 2026-11-26, run: "artifact of a55a70d flashed with bench flash; pytest tests/target tests/bench --run-bench; cancel_ms=5 (limit 100)"}
 
   # --- F1: upstream reproduction and the R1 host reference
   - id: TC-ENG-01
