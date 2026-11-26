@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.1.0
+fsd_version: 0.1.1
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -13,6 +13,7 @@ created: 2026-11-26
 last_updated: 2026-11-26
 change_history:
   - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26; valores propostos aceitos pelo responsável no mesmo dia
+  - 0.1.1 (2026-11-26): FR-RES-15 e FR-RES-16 usam `ESPK error code=…`, no formato do FR-LOG-01 (achado do /commission)
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -301,10 +302,10 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
   amostragem, o tamanho e o CRC da imagem, os idiomas presentes e a voz atual.
 - **FR-RES-14** [Must · derived · v0.1] O comando `mem` deve responder a heap interna livre, a mínima desde o boot,
   a PSRAM livre e a mínima desde o boot, em bytes.
-- **FR-RES-15** [Must · user · v0.1] Uma linha de comando desconhecida deve receber `ESPK err=unknown_command`, sem
+- **FR-RES-15** [Must · user · v0.1] Uma linha de comando desconhecida deve receber `ESPK error code=unknown_command`, sem
   efeito na fala em curso.
 - **FR-RES-16** [Should · user · v0.1] O firmware deve aceitar textos de até 1 024 bytes por `say` e responder
-  `ESPK err=too_long` acima disso (1 024).
+  `ESPK error code=too_long` acima disso (1 024).
 
 ### 5.3 Contratos
 
@@ -324,8 +325,8 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 | FR-RES-12 | `say` | campo `underrun` presente | campo ausente | target |
 | FR-RES-13 | `ready` · `info` | campos completos e coerentes com `ESPK boot` | divergência com o boot | target |
 | FR-RES-14 | `mem` | quatro números em bytes | campos ausentes | target |
-| FR-RES-15 | `xyzzy` | `err=unknown_command`; a fala em curso continua | reinício; cancelamento | host (parser) · target |
-| FR-RES-16 | `say` com 1 024 e com 1 025 bytes | o primeiro fala; o segundo recebe `err=too_long` | estouro; reinício | target |
+| FR-RES-15 | `xyzzy` | `ESPK error code=unknown_command`; a fala em curso continua | reinício; cancelamento | host (parser) · target |
+| FR-RES-16 | `say` com 1 024 e com 1 025 bytes | o primeiro fala; o segundo recebe `ESPK error code=too_long` | estouro; reinício | target |
 
 ## 6. Perfis de carga e convivência
 

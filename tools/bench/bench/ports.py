@@ -1,9 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Finding a role's port and opening it without stopping a native-USB ESP32.
+"""Finding a role's port and opening it without resetting a native-USB ESP32.
 
-On the ESP32-S3 USB-Serial/JTAG, DTR asserted selects download mode and RTS
-asserted holds the chip in reset. pyserial asserts both on open, so the lines
-are set low *before* opening.
+On the ESP32-S3 USB-Serial/JTAG the chip resets when RTS is high while DTR is
+low. Linux's cdc-acm raises DTR and RTS together on open; lowering DTR first
+(pyserial's order when both are preset) passes through exactly that state and
+reboots the board on every open (seen on the bench, 2026-11-26). So the lines
+are left as the kernel raised them and lowered after open, RTS first:
+(1,1) -> (DTR 1, RTS 0) -> (0,0), never (DTR 0, RTS 1).
 """
 
 from __future__ import annotations
@@ -62,7 +65,7 @@ def resolve(bench: Bench, role_name: str, devices: list[Found] | None = None,
 
 
 def open_port(device: str, baudrate: int = 115200, timeout: float = 0.1, factory=None):
-    """Open with DTR and RTS low first: opening first would stop the chip."""
+    """Open, then drop RTS before DTR, so the chip never sees the reset state."""
     if factory is None:
         import serial
 
@@ -70,7 +73,7 @@ def open_port(device: str, baudrate: int = 115200, timeout: float = 0.1, factory
     ser = factory(device, do_not_open=True)
     ser.baudrate = baudrate
     ser.timeout = timeout
-    ser.dtr = False
-    ser.rts = False
     ser.open()
+    ser.rts = False
+    ser.dtr = False
     return ser

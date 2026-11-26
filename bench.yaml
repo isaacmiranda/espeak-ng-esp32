@@ -1,7 +1,6 @@
 # Mapa de papéis da bancada (docs/Method/project/bancada.md).
 # Versionado: papel -> como reconhecer a placa. Caminho de /dev/ttyACM* NUNCA entra aqui.
-# `serial` fica em branco até o /commission rodar `python -m bench discover` com a placa ligada
-# (nada abaixo foi lido da placa neste repositório).
+# `serial` vem do `python -m bench discover` do /commission (2026-11-26).
 project: espeak-ng-esp32
 link_prefix: /dev/espk-           # regra udev: /dev/espk-<papel>, amarrada ao número de série
 status: unproven                  # vira `available` no /commission
@@ -16,5 +15,5 @@ roles:
     psram: true
     codec: es8311
     vid_pid: "303a:1001"          # USB-Serial/JTAG nativo; o mesmo par no modo de gravação
-    serial: null
+    serial: "3C:DC:75:F8:63:2C"      # read by `bench discover` on 2026-11-26
     required: true

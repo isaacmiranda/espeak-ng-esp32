@@ -81,3 +81,7 @@ Um único processo segura a porta serial. Nada de terminal aberto à mão.
 - **Escrita na USB-Serial/JTAG maior que o buffer de TX falha inteira**: o console fatia a saída.
 - **Placa com firmware do AlertAlergo**: lê pulseiras BLE e fala sozinha quando há pulseira por perto; regrave antes de
   qualquer medição.
+- **Abrir a porta pode reiniciar a placa.** O cdc-acm do Linux sobe DTR e RTS juntos ao abrir; baixar o DTR antes do RTS
+  passa pelo estado de reset do USB-Serial/JTAG (RTS alto com DTR baixo). O driver baixa o RTS primeiro
+  (`tools/bench/bench/ports.py`, teste `test_open_never_passes_through_the_reset_state`). Um reset no meio de um teste é
+  suspeita de bancada antes de ser defeito do produto.

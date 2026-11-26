@@ -57,3 +57,10 @@ def test_flash_reports_esptool_failure(tmp_path):
     art = make_artifact(tmp_path)
     assert actions.flash(art, "/dev/x", "esp32s3", lambda argv: 2, Out()) == 1
     assert actions.flash(art, "/dev/x", "esp32s3", lambda argv: 0, Out()) == 0
+
+
+def test_esptool_runs_from_the_drivers_interpreter(tmp_path):
+    import sys
+
+    argv = actions.flash_argv(make_artifact(tmp_path), "/dev/x", "esp32s3")
+    assert argv[:3] == [sys.executable, "-m", "esptool"]

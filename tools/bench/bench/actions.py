@@ -7,6 +7,7 @@ from __future__ import annotations
 import re
 import shlex
 import subprocess
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -16,6 +17,9 @@ from .lines import LineReader, read_lines
 from .ports import BenchError, Found, match
 
 OK, FAIL, REFUSED, TIMEOUT, PRECONDITION = 0, 1, 2, 3, 4
+
+# esptool from the driver's own environment, never whatever is first on PATH
+ESPTOOL = [sys.executable, "-m", "esptool"]
 
 
 # --- discover ---------------------------------------------------------------
@@ -59,7 +63,7 @@ def parse_chip_info(text: str) -> dict[str, str]:
 
 def chip_info(port: str, run, out, expect=None) -> int:
     """esptool flash-id gives chip, revision, features (PSRAM), MAC and flash size."""
-    text = run(["esptool", "--port", port, "--before", "default-reset",
+    text = run([*ESPTOOL, "--port", port, "--before", "default-reset",
                 "--after", "hard-reset", "flash-id"])
     info = parse_chip_info(text)
     for k in ("chip", "revision", "flash_mb", "psram_mb", "mac"):
@@ -100,7 +104,7 @@ def flash_argv(artifact: Path, port: str, chip: str, baud: int = 460800) -> list
         pairs += [toks[0], str(path)]
     if not pairs:
         raise BenchError("flash_args lists no image")
-    return ["esptool", "--chip", chip, "--port", port, "--baud", str(baud),
+    return [*ESPTOOL, "--chip", chip, "--port", port, "--baud", str(baud),
             "--before", "default-reset", "--after", "hard-reset", "write-flash", *opts, *pairs]
 
 

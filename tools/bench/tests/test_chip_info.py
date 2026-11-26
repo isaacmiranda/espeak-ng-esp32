@@ -47,3 +47,11 @@ def test_esptool_failure_is_not_a_chip(bench):
     text = "A fatal error occurred: Failed to connect to ESP32-S3: No serial data received."
     assert actions.chip_info("/dev/x", lambda argv: text, out, expect=bench.role("dut")) == 1
     assert "chip=unknown" in out
+
+
+def test_chip_info_uses_the_drivers_esptool(bench):
+    import sys
+
+    seen = []
+    actions.chip_info("/dev/x", lambda argv: seen.append(argv) or ESPTOOL_S3, Out())
+    assert seen[0][:3] == [sys.executable, "-m", "esptool"]
