@@ -4,7 +4,9 @@
 The board's libc (newlib, C locale) knows no letter beyond ASCII (#1611). The wrap sends the
 engine's isw*/tow* calls to ucd-tools, so R3 = R1 holds only where ucd-tools and the desktop libc
 agree. They agree on Latin, Greek, Cyrillic and Latin Extended Additional (U+0000-U+052F,
-U+1E00-U+1EFF) except for the code points below, which the FSD lists as known differences.
+U+1E00-U+1EFF) except, at most, for the code points below, which the FSD lists as known differences
+(the desktop libc's Unicode tables move with its version: a newer glibc differs on more of them,
+an older one on fewer; the CI runner and the bench notebook differ).
 """
 
 import subprocess
@@ -33,5 +35,6 @@ def test_ucd_tools_agree_with_the_desktop_libc_except_the_listed_code_points(tmp
     for line in out.splitlines():
         name, cp = line.split()
         got[name].add(int(cp[2:], 16))
-    changed = {k: sorted(got.get(k, set()) ^ KNOWN.get(k, set())) for k in got.keys() | KNOWN.keys()}
-    assert dict(got) == KNOWN, f"agreement changed: { {k: v for k, v in changed.items() if v} }"
+    # an older or newer libc may agree on more; none may disagree anywhere else
+    unexpected = {k: sorted(v - KNOWN.get(k, set())) for k, v in got.items() if v - KNOWN.get(k, set())}
+    assert not unexpected, f"differences outside the listed code points: {unexpected}"

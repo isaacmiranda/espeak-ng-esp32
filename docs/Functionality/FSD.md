@@ -1008,8 +1008,9 @@ verification:
   equivalentes do `ucd-tools` do próprio upstream, com `CONFIG_ESPK_UCD_WRAP` ligado por padrão. (O motor já passa
   pelo `ucd-tools` para minúsculas, em `towlower2`.) A F2 confirmou em 2026-11-26 que, sem o redirecionamento, a placa
   diverge de R1 em textos com acento (#1611). O `ucd-tools` e a libc de desktop concordam em Latim, grego, cirílico e
-  Latim Estendido Adicional (U+0000–U+052F, U+1E00–U+1EFF), exceto nos pontos de código U+0085, U+00A0, U+00AD, U+00B2,
-  U+00B3, U+00B9, U+00BC–U+00BE, U+0295 e U+0363–U+036F; fora dessas faixas (por exemplo árabe, devanágari, CJK) a
+  Latim Estendido Adicional (U+0000–U+052F, U+1E00–U+1EFF), exceto, no máximo, nos pontos de código U+0085, U+00A0,
+  U+00AD, U+00B2, U+00B3, U+00B9, U+00BC–U+00BE, U+0295 e U+0363–U+036F (uma libc de desktop mais antiga concorda em mais
+  deles; o teste aceita qualquer subconjunto); fora dessas faixas (por exemplo árabe, devanágari, CJK) a
   equivalência com a libc de desktop não é garantida. O redirecionamento vale para o link da aplicação inteira.
 - **FR-ENG-05** [Must · user · v0.1] Com `CONFIG_ESPK_UCD_WRAP` desligado (o modo "intacto"), o componente deve
   compilar e funcionar sem o redirecionamento.

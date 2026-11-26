@@ -12,7 +12,7 @@
 #include <ucd/ucd.h>
 int main(void)
 {
-    setlocale(LC_CTYPE, "C.UTF-8");
+    if (!setlocale(LC_CTYPE, "C.UTF-8")) return 3;  /* the locale the engine selects (speech.c) */
     struct { const char *n; int (*a)(wint_t); int (*b)(codepoint_t); } t[] = {
         {"alpha", iswalpha, ucd_isalpha}, {"alnum", iswalnum, ucd_isalnum}, {"upper", iswupper, ucd_isupper},
         {"lower", iswlower, ucd_islower}, {"punct", iswpunct, ucd_ispunct}, {"space", iswspace, ucd_isspace},
