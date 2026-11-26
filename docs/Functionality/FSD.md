@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.1.1
+fsd_version: 0.2.0
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -14,6 +14,7 @@ last_updated: 2026-11-26
 change_history:
   - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26; valores propostos aceitos pelo responsável no mesmo dia
   - 0.1.1 (2026-11-26): FR-RES-15 e FR-RES-16 usam `ESPK error code=…`, no formato do FR-LOG-01 (achado do /commission)
+  - 0.2.0 (2026-11-26): ferramenta guiada de escuta (FR-LST-07 a FR-LST-19, NFR-LST-01), pedido do responsável
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -217,7 +218,7 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 
 - **Escopo:** pesquisa de engenharia.
 - **Entregas:** perfis de convivência e seus portões (§6); medidas nos dois modos de `.bss` (§16); comparação com
-  outros portes (§7); escuta interna (§10); entradas candidatas ao `pt_list` do upstream (§25).
+  outros portes (§7); escuta interna com a ferramenta guiada (§10); entradas candidatas ao `pt_list` do upstream (§25).
 - **Saída:** requisitos com marco v0.2 verdes.
 - **Depende de:** F4.
 - **Alvo:** 1º semestre de 2027.
@@ -225,6 +226,7 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 ### 3.6 Futuro
 
 - Estudo com pessoas de baixa visão e de baixa audição, com protocolo aprovado pelo CEP. É aberto por emenda.
+- Ligação da ferramenta de escuta com a placa pela rede local (FR-LST-19, OD-05).
 - Migração para o eSpeak NG 1.53 quando ela sair (FR-ENG-06).
 - OTA da partição de dados; transporte de OTA do firmware de pesquisa.
 - Publicações: SBESC 2027, quando sair a chamada; JOSS a partir de ~2027-05-26, seis meses depois do primeiro commit
@@ -534,6 +536,44 @@ medida**. O instrumento serve depois ao estudo com o CEP [user].
 - **FR-LST-06** [Must · user · futuro] A coleta com participantes de fora da equipe só pode começar com o número do
   CAAE do protocolo aprovado registrado na FSD.
 
+#### Ferramenta guiada de escuta
+
+Uma aplicação web local, servida pelo computador ligado à placa e aberta no navegador, sem acesso à internet. Ela
+conduz o ouvinte do começo ao fim, comanda a placa e registra as respostas. Na v0.2 a ligação com a placa é por cabo,
+pelo driver de bancada; a ligação por rede é um requisito futuro (FR-LST-19) [user].
+
+- **FR-LST-07** [Must · user · v0.2] A ferramenta deve rodar como servidor local (`127.0.0.1`) aberto no navegador,
+  sem requisição a endereço fora do computador.
+- **FR-LST-08** [Must · user · v0.2] Antes do primeiro item, a ferramenta deve mostrar a tela de abertura com o texto
+  de instruções da versão do protocolo em uso, a duração estimada da sessão e as recomendações de ambiente, e só deve
+  avançar depois que o ouvinte confirmar que leu.
+- **FR-LST-09** [Must · derived · v0.2] A duração estimada deve ser a soma das durações dos itens da sessão mais 8 s
+  por item para a resposta (proposto: 8 s), arredondada para o minuto acima.
+- **FR-LST-10** [Must · user · v0.2] Antes do primeiro item, a ferramenta deve tocar uma frase de ajuste, que não
+  pertence ao corpus, e deixar o ouvinte ajustar o volume dentro da sessão de escuta aberta. O volume final fica
+  registrado e não muda até o fim da sessão.
+- **FR-LST-11** [Must · user · v0.2] Para cada item, a ferramenta deve comandar a placa (`play <id>`) e habilitar o
+  campo de resposta só depois do `ESPK done` desse item.
+- **FR-LST-12** [Must · user · v0.2] A tela deve mostrar o progresso como "item k de N" e o tempo restante estimado.
+- **FR-LST-13** [Must · user · v0.2] Para palavras e frases imprevisíveis, a resposta deve ser uma transcrição livre.
+  Para frases do dia a dia, a resposta deve ser a nota ACR de 1 a 5 com os rótulos da ITU-T P.800 em pt-BR
+  ("Excelente", "Boa", "Razoável", "Pobre", "Ruim") e a pergunta "Você entendeu a informação principal?" (sim/não).
+- **FR-LST-14** [Must · user · v0.2] Durante a sessão, a tela não deve mostrar o texto esperado, a condição do item
+  (velocidade, com ou sem acento), se a resposta está certa, nem qualquer resultado parcial.
+- **FR-LST-15** [Must · user · v0.2] O número de vezes que um item pode ser ouvido deve vir da versão do protocolo
+  (proposto: 1 vez, sem repetição), e cada repetição concedida deve ser registrada.
+- **FR-LST-16** [Must · user · v0.2] Cada resposta deve ser gravada em disco no momento da confirmação. Uma sessão
+  interrompida (navegador fechado, placa desligada, queda de energia) deve retomar no primeiro item sem resposta.
+- **FR-LST-17** [Must · user · v0.2] O registro da sessão deve ser um arquivo JSON com: código pseudônimo do ouvinte,
+  versão do protocolo, commit do artefato da placa, volume, semente e ordem dos itens, e, por item, a resposta, o
+  número de reproduções, o tempo de resposta em ms e o horário. Ele não deve conter nome nem outro dado identificável.
+- **FR-LST-18** [Must · user · v0.2] O comando de consolidação deve juntar os registros de sessão numa tabela CSV, com
+  uma linha por ouvinte × item, e recusar juntar sessões de versões de protocolo diferentes.
+- **NFR-LST-01** [Must · user · v0.2] As telas da ferramenta devem atender aos critérios de nível AA da WCAG 2.2
+  (contraste, operação só por teclado, nomes acessíveis para leitor de tela, zoom de 200 % sem perda de conteúdo).
+- **FR-LST-19** [May · user · futuro] A ferramenta deve poder comandar a placa pela rede local. O transporte e a
+  segurança dessa ligação são a decisão aberta OD-05.
+
 ### 10.3 Contratos
 
 | ID | Pré-condição · estímulo | Esperado | Não pode acontecer | Nível |
@@ -544,6 +584,19 @@ medida**. O instrumento serve depois ao estudo com o CEP [user].
 | FR-LST-04 | sessão de teste | arquivo com código pseudônimo | nome ou dado identificável no git | host |
 | FR-LST-05 | commit de ajuste | referência à sessão e ao item | ajuste sem rastro | other |
 | FR-LST-06 | antes do CAAE | ferramenta de coleta recusa modo "estudo" sem CAAE configurado | coleta com terceiros sem CAAE | host |
+| FR-LST-07 | ferramenta iniciada · captura de rede do processo | só conexões a `127.0.0.1` e à porta da placa | requisição externa (fonte, script, telemetria) | host |
+| FR-LST-08 | sessão nova · tentar avançar sem confirmar | instruções da versão do protocolo, duração e recomendações; avanço bloqueado | primeiro item tocado antes da confirmação | host |
+| FR-LST-09 | sessão de 10 itens com durações conhecidas | duração = Σ durações + 80 s, arredondada para cima | estimativa fixa no texto | host |
+| FR-LST-10 | tela de ajuste · mudar volume · iniciar · tentar mudar de novo | frase de ajuste fora do corpus; volume registrado; mudança recusada depois do início | item do corpus usado no ajuste | host · target |
+| FR-LST-11 | placa simulada que atrasa o `ESPK done` | campo de resposta desabilitado até o `done` | resposta aceita antes do fim do áudio | host · target |
+| FR-LST-12 | item 3 de 10 | "item 3 de 10" e tempo restante | progresso ausente | host |
+| FR-LST-13 | um item de cada tipo | campo livre; escala com os cinco rótulos e a pergunta sim/não | rótulos diferentes dos fixados | host |
+| FR-LST-14 | sessão inteira · varrer o HTML de cada tela | nenhum texto esperado, condição, acerto ou parcial | qualquer um deles no HTML, inclusive oculto | host |
+| FR-LST-15 | protocolo com 1 reprodução · pedir repetição | repetição recusada; com protocolo de 2, a segunda registrada | repetição sem registro | host |
+| FR-LST-16 | matar o processo depois do item 5 · reabrir | retoma no item 6; respostas 1–5 intactas | resposta perdida; item repetido | host |
+| FR-LST-17 | sessão concluída | JSON com todos os campos | nome, e-mail ou outro identificador no arquivo | host |
+| FR-LST-18 | três sessões, uma de outra versão | CSV das duas compatíveis; recusa explícita da terceira | mistura de versões | host |
+| NFR-LST-01 | cada tela · verificador automático de acessibilidade (axe-core) e revisão por teclado | nenhuma violação AA | tela só operável com mouse | host · other |
 
 ## 11. Exemplos
 

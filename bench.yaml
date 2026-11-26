@@ -3,7 +3,7 @@
 # `serial` vem do `python -m bench discover` do /commission (2026-11-26).
 project: espeak-ng-esp32
 link_prefix: /dev/espk-           # regra udev: /dev/espk-<papel>, amarrada ao número de série
-status: unproven                  # vira `available` no /commission
+status: available                 # comissionada em 2026-11-26 (testing/test-plan.yaml → capabilities)
 shared_with: alertalergo-v3-firmware   # a mesma placa; cada sessão regrava o próprio artefato
 audio:
   bench_volume_ceiling: 10        # teto fora de sessão de escuta (FSD FR-RES-07); padrão no boot: 5 (FR-RES-08)

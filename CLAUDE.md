@@ -19,9 +19,9 @@ de qualquer mudança.**
 | 3 · Construção | `/build` | **Ready for shipment**: requisitos atendidos, jornada verde, reconcile vazio |
 | Liberação | tag (ato do responsável) | **Shipped**: versão publicada e jornada verde nos bytes publicados |
 
-Estado atual: **Fase 2 (comissionamento)**: portão "AI harnessed" aberto (`testing/test-plan.yaml` → `gates`). FSD em
-`docs/Functionality/FSD.md`, agenda em `testing/debugging-agenda.md`, portões em `testing/gates/`. Próximo passo:
-`/commission`. O que está em `seed/` é evidência,
+Estado atual: **Fase 3 (construção), onda 1**: portões "AI harnessed" e "DUT ready" abertos (`testing/test-plan.yaml`
+→ `gates`). FSD em `docs/Functionality/FSD.md`, itens de bring-up em `testing/debugging-agenda.md`, portões em
+`testing/gates/`. Próximo passo: `/build` (F1 da FSD: reprodução do upstream e R1 no host). O que está em `seed/` é evidência,
 não produto.
 
 ## A bancada
