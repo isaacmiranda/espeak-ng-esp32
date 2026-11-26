@@ -15,6 +15,7 @@ set(UPSTREAM_SRCS
     ${D}/case.c ${D}/categories.c ${D}/ctype.c ${D}/proplist.c ${D}/scripts.c ${D}/tostring.c)
 idf_component_register(SRCS src/espk.c src/espk_async.c src/espk_fsm.c src/espk_part.c src/espk_wrap.c ${UPSTREAM_SRCS}
                        INCLUDE_DIRS include
+                       LDFRAGMENTS linker.lf
                        PRIV_INCLUDE_DIRS config upstream/src/include ${U} ${D}/include
                        REQUIRES esp_common
                        PRIV_REQUIRES esp_partition vfs esp_rom esp_timer esp_psram heap freertos)
