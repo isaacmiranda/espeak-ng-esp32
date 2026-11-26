@@ -17,9 +17,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: ruff check tools conftest.py
+      - run: sudo apt-get install -y --no-install-recommends ninja-build
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/espk
+          key: espk-r1-${{ hashFiles('components/espeak-ng/tools/upstream.env', 'tools/ref/pcm_dump.c') }}
+      - run: ruff check tools tests conftest.py
       - run: reuse lint
-      - run: pytest -q tools/bench
+      - run: pytest -q tools/bench tests/host
   firmware:
     runs-on: ubuntu-24.04
     container: espressif/idf:v5.5.5

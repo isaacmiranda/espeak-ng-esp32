@@ -37,3 +37,6 @@ secrets.*
 .idea/
 *.swp
 *.egg-info/
+/components/espeak-ng/data/
+/components/espeak-ng/phsource/
+/components/espeak-ng/dictsource/

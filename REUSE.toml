@@ -45,3 +45,9 @@ path = ["seed/alertalergo-port/firmware/components/third_party/espeak-ng/upstrea
 precedence = "override"
 SPDX-FileCopyrightText = "2012-2018 Reece H. Dunn; Unicode, Inc. (data)"
 SPDX-License-Identifier = "GPL-3.0-or-later AND Unicode-DFS-2016"
+
+[[annotations]]
+path = "components/espeak-ng/upstream/**"
+precedence = "override"
+SPDX-FileCopyrightText = "eSpeak NG contributors (https://github.com/espeak-ng/espeak-ng), tag 1.52.0"
+SPDX-License-Identifier = "GPL-3.0-or-later"

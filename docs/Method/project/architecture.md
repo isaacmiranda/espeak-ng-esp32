@@ -30,7 +30,7 @@ linker (fragmento de colocação), e a correção de verdade vai ao upstream.
 ```
 components/espeak-ng/       O PRODUTO (vai ao Registro)
   upstream/                 fontes 1.52.0 intactas, geradas pelo script com SHA-256
-  data/ phsource/ dictsource/  dados compilados de todos os idiomas + suas fontes
+  data/ phsource/ dictsource/  gerados pelo CI ao empacotar (fora do git)
   src/ include/             camada própria (VFS, partição, API síncrona e assíncrona)
   tools/                    gerador da imagem, relatório de capacidade, script de regeneração
   Kconfig CMakeLists.txt idf_component.yml LICENSE COPYING* README.md ORIGIN.md
@@ -46,6 +46,11 @@ testing/                    test-plan.yaml, debugging-agenda.md, gates/ (do /har
 scripts/idf.sh              ESP-IDF fixado, ambiente limpo
 seed/alertalergo-port/      evidência de partida; sai quando o código a absorver
 ```
+
+**O que o git guarda e o que o CI gera.** O git guarda as fontes C do upstream em `upstream/` (regeneradas por
+`tools/regen-upstream.sh`, `git diff` vazio). Os dados compilados de todos os idiomas, o `phsource/` e o `dictsource/`
+não são commitados: o CI os gera do mesmo tarball ao empacotar o componente, e o pacote publicado os leva (FSD
+FR-LIC-03, FR-LIC-04). O R1 compila o upstream no cache do host (`~/.cache/espk/`), nunca no repositório.
 
 Cada componente da §2.4 é um módulo próprio. O núcleo puro de cada interface (leitor da imagem, cálculo de
 capacidade, transições de estado, parser do console) é uma função livre testável no host.

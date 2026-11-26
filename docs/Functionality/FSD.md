@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.2.0
+fsd_version: 0.2.1
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -16,6 +16,8 @@ change_history:
   - 0.1.1 (2026-11-26): FR-RES-15 e FR-RES-16 usam `ESPK error code=…`, no formato do FR-LOG-01 (achado do /commission)
   - 0.2.0 (2026-11-26): ferramenta guiada de escuta (FR-LST-07 a FR-LST-19, NFR-LST-01), pedido do responsável;
     cada item tocado uma única vez, sem repetição (decisão do responsável)
+  - 0.2.1 (2026-11-26): corpus en sem listas de terceiros (FR-COR-05); OTA fora do escopo; rede da ferramenta por
+    SoftAP com pareamento (FR-LST-19). Decisões do responsável sobre OD-03, OD-04 e OD-05
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -78,7 +80,8 @@ com ouvintes é preparado desde já e acontece depois, com aprovação do CEP.
 - MBROLA, Klatt, sonic e o modo assíncrono do upstream. Só o motor síncrono é compilado.
 - Reamostragem no componente.
 - Atualização da partição de dados por OTA (futuro; o formato da imagem já leva versão e CRC).
-- Mecanismo de transporte de OTA do firmware de pesquisa. As partições existem, e o transporte é uma decisão aberta.
+- Atualização do firmware de pesquisa por OTA. As partições `ota_0`/`ota_1` ficam reservadas; toda gravação passa
+  pelo driver de bancada com o artefato do CI.
 - Estudo com participantes de fora da equipe antes da aprovação do protocolo pelo CEP.
 - Publicar taxas de acerto ou notas de qualidade vindas de ouvintes humanos antes desse estudo.
 - Comparação com o `vtts`, a não ser por emenda; tráfego Wi-Fi com cliente (`iperf`); medida de corrente.
@@ -227,7 +230,7 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 ### 3.6 Futuro
 
 - Estudo com pessoas de baixa visão e de baixa audição, com protocolo aprovado pelo CEP. É aberto por emenda.
-- Ligação da ferramenta de escuta com a placa pela rede local (FR-LST-19, OD-05).
+- Ligação da ferramenta de escuta com a placa pela rede própria da placa (SoftAP), com pareamento (FR-LST-19).
 - Migração para o eSpeak NG 1.53 quando ela sair (FR-ENG-06).
 - OTA da partição de dados; transporte de OTA do firmware de pesquisa.
 - Publicações: SBESC 2027, quando sair a chamada; JOSS a partir de ~2027-05-26, seis meses depois do primeiro commit
@@ -462,8 +465,9 @@ verification:
   Leipzig pt-BR (CC BY 4.0), excluídas as palavras de uma letra (200); 50 frases semanticamente
   imprevisíveis geradas por modelos gramaticais a partir dessas palavras, pelo método de Benoît et al. (1996)
   (50); e 30 frases do dia a dia de aparelho com fala (30).
-- **FR-COR-05** [Should · user · v0.1] O corpus de escuta en deve conter frases semanticamente imprevisíveis geradas
-  pelo mesmo método e as Harvard sentences, se a licença for confirmada (OD-03).
+- **FR-COR-05** [Should · user · v0.1] O corpus de escuta en deve conter 50 frases semanticamente imprevisíveis geradas
+  pelo mesmo método e 30 frases do dia a dia escritas por este projeto. Listas de terceiros com licença incerta (por
+  exemplo, as Harvard sentences) não entram.
 - **FR-COR-06** [Must · user · v0.1] Todo arquivo de corpus deve ter licença registrada no `REUSE.toml`. Material
   protegido sem permissão registrada (LSP, Alcaim et al.) não entra no repositório.
 - **FR-COR-07** [Must · derived · v0.1] O gerador de frases imprevisíveis deve ser determinístico: a mesma semente e a
@@ -477,7 +481,7 @@ verification:
 | FR-COR-02 | corpus pt-BR | cada item acentuado tem o par sem acento | par ausente | host |
 | FR-COR-03 | gerador · cada idioma | os três itens por idioma | texto em idioma natural | host |
 | FR-COR-04 | lista Leipzig com SHA-256 fixado | 200 palavras, 50 frases, 30 frases | lista sem hash fixado | host |
-| FR-COR-05 | idem en | frases geradas presentes; Harvard só com OD-03 resolvida | Harvard sem licença confirmada | host |
+| FR-COR-05 | idem en | 50 frases geradas e 30 do dia a dia, com licença do projeto no `REUSE.toml` | lista de terceiros no corpus | host |
 | FR-COR-06 | `reuse lint` | sem erro | arquivo de corpus sem licença | host |
 | FR-COR-07 | gerar duas vezes com a mesma semente | arquivos idênticos | diferença | host |
 
@@ -572,8 +576,9 @@ pelo driver de bancada; a ligação por rede é um requisito futuro (FR-LST-19) 
   uma linha por ouvinte × item, e recusar juntar sessões de versões de protocolo diferentes.
 - **NFR-LST-01** [Must · user · v0.2] As telas da ferramenta devem atender aos critérios de nível AA da WCAG 2.2
   (contraste, operação só por teclado, nomes acessíveis para leitor de tela, zoom de 200 % sem perda de conteúdo).
-- **FR-LST-19** [May · user · futuro] A ferramenta deve poder comandar a placa pela rede local. O transporte e a
-  segurança dessa ligação são a decisão aberta OD-05.
+- **FR-LST-19** [May · user · futuro] A ferramenta deve poder comandar a placa por uma rede Wi-Fi criada pela própria
+  placa (SoftAP, sem internet), num marco depois da v0.2. A placa só deve aceitar comandos da ferramenta depois de um
+  pareamento por código curto mostrado na tela da placa. Os requisitos de segurança dessa ligação entram com o marco.
 
 ### 10.3 Contratos
 
