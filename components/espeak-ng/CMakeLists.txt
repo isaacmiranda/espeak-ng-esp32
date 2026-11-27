@@ -13,7 +13,7 @@ set(UPSTREAM_SRCS
     ${U}/synthdata.c ${U}/synthesize.c ${U}/tr_languages.c ${U}/translate.c
     ${U}/translateword.c ${U}/voices.c ${U}/wavegen.c ${U}/speech.c ${U}/espeak_api.c
     ${D}/case.c ${D}/categories.c ${D}/ctype.c ${D}/proplist.c ${D}/scripts.c ${D}/tostring.c)
-idf_component_register(SRCS src/espk.c src/espk_async.c src/espk_fsm.c src/espk_part.c src/espk_wrap.c ${UPSTREAM_SRCS}
+idf_component_register(SRCS src/espk.c src/espk_async.c src/espk_fsm.c src/espk_part.c ${UPSTREAM_SRCS}
                        INCLUDE_DIRS include
                        LDFRAGMENTS linker.lf
                        PRIV_INCLUDE_DIRS config upstream/src/include ${U} ${D}/include
@@ -24,12 +24,11 @@ set_source_files_properties(${UPSTREAM_SRCS} PROPERTIES COMPILE_OPTIONS "-w;-fwr
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LIBESPEAK_NG_EXPORT=1
                            PATH_ESPEAK_DATA="${CONFIG_ESPK_MOUNT_POINT}")
 
-# FR-ENG-04: send the engine's wide-character classification to ucd-tools (see src/espk_wrap.c).
-# The flags go on the final link, where the engine's objects call the libc.
+# FR-ENG-04 (issue espeak-ng#1611): the upstream's own way, as its CMake build does (src/CMakeLists.txt puts
+# include/compat on the include path). Its wctype.h maps the engine's isw* calls to ucd-tools at compile time, so the
+# ESP32 libc (newlib, C locale, ASCII letters only) is not asked. The sources stay untouched.
 if(CONFIG_ESPK_UCD_WRAP)
-    foreach(fn iswalpha iswalnum iswupper iswlower iswpunct iswspace iswdigit)
-        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${fn}")
-    endforeach()
+    target_include_directories(${COMPONENT_LIB} BEFORE PRIVATE upstream/src/include/compat)
 endif()
 
 # FR-ASY-06: the engine's deepest call chain measured ~39 KB on the AlertAlergo port; 49 152 B is the floor.

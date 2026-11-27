@@ -229,3 +229,14 @@ def test_espk_synth_documents_the_48_kb_stack_and_the_examples_use_espk_say():
         lines = src.read_text(encoding="utf-8").splitlines()
         code = "\n".join(ln for ln in lines if not ln.lstrip().startswith("//"))
         assert "espk_synth(" not in code, src
+
+
+def test_the_engine_uses_the_upstream_compat_shim_not_a_link_wrap():
+    """FR-ENG-04 (#1611): isw* reach ucd-tools through the upstream's own include/compat."""
+    comp = ROOT / "components/espeak-ng"
+    cmake = (comp / "CMakeLists.txt").read_text()
+    assert "upstream/src/include/compat" in cmake
+    assert "--wrap" not in cmake
+    assert not (comp / "src/espk_wrap.c").exists()
+    shim = (comp / "upstream/src/include/compat/wctype.h").read_text()
+    assert "#define iswalpha  ucd_isalpha" in shim

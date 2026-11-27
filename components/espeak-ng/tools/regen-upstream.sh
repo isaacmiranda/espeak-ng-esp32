@@ -32,10 +32,12 @@ tar -xzf "$tgz" -C "$work"
 SRC="$work/espeak-ng-$ESPEAK_VER"
 stage="$work/upstream"
 mkdir -p "$stage/src/libespeak-ng" "$stage/src/include/espeak-ng" \
-         "$stage/src/ucd-tools/src/include/ucd"
+         "$stage/src/ucd-tools/src/include/ucd" "$stage/src/include/compat"
 cp "$SRC"/COPYING "$SRC"/COPYING.APACHE "$SRC"/COPYING.BSD2 "$SRC"/COPYING.UCD "$stage/"
 cp "$SRC"/src/libespeak-ng/*.c "$SRC"/src/libespeak-ng/*.h "$stage/src/libespeak-ng/"
 cp "$SRC"/src/include/espeak-ng/*.h "$stage/src/include/espeak-ng/"
+# the upstream CMake puts include/compat on the include path; its wctype.h maps isw* to ucd-tools (espeak-ng#1611)
+cp "$SRC"/src/include/compat/wctype.h "$stage/src/include/compat/"
 cp "$SRC"/src/ucd-tools/src/*.c "$stage/src/ucd-tools/src/"
 cp "$SRC"/src/ucd-tools/src/include/ucd/*.h "$stage/src/ucd-tools/src/include/ucd/"
 [ -f "$SRC/src/ucd-tools/COPYING" ] && cp "$SRC/src/ucd-tools/COPYING" "$stage/src/ucd-tools/"

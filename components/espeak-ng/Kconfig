@@ -85,9 +85,11 @@ menu "eSpeak NG (espk)"
         default y
         help
             The ESP32 libc knows no letter beyond ASCII, so accented text is spelled out
-            letter by letter. With this option the linker redirects the engine's isw*
-            calls to the upstream's ucd-tools (the engine's sources stay untouched).
-            Note that --wrap acts on the whole application's link, not only on the engine.
+            letter by letter. With this option the upstream's include/compat is put first on
+            the engine's include path, as the upstream's own CMake build does: its wctype.h maps the
+            isw* calls to ucd-tools at compile time (the engine's sources stay untouched, and the
+            application's other code is not affected). The name is historical: an earlier version
+            redirected the calls at link time.
             Turn it off to get the upstream's behaviour on the ESP32 libc as it is.
 
     config ESPK_MAX_TEXT_LEN

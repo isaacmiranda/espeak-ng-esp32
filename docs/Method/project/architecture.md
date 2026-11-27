@@ -12,7 +12,7 @@ uma reescrita.
 | **L2 aplicação de pesquisa e ferramentas** | firmware de pesquisa (console, marcadores, perfis de carga, escuta), exemplos, R1/R2, corpora, ASR, driver de bancada | este repositório | o estudo ou a bancada muda |
 
 Regra de dependência: L2 → L1 → L0. A L1 não conhece a placa: o PCM sai por callback. Nada deste repositório edita as
-fontes de L0. O que precisar mudar no comportamento do motor sem editar a fonte é feito no link (`-Wl,--wrap`) ou no
+fontes de L0. O que precisar mudar no comportamento do motor sem editar a fonte é feito pelo caminho de inclusão (o `include/compat` do upstream) ou no
 linker (fragmento de colocação), e a correção de verdade vai ao upstream.
 
 ## Seams que dão os níveis baratos

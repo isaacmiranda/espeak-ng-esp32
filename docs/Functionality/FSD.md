@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.4.0
+fsd_version: 0.5.0
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -29,6 +29,9 @@ change_history:
   - 0.4.0 (2026-11-27): decisões do responsável da noite de 2026-11-27: bancada muda (FR-RES-17); comandos e marcadores de
     pesquisa (FR-RES-18..20); FR-SYN-11 com a tolerância medida; NFR-SYN-04 lido como heap estável; `espk_synth` exige
     48 KB de pilha; IDF 6.x = v6.1.1; R2 no CI em contêiner; lista pt-BR rotulada; nota de capacidade (todos os idiomas)
+  - 0.5.0 (2026-11-27): FR-ENG-04 passa do redirecionamento no link (`-Wl,--wrap`) para o `include/compat` do próprio
+    upstream no caminho de inclusão do motor, como o build CMake do upstream já faz; o experimento (R3 = R1 em 100 de
+    100 itens, sem nenhum `iswalpha` na imagem) está em `docs/rascunhos/upstream-1611.md`.
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -257,7 +260,7 @@ O calendário conta a partir de 2026-11-26 [user]. Cada fase só começa com o q
 
 | Risco | Prob. | Impacto | Mitigação |
 |---|---|---|---|
-| `iswalpha` da newlib não reconhece letras acentuadas (#1611): o PCM no alvo diverge do host | alta | alto | F2 primeiro; wrap no link (FR-ENG-04); PR upstream (FR-UPS-01) |
+| `iswalpha` da newlib não reconhece letras acentuadas (#1611): o PCM no alvo diverge do host | alta | alto | F2 primeiro; `include/compat` do upstream (FR-ENG-04); PR upstream (FR-UPS-01) |
 | `libm` da newlib e da glibc divergem em ponto flutuante (`wavegen.c`, `setlengths.c`) | média | alto | F2 investiga; emenda decide tolerância medida ou correção (FR-REF-04) |
 | RTF passa de 0,5 com a `.bss` na PSRAM | média | médio | medir os dois modos (FR-MEM-03); emenda do limiar ou do padrão |
 | Pacote do Registro grande demais com todos os idiomas e as fontes | média | médio | upload de teste no *staging* (OD-02); alternativa: pacote base mais pacotes de idioma |
@@ -1022,15 +1025,17 @@ verification:
   do tarball. O script de regeneração, rodado de novo, deve dar `git diff` vazio.
 - **CON-ENG-03** [Must · seed:alertalergo · v0.1] Só o runtime síncrono deve ser compilado: sem MBROLA, Klatt, sonic
   nem o modo assíncrono do upstream.
-- **FR-ENG-04** [Must · user · v0.1] O componente deve redirecionar no link (`-Wl,--wrap`) as funções `isw*` que o
-  motor chama (`iswalpha`, `iswalnum`, `iswupper`, `iswlower`, `iswpunct`, `iswspace`, `iswdigit`) para as funções
+- **FR-ENG-04** [Must · user · v0.1] O componente deve pôr o `src/include/compat` do upstream (cujo `wctype.h` mapeia
+  as `isw*` para o `ucd-tools` na compilação, como o build CMake do upstream faz) no caminho de inclusão do motor, de
+  modo que as funções `isw*` que o motor chama (`iswalpha`, `iswalnum`, `iswupper`, `iswlower`, `iswpunct`, `iswspace`, `iswdigit`) para as funções
   equivalentes do `ucd-tools` do próprio upstream, com `CONFIG_ESPK_UCD_WRAP` ligado por padrão. (O motor já passa
   pelo `ucd-tools` para minúsculas, em `towlower2`.) A F2 confirmou em 2026-11-26 que, sem o redirecionamento, a placa
   diverge de R1 em textos com acento (#1611). O `ucd-tools` e a libc de desktop concordam em Latim, grego, cirílico e
   Latim Estendido Adicional (U+0000–U+052F, U+1E00–U+1EFF), exceto, no máximo, nos pontos de código U+0085, U+00A0,
   U+00AD, U+00B2, U+00B3, U+00B9, U+00BC–U+00BE, U+0295 e U+0363–U+036F (uma libc de desktop mais antiga concorda em mais
   deles; o teste aceita qualquer subconjunto); fora dessas faixas (por exemplo árabe, devanágari, CJK) a
-  equivalência com a libc de desktop não é garantida. O redirecionamento vale para o link da aplicação inteira.
+  equivalência com a libc de desktop não é garantida. O efeito vale só para as unidades do motor, não para o resto da
+  aplicação.
 - **FR-ENG-05** [Must · user · v0.1] Com `CONFIG_ESPK_UCD_WRAP` desligado (o modo "intacto"), o componente deve
   compilar e funcionar sem o redirecionamento.
 - **FR-ENG-06** [Should · user · futuro] Quando a 1.53.0 sair, a migração deve regenerar as fontes e os dados e
@@ -1043,8 +1048,8 @@ verification:
 | CON-ENG-01 | CI | SHA-256 do tarball conferido antes de extrair | tarball sem conferência | host |
 | CON-ENG-02 | rodar o script de regeneração | `git diff --exit-code` sem diferença | qualquer diferença em `upstream/` | host |
 | CON-ENG-03 | build | nenhum objeto de MBROLA, Klatt, sonic ou async no `.map` | símbolo presente | host |
-| FR-ENG-04 | wrap ligado · roteiro do corpus de verificação pt-BR com acento · `ucd-tools` × libc de desktop nas faixas listadas | R3 = R1 em todos os `say`; `nm` da imagem mostra os sete `__wrap_isw*`; as únicas diferenças nas faixas são as listadas | fonte do upstream editada; divergência restante atribuída à #1611 sem prova; faixa nova de diferença sem mudar a lista | host · target |
-| FR-ENG-05 | wrap desligado | build verde; divergência de acentos registrada como esperada | falha de build | host · target |
+| FR-ENG-04 | opção ligada · roteiro do corpus de verificação pt-BR com acento · `ucd-tools` × libc de desktop nas faixas listadas | R3 = R1 em todos os `say`; `nm` da imagem não tem `iswalpha` e tem `ucd_isalpha`; as únicas diferenças nas faixas são as listadas | fonte do upstream editada; divergência restante atribuída à #1611 sem prova; faixa nova de diferença sem mudar a lista | host · target |
+| FR-ENG-05 | opção desligada | build verde; divergência de acentos registrada como esperada | falha de build | host · target |
 | FR-ENG-06 | tag 1.53.0 | R1, R2 e R3 verdes na nova versão | migração sem refazer as referências | host · target |
 
 ## 18. ESP-IDF e plataforma
@@ -1213,8 +1218,11 @@ Os códigos estão no Apêndice B. As regras gerais:
 - **FR-REL-05** [Must · user · v0.1] Antes da primeira publicação no Registro, uma issue ou discussion deve estar
   aberta no repositório `dfxpto-cyber/eSpeak-NG-.-Esp32`, propondo colaboração, com o texto aprovado pelo
   responsável. A release não espera resposta.
-- **FR-UPS-01** [Must · user · v0.1] Um PR ao `espeak-ng/espeak-ng` deve estar aberto, com
-  teste, trocando `iswalpha` e funções parecidas pelas do `ucd-tools`, e o link registrado no `ORIGIN.md`.
+- **FR-UPS-01** [Must · user · v0.1] Um PR ao `espeak-ng/espeak-ng` deve estar aberto
+  ou ter sido comentado, com o que o experimento de 2026-11-27 mostrou: quem compila as fontes fora do CMake precisa do
+  `src/include/compat` no caminho de inclusão (um PR que troque `iswalpha` pelo `ucd-tools` seria redundante, porque o
+  upstream já tem o shim); opcionalmente, uma correção de uma linha do erro de digitação `udc_toupper` no shim. O
+  link fica registrado no `ORIGIN.md`.
 - **FR-UPS-02** [Should · user · v0.2] As correções de pronúncia pt-BR que valem para qualquer falante, encontradas na
   escuta interna ou no ASR, devem ser propostas ao `dictsource/pt_list` do upstream, cada uma com caso `test_phon`,
   conferidas contra o `master`.
@@ -1228,7 +1236,7 @@ Os códigos estão no Apêndice B. As regras gerais:
 | FR-REL-03 | upload ao *staging* | aceito | publicação real sem o teste | other |
 | FR-REL-04 | pacote gerado | lista sem as pastas proibidas | pasta proibida presente | host |
 | FR-REL-05 | antes da tag | link da issue registrado; texto aprovado | publicação antes do contato | other |
-| FR-UPS-01 | antes da tag | link do PR no `ORIGIN.md`; o texto do PR aprovado pelo responsável | PR sem teste | other |
+| FR-UPS-01 | antes da tag | link do PR ou do comentário no `ORIGIN.md`; o texto aprovado pelo responsável | afirmar defeito do upstream sem prova; PR redundante | other |
 | FR-UPS-02 | entradas candidatas | PR com `test_phon` por entrada | entrada sem conferência no `master` | other |
 | FR-AIU-01 | release | arquivo presente nos dois idiomas | ausente | host |
 

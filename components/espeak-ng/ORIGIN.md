@@ -21,6 +21,8 @@ version above is the one it packages.
 ## Upstream contribution
 
 The ESP32 libc knows no letter beyond ASCII, so the engine spells accented text letter by letter
-(upstream issue espeak-ng#1611). The component redirects the engine's `isw*` calls to the upstream's own
-`ucd-tools`. A pull request to `espeak-ng/espeak-ng` that makes the engine use `ucd-tools` for these
-classifications is **not open yet**; its link goes here when it is.
+(upstream issue espeak-ng#1611). The component puts the upstream's own `src/include/compat` on the engine's include path, exactly as the upstream's
+CMake build does; its `wctype.h` maps the `isw*` calls to the upstream's `ucd-tools` at compile time (checked on the
+board: PCM equal to the upstream's on the whole verification corpus). So there is no defect to fix upstream: the useful
+contribution is documentation for anyone building the sources outside CMake, and a one-line typo fix in that shim
+(`udc_toupper`). Neither is sent yet; the link goes here when it is.
