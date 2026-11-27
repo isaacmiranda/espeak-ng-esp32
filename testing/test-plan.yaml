@@ -1074,6 +1074,28 @@ tests:
     impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_the_examples_for_each_chip"
     status: successful
     result: {commit: 4af2bbb, date: 2026-11-26, run: "local scripts/examples.sh hello:esp32 hello:esp32s2 hello:esp32p4 waveshare-s3-rlcd:esp32s3 built clean (rc=0); pytest tests/host/test_project_facts.py reads ci.yml; the board test of the waveshare example is skipped by the silent-bench guard"}
+  - id: TC-CAP-11-readme
+    title: "The capacity block of both READMEs is the generated one"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-CAP-11]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_readme.py::test_the_capacity_block_of_each_readme_is_the_generated_one"
+    status: successful
+    result: {commit: fa1ec45, date: 2026-11-26, run: "local pytest tests/host/test_readme.py"}
+  - id: TC-PLT-04-readme
+    title: "The README levels per chip match what the CI builds; only the ESP32-S3 is verified on the board"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-PLT-04]
+    needs: []
+    impl: "tests/host/test_readme.py::test_the_readme_levels_per_chip_match_what_the_ci_builds"
+    status: successful
+    result: {commit: fa1ec45, date: 2026-11-26, run: "local pytest tests/host/test_readme.py"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic
