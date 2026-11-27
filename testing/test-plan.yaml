@@ -1281,8 +1281,8 @@ tests:
     verifies: [FR-LST-03]
     needs: [dut, bench-flash, bench-command, audio-out, r1-host-reference]
     impl: "tests/target/test_listen.py::test_play_speaks_a_listening_item_with_the_hash_of_its_pcm"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 0a9cff8, date: 2026-11-26, run: "artifact of 0a9cff8 flashed with bench flash; pytest tests/target/test_listen.py --run-bench at volume 5, run on 2026-11-27 BEFORE the silent-bench decision; it cannot run again while bench.yaml forbids sound"}
   - id: TC-EXM-01
     title: "The hello example logs the sample rate, the duration and the SHA-256 of the PCM without playing it; the hash is the host build's"
     shape: atomic
@@ -1292,8 +1292,8 @@ tests:
     verifies: [FR-EXM-01]
     needs: [dut, bench-flash, bench-command, r1-host-reference]
     impl: "tests/target/test_examples.py::test_hello_logs_the_rate_the_duration_and_the_hash_of_its_pcm_without_playing_it"
-    status: not done
-    reason: "not implemented: scripts/examples.sh has not run it yet"
+    status: successful
+    result: {commit: c6df329, date: 2026-11-26, run: "hello on esp32s3 built from the working tree of c6df329, flashed with bench flash (silent application); ESPK_EXAMPLE=hello pytest tests/target/test_examples.py --run-bench"}
   - id: TC-EXM-03
     title: "The waveshare-s3-rlcd example speaks a pt-BR sentence through the ES8311 at volume 5 without underrun"
     shape: atomic
@@ -1314,8 +1314,8 @@ tests:
     verifies: [FR-EXM-04]
     needs: []
     impl: "tests/host/test_resample.py::test_the_block_size_does_not_change_the_samples"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3b9bdba, date: 2026-11-26, run: "local pytest tests/host/test_resample.py"}
   - id: TC-RES-04-silent
     title: "After a boot and several --mute says and a pcm dump the codec was never initialised: nothing reaches the I2S and the amplifier stays asleep"
     shape: atomic
@@ -1325,5 +1325,5 @@ tests:
     verifies: [FR-RES-04]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_performance.py::test_a_muted_session_never_touches_the_codec"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 3b9bdba, date: 2026-11-26, run: "artifact of 3b9bdba flashed with bench flash; pytest tests/target tests/bench --run-bench; the codec was never initialised (audio initialised=0)"}
