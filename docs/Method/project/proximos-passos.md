@@ -3,23 +3,28 @@
 Documento de **retomada**: onde o trabalho está e o que fazer a seguir, para uma sessão nova começar sem perguntar.
 A posição **derivada** (testes, requisitos, portões) está em [`testing/test-plan.yaml`](../../../testing/test-plan.yaml) e
 na [FSD](../../Functionality/FSD.md); este arquivo só aponta e lista o que o plano não diz. **Quem encerra uma sessão
-atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
+atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da sessão da noite (decisões aceitas, fila da madrugada).
 
 ## Como abrir a sessão
 
-1. Leia `CLAUDE.md` e [`AI-Workflow.md`](../AI-Workflow.md).
-2. Abra a sessão dizendo onde o projeto está (skill `/build`, §0): Fase 3, **onda 1** (só testes `standard` e
-   funcionalidades; deviation e negative ficam travados).
-3. Confira a árvore: `git status`, `git log --oneline -5`, `gh run list -w ci -L 1` (o último CI verde conhecido foi `9946bf8`).
-4. A placa está no notebook com o firmware de pesquisa normal (build local de `6951a9e`, regravado depois da variante intacta; agora o de `174a978`, com áudio). Antes de gravar outra coisa, leia o
-   que está nela (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`); ela é compartilhada com o
-   AlertAlergo V3.
+1. Leia `CLAUDE.md`, [`AI-Workflow.md`](../AI-Workflow.md) e a seção **Fila da madrugada** abaixo: o responsável foi dormir
+   e mandou continuar sozinho. Não pergunte; trabalhe a fila em ordem e pare só diante de um empecilho real.
+2. Posição: Fase 3, **onda 1** (só testes `standard`; `deviation` e `negative` já escritos ficam, mas não escreva novos).
+3. **A placa é muda (decisão dele, 2026-11-27).** `bench.yaml` tem `audio.bench_sound: forbidden`; o driver recusa `say` sem
+   `--mute`, `play` e a gravação de `espk_waveshare`. Não contorne, não edite para `allowed`. Use `--mute`, `pcm`, `synth`.
+4. Confira a árvore: `git status`, `git log --oneline -5`. **Nenhum `git push` foi feito** (≈ 80 commits locais): só ele
+   manda. Leia o que está na placa antes de gravar (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`):
+   deve ser o firmware de pesquisa (`espk_research`); ela é compartilhada com o AlertAlergo V3.
+5. Havia um build em segundo plano ao encerrar: `scripts/examples.sh hello:esp32 hello:esp32s2 hello:esp32p4
+   waveshare-s3-rlcd:esp32s3`, saída em `/tmp/ex3.out` (termina com `rc=`). Se `/tmp` ainda existir, leia-o: os quatro
+   `hello` compilados fecham o TC-EXM-02; a gravação do exemplo da Waveshare é barrada pelo guarda (esperado, teste pulado).
 
 ## Onde estamos
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 45 de 46 declarados `successful`; 1 `failed` (TC-SYN-11-heap, vazamento do upstream). Camada assíncrona (FR-ASY-01..09) e núcleo (FR-SYN-*) cobertos; faltam os grupos de "Próximos atos".
+- **Testes:** 109 de 112 declarados `successful` (o resto: TC-SYN-11-heap `failed` por vazamento do upstream; TC-BLD-02-examples e o que
+  ainda não rodou). Suítes: `pytest -q tools/bench tests/host` (≈ 170, 3 min) e `pytest tests/target tests/bench --run-bench` (≈ 8 min).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
   placa soletra as letras acentuadas (#1611).
@@ -34,75 +39,66 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 - **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5 é inaudível; a escuta do responsável (30 não, 70 sim, baixa) provou o caminho: `audio-out: yes`. A placa tem o firmware de `174a978`.
 - **Capacidades ainda `unproven`:** `release-verification` (o runner).
 
-## Próximos atos, em ordem
+## Decisões tomadas pelo responsável (2026-11-27)
 
-O levantamento de lacunas é gerado, não escrito à mão: requisitos Must/Should da v0.1 da FSD cujo id não aparece em
-nenhum `verifies:` de `testing/test-plan.yaml` (na sessão de 2026-11-26 eram ~70 depois do núcleo e da camada assíncrona).
-Em ordem de dependência:
+Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as absorve (primeiro item da fila).
 
-1. **Escuta e nível de saída.** Registrar posição e ruído da escuta de 2026-11-26 (o responsável ouviu a fala em 70, baixa;
-   em 30 não ouviu). O PCM do eSpeak não tem ganho e o AlertAlergo subiu +4 dB com compressão suave; um ganho só pode entrar
-   depois do hash (R3 = R1 exige o PCM intacto). Proposta minha, sem requisito. Falta a metade de FR-RES-07/09 na placa com
-   `--listening` (`volume 60` aceito dentro da sessão, recusado depois).
-2. **Cancelamento no R1** (`tools/ref/pcm_script.c`: repetir o cancelamento no mesmo bloco) para comparar com R1 o hash do
-   `say` depois de cancelar (FR-SYN-03, FR-ASY-03; hoje só se prova que o núcleo continua falando).
-3. **Parte B restante:** FR-DAT-01 a 06 com partição trocada ou corrompida (precisa de `bench flash` de imagem ruim e depois
-   regravar o artefato), FR-MEM-01/02/04, relatório de capacidade e falhas de build (§13, FR-CAP), `Kconfig` completo
-   (§19, FR-CFG), erros do Apêndice B (FR-ERR), FR-LOG, FR-SEC, NFR-SYN (RTF, primeira amostra, watchdog, 50 sínteses).
-4. **R2 como ferramenta (FR-REF-05 a 07).** Hoje só houve uma comparação exploratória (CLI do Ubuntu = CLI do R1, bit a
-   bit). Falta `tools/ref/r2.py`: API × API e CLI × CLI, todos os idiomas, relatório com a versão do pacote.
-5. **Corpora e ASR (FR-COR-03 a 07, FR-ASR-*).** Corpus automático para todos os idiomas, lista de frequência Leipzig
-   (CC BY 4.0, versão fixada por SHA-256), frases imprevisíveis geradas por semente, `whisper.cpp` no CI.
-6. **Empacotamento e publicação (F4):** dados de todos os idiomas gerados pelo CI (fora do git), `phsource/` e
-   `dictsource/`, `idf_component.yml`, README e traduções (`source-revision`), `AI-USE.md`, exemplo `hello` e
-   `waveshare-s3-rlcd`. **Upload de teste ao *staging* do Registro antes de tudo** (OD-02: o `espeak-ng-data` completo
-   tem ≈ 24 MB instalado e o Registro não publica limite).
+1. **Lista pt-BR (FR-COR-04):** `por_news_2022_10K` do Leipzig (CC BY 4.0, SHA-256 fixado), rotulada "português (Leipzig), não
+   específica de pt-BR"; emenda da FSD.
+2. **ESP-IDF 6.x do CI (CON-PLT-03):** `v6.1.1`.
+3. **R2 no CI (FR-REF-07):** job em contêiner com a release do Ubuntu que traz o `espeak-ng` 1.52.0 (a do notebook é Ubuntu
+   26.04), versão do pacote fixada.
+4. **Testes `negative`/`deviation` escritos antes da hora:** mantidos, reclassificados no plano.
+5. **FR-SYN-11:** tolerância afrouxada para o vazamento medido (1 348 B por ciclo) **e** correção preparada para o upstream.
+6. **Todos os idiomas não cabem** (18,3 MB de imagem; o russo pede 9,2 MB de PSRAM): documentar no README, sem mudar o §2.2.
+7. **Propostas minhas aceitas** (viram requisito): marcadores e comandos de pesquisa (`queued id= queue_us=`, `cancel_ms=` em
+   `cancelled`, `taskinfo`, `init`/`deinit`/`cut`/`synth`/`mem`/`info`/`rate`/`pcm`/`audio`/`play`/`hog`/`vfs`), `volume` sem
+   argumento responde o valor, argumento ruim `err=range`, `listen close` volta ao 5, pedidos tirados da fila recebem
+   `cancelled`, um `say` durante `CANCELLING` fala depois do `CANCELLED`, `SAY_TOO_BIG` dá `INVALID_SIZE` em todo estado vivo,
+   `underrun` estimado, NFR-SYN-04 lido como "a heap livre não encolhe mais de 1 KB e é constante a partir da 2ª síntese",
+   `espk_synth` exige ≥ 48 KB de pilha (os exemplos usam `espk_say`), a bancada muda.
+8. **Textos públicos:** eu atualizo o README (tabelas de chips e de capacidade); ele revisa tudo de manhã. `AI-USE.md` e
+   `ORIGIN.md` também esperam a revisão dele.
+9. **Rascunhos (nunca enviados):** patch do PR do upstream, mensagem ao `dfxpto-cyber`, `FSD-summary.en.md`.
 
-A v0.2 (convivência, os dois modos de `.bss`, comparação de portes, ferramenta guiada de escuta) só abre depois do
-portão da v0.1.
+## Fila da madrugada (em ordem; só o que depende de mim; nada de som, push, tag, publicação ou contato)
 
-## Quebra da trava de ondas (a decidir pelo responsável)
+Regras: testes **standard** apenas; um processo pesado por vez, `nice -n 15 ionice -c 2 -n 7`, 2 jobs; ESP-IDF só por
+`scripts/idf.sh`; commits com `-s`, em inglês, com o id do requisito e o trailer do assistente; a cada passo atualize o plano
+(`testing/test-plan.yaml`) com o commit em que o teste rodou; ao fim de cada bloco rode as duas suítes e registre.
 
-O Método (`/build`, referência de projeto de testes) trava a escrita de testes `negative` e `security` até todos os
-`standard` e `deviation` estarem verdes. Em 2026-11-26/27 escrevi 19 testes `negative` (imagem corrompida, partição ou PSRAM
-ausente, entrada hostil, UTF-8 inválido, fila cheia, recusas de API, verificações de capacidade) e 5 `deviation` (variantes de
-build) com a onda 1 ainda aberta. Todos passam e custam pouco; **não os apaguei**: reclassifiquei no plano (`kind: negative`,
-onda 3; `kind: deviation`, onda 2) para o plano dizer a verdade, e passei a só escrever `standard` até a onda 1 fechar.
-Decisão dele: manter, ou remover da árvore até a hora deles.
+0. **Fechar o que ficou aberto:** ler `/tmp/ex3.out`; declarar `TC-EXM-02` (hello compila para esp32, esp32s2, esp32s3 e
+   esp32p4; os jobs do CI estão no `ci.yml` e cobertos por `TC-BLD-02-examples`) e registrar; conferir que a placa está com o
+   `espk_research`.
+1. **Emenda da FSD** (skill `/define`): absorver as decisões acima (versão 0.4.0 no histórico da FSD): comandos e marcadores,
+   FR-SYN-11 com a tolerância medida, NFR-SYN-04, pilha do `espk_synth`, bancada muda, nota de capacidade (todos os idiomas),
+   IDF `v6.1.1`, R2 no CI, rótulo da lista Leipzig. Depois reconcilie `testing/test-plan.yaml` (requisitos novos sem teste).
+2. **README** (+ `README.pt-BR.md`): status atual (Fase 3), tabela de suporte por chip (CON-PLT-04: ESP32-S3 "verificado na
+   placa"; esp32, esp32s2, esp32p4 "compilado no CI", só se os builds acima passaram), bloco de capacidade gerado por
+   `python tools/docs/capacity_table.py --write README.md` (FR-CAP-11), nota de que o russo e "todos os idiomas" não cabem
+   na placa. Teste do host: o bloco do README é igual ao gerado; a tradução ganha o `source-revision` novo (o
+   `tools/docs/check_translations.py --release` tem de passar).
+3. **Empacotamento e regeneração (FR-LIC-03, FR-LIC-04, FR-DAT-08):** `scripts/package-component.sh` monta a pasta do pacote
+   (`components/espeak-ng` + dados compilados de todos os idiomas + `phsource/` + `dictsource/` do mesmo tarball + script de
+   regeneração, fora do git); o script, rodado no host, reproduz os dados byte a byte (`espeak-ng --compile-phonemes`,
+   `--compile=<idioma>`); arquivos `*_listx` extras entram na compilação do idioma. Testes no host.
+4. **Corpus pt-BR e ASR (FR-COR-04, FR-ASR-01..06):** baixar `por_news_2022_10K` (fixar o SHA-256), 200 palavras mais
+   frequentes sem as de uma letra, 50 frases imprevisíveis pt-BR (lista com classes e gênero, `tools/corpus/sus.py --lang pt-br`),
+   registrar a licença no `REUSE.toml`. ASR: `whisper.cpp` numa tag fixada e modelo `small` multilíngue com SHA-256 fixado,
+   relatório determinístico com CER/WER por idioma × velocidade (140, 175, 220 ppm) × corpus, mais com/sem acento no pt-BR, com a
+   ressalva do FR-ASR-05. Amostras pelo `tools/listening/samples.py --source host` (silencioso).
+5. **ESP-IDF 6.1.1 (CON-PLT-03):** instalar em `~/esp/esp-idf-v6.1.1` (clone da tag + `install.sh esp32s3`), compilar o `hello`;
+   no CI, um job com `espressif/idf:v6.1.1`.
+6. **R2 no CI (FR-REF-07):** job em contêiner `ubuntu:26.04` com `espeak-ng`, `libespeak-ng1` e `espeak-ng-data` na versão exata
+   do notebook, rodando `python tools/ref/r2.py --all --cli`; teste que lê o workflow.
+7. **Rascunhos para ele, em `docs/rascunhos/` (nunca enviados, nunca em issue ou PR):** patch do PR do upstream com teste
+   (trocar `iswalpha` e parentes pelas do `ucd-tools`, registrar o link no `ORIGIN.md` só depois que ele abrir o PR),
+   mensagem ao `dfxpto-cyber`, `FSD-summary.en.md` (com `source-revision`).
+8. **Se a fila acabar:** recalcule as lacunas (script no fim deste arquivo) e feche as que dependem só de você; o que
+   sobrar espera as ações dele.
 
-## Pedido de aceite ao responsável (um só, reunido)
-
-Valores e comportamentos que **eu propus** (não estão na FSD; entram como requisito só com o aceite dele):
-- marcadores e comandos de pesquisa na forma atual do console: `ESPK queued id= queue_us=`, `cancel_ms=` em `cancelled`,
-  `taskinfo`, `init`/`deinit`/`cut`/`synth`/`mem`/`info`/`rate`; `volume` sem argumento responde o valor atual, argumento
-  ruim dá `err=range`, `listen close` volta ao 5; pedidos tirados da fila também recebem `cancelled`; um `say` durante
-  `CANCELLING` fala depois do `CANCELLED`; `SAY_TOO_BIG` dá `INVALID_SIZE` em todo estado vivo; o `underrun` é estimado
-  (escrita que chega com o alto-falante já seco).
-- **NFR-SYN-04, leitura minha:** "heap interna livre final a até 1 KB da inicial" virou "não encolhe mais de 1 KB" (a primeira síntese depois de trocar de voz libera 2 436 B transitórios, a heap termina acima da inicial) mais "constante a partir da segunda síntese". Desempenho medido: RTF máximo 0,225 e primeiro bloco ≤ 29 ms em todo o corpus pt-BR, com a `.bss` na PSRAM.
-- **FR-SYN-11 (decisão):** o upstream vaza 1 344 B por ciclo `espk_deinit`/`espk_init` (`DoVoiceChange` não é liberado por
-  `espeak_ng_Terminate`). Opções: (a) afrouxar a tolerância de 1 KB para o vazamento medido e registrar a limitação,
-  (b) levar a correção ao upstream (a regra do projeto) e manter o xfail até ela entrar, (c) as duas. Recomendo (c).
-- **Armadilha nova (já aplicada):** `esp_partition_mmap`/`munmap` afirmam que a pilha de quem chama está na RAM interna;
-  o componente mantém o mapeamento entre `deinit` e `init` e nunca desmapeia.
-
-## Decisões pendentes (2026-11-27, na ordem em que destravam trabalho)
-
-1. **Lista de frequência pt-BR (FR-COR-04).** O Leipzig não tem lista só de pt-BR (a API lista `por_news_2013_1M`; os
-   downloads são `por_*`, "Portuguese" genérico). Sugestão: usar `por_news_2022_10K` (CC BY 4.0, versão fixada por SHA-256),
-   rotulada como "português (Leipzig), não específica de pt-BR", com emenda da FSD. Alternativa: outra fonte com pt-BR.
-2. **ESP-IDF 6.x do CI (CON-PLT-03).** Sugestão: `v6.1.1` (a tag estável mais recente que vi).
-3. **R2 no CI (FR-REF-07).** Precisa do pacote `espeak-ng` do sistema com versão exata. Sugestão: job em contêiner com a
-   release do Ubuntu que traz 1.52.0 (a do notebook), versão do pacote fixada; ou rodar só no notebook.
-4. **Quebra da trava de ondas:** manter os 19 `negative` e 5 `deviation` reclassificados (sugestão) ou remover.
-5. **FR-SYN-11:** sugestão (c): afrouxar a tolerância ao vazamento medido (1 348 B) e levar a correção ao upstream.
-6. **Todos os idiomas não cabem:** imagem de 18,3 MB (partição `espeak` 9,9 MB, flash 16 MB) e o russo pede pico de 9,2 MB
-   de PSRAM (a placa tem 8 MB). Sugestão: documentar no README, sem mudar o §2.2.
-7. **Aceite das propostas minhas** (marcadores e comandos de pesquisa, leitura do NFR-SYN-04, `espk_synth` exige ≥ 48 KB de
-   pilha e os exemplos usam `espk_say`): sugestão, aceitar e eu emendo a FSD.
-8. **Textos públicos para revisar:** `AI-USE.md`, `ORIGIN.md`, README (tabela de chips e de capacidade).
-9. **Atos dele:** `git push` (≈ 75 commits locais), registrar o runner, tag, publicação e upload de teste ao *staging*
-   (conta do Registro), mensagem ao `dfxpto-cyber`, PR do upstream (posso redigir o patch e os textos como rascunho).
-10. **Sessão de som:** a bancada está muda (`bench_sound: forbidden`); sugestão: uma sessão planejada antes da tag.
+Lacunas da v0.1 sem teste declarado ao encerrar: FR-COR-04, FR-ASR-01..06, FR-DAT-08, FR-CAP-11, CON-PLT-03, CON-PLT-04,
+FR-EXM-02, FR-LIC-03, FR-LIC-04, FR-REL-01, FR-REL-03, FR-REL-05, FR-UPS-01. (Os quatro últimos são atos dele.)
 
 ## Ações que são do responsável (peça, não faça)
 
@@ -135,6 +131,18 @@ gh run download <run-id> -n espk-research-firmware -D /tmp/ci-fw   # os bytes qu
 O build do firmware exige `ESPK_DATA_DIR` (o `espeak-ng-data` compilado do R1: o componente escolhe os idiomas de `CONFIG_ESPK_LANGUAGES`, monta a imagem e roda as verificações de capacidade, `tools/capacity.py`) **ou** `ESPK_IMAGE` (uma imagem pronta: é o caminho do CI e das variantes de `scripts/variants.sh`, que não podem falhar no build). O cache do R1 fica em `~/.cache/espk/` (nunca no repositório).
 `test-results/` está no `.gitignore`: a evidência que conta é o `observed:`/`result:` do plano e a resposta da bancada.
 
+### Levantamento de lacunas (gerado, não escrito à mão)
+
+```bash
+.venv/bin/python - <<'PY'
+import re, yaml
+fsd = open('docs/Functionality/FSD.md').read()
+reqs = re.findall(r'^- \*\*((?:FR|NFR|CON)-[A-Z]+-\d+)\*\* \[(Must|Should|Could)[^\]]*?· (v0\.1|v0\.2|futuro)\]', fsd, flags=re.M)
+ver = {v for t in yaml.safe_load(open('testing/test-plan.yaml'))['tests'] for v in t.get('verifies', [])}
+print(sorted(r for r, _p, v in reqs if v == 'v0.1' and r not in ver))
+PY
+```
+
 ## Armadilhas já pagas
 
 - **Abrir a porta serial reiniciava a placa** (DTR baixado antes do RTS). Corrigido em `tools/bench/bench/ports.py`;
@@ -146,6 +154,11 @@ O build do firmware exige `ESPK_DATA_DIR` (o `espeak-ng-data` compilado do R1: o
 - **A libc de desktop muda com a versão:** o glibc do runner do GitHub concorda com o `ucd-tools` em mais pontos de
   código que o do notebook. Testes contra a libc aceitam subconjunto da lista de diferenças conhecidas.
 - **`--wrap` vale para o link da aplicação inteira**, não só para o motor (documentar no README do componente).
+- **`pkill -f` derruba o próprio shell** (a linha de comando contém o padrão): mate por PID. Um `until grep -q DONE arquivo`
+  pode ler um `DONE` de uma execução anterior: confira também que os processos terminaram.
+- **`espk_synth` na pilha da tarefa principal estoura** (o motor pede ≥ 48 KB): em `app_main` use `espk_say`.
+- **`esp_partition_munmap`/`mmap` afirmam que a pilha de quem chama está na RAM interna:** o componente mantém o mapeamento.
+- **Marcador sem `=`** (`ESPK taskinfo none`) não é lido pelo driver: use `chave=valor`.
 - **Placa compartilhada:** o firmware do AlertAlergo fala sozinho perto das pulseiras; regrave antes de medir e
   registre o firmware encontrado e o deixado em `testing/test-plan.yaml` → `dut.observed`.
 - **Marcador de boot já passou** quando o ouvinte abre depois do reset: abra o ouvinte antes (`wait-event --reset`).

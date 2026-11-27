@@ -19,9 +19,10 @@ de qualquer mudança.**
 | 3 · Construção | `/build` | **Ready for shipment**: requisitos atendidos, jornada verde, reconcile vazio |
 | Liberação | tag (ato do responsável) | **Shipped**: versão publicada e jornada verde nos bytes publicados |
 
-Estado atual: **Fase 3 (construção), onda 1**, 21 de 23 testes declarados verdes; a placa fala e o PCM dela é igual ao do
-upstream no host (F2). **Para retomar, leia `docs/Method/project/proximos-passos.md`** (posição, próximos atos em ordem,
-o que é do responsável, comandos e armadilhas) e atualize-o ao encerrar a sessão. O que está em `seed/` é evidência, não
+Estado atual: **Fase 3 (construção), onda 1**, ≈ 109 de 112 testes declarados verdes; a placa fala (baixo, volume 5) e o PCM dela é
+igual ao do upstream no host; a bancada está **muda por decisão do responsável** (`bench.yaml`, `bench_sound: forbidden`). **Para
+retomar, leia `docs/Method/project/proximos-passos.md`** (fila da madrugada, decisões tomadas, o que é do responsável, comandos
+e armadilhas) e atualize-o ao encerrar a sessão. O que está em `seed/` é evidência, não
 produto.
 
 ## A bancada
