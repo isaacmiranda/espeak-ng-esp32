@@ -358,7 +358,7 @@ tests:
     needs: []
     impl: "tests/host/test_project_facts.py::test_the_engine_uses_the_upstream_compat_shim_not_a_link_wrap"
     status: successful
-    result: {commit: HEAD, date: 2026-11-27, run: "local pytest tests/host"}
+    result: {commit: b3aab21, date: 2026-11-27, run: "local pytest tests/host"}
   - id: TC-ENG-05-elf
     title: "Intact mode (CONFIG_ESPK_UCD_WRAP=n) builds, and its ELF has no iswalpha-to-ucd mapping, and no __wrap_isw* symbol"
     shape: atomic
@@ -1490,8 +1490,8 @@ tests:
     verifies: [FR-EXM-03]
     needs: [dut, bench-flash, bench-command, r1-host-reference, audio-out]
     impl: "tests/target/test_examples.py::test_the_waveshare_example_speaks_pt_br_through_the_codec_at_volume_5"
-    status: not done
-    reason: "not implemented: scripts/examples.sh has not run it yet"
+    status: successful
+    result: {commit: b3aab21, date: 2026-11-27, run: "scripts/examples.sh waveshare-s3-rlcd:esp32s3, sound lifted by the responsible for this run only; bench.yaml back to forbidden"}
   - id: TC-EXM-04
     title: "The example's resampler keeps a constant, follows the ratio of the rates, keeps a tone's frequency and does not depend on the block size"
     shape: atomic

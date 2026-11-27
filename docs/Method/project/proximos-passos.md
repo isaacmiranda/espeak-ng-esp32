@@ -22,7 +22,7 @@ atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da fila da ma
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 126 de 128 declarados `successful` (o resto: TC-SYN-11-heap `failed` por vazamento do upstream; TC-EXM-03 que espera a placa não muda; antes: e o que
+- **Testes:** 128 de 129 declarados `successful` (o resto: TC-SYN-11-heap `failed` por vazamento do upstream). Suíte da placa com o firmware sem wrap (`b3aab21`): 41 passam, 15 pulados, 1 xfail.
   ainda não rodou). Suítes: `pytest -q tools/bench tests/host` (≈ 170, 3 min) e `pytest tests/target tests/bench --run-bench` (≈ 8 min).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
@@ -78,22 +78,22 @@ Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as 
 - **6 · R2 no CI:** job `r2` em `ubuntu:26.04` com `espeak-ng` 1.52.0+dfsg-5build1 fixado; o teste de "sem apt sem versão"
   agora só admite apt nesse contêiner e com os pacotes espeak fixados (as ferramentas de build são as da release).
 - **7 · rascunhos:** `docs/rascunhos/` (nunca enviados). **Achado:** o build CMake do upstream já usa o shim
-  `src/include/compat/wctype.h` (isw* → ucd-tools); o componente não põe esse diretório no include, daí o wrap.
+  `src/include/compat/wctype.h` (isw* → ucd-tools); o componente passou a pôr esse diretório no include (no lugar do wrap antigo).
   Ver `upstream-1611.md`.
 - **Suítes ao fim:** `pytest tools/bench tests/host` 187 verdes; `tests/target tests/bench --run-bench` com o artefato
   `4d4b2fa` na placa: 41 passam, 15 pulados, 1 xfail (o vazamento do FR-SYN-11).
 
 ## Depois da fila (o que um próximo passo pode fazer sozinho)
 
-1. **Experimento do `compat`** (ver `docs/rascunhos/upstream-1611.md`): `PRIV_INCLUDE_DIRS` com
-   `upstream/src/include/compat` no lugar do wrap; build, PCM da placa × R1 (silencioso), modo intacto. Se igual, emenda da
-   FSD (FR-ENG-04, FR-UPS-01) e o wrap sai. É decisão de projeto: mostre ao responsável antes de remover o wrap.
-2. **TC-EXM-03** (exemplo da Waveshare fala): precisa da placa não muda; espera o responsável.
+1. **Experimento do `compat` — feito (2026-11-27):** o `include/compat` do upstream substituiu o wrap (FSD 0.5.0, FR-ENG-04
+   e FR-UPS-01 emendados, `espk_wrap.c` removido). PCM da placa × R1: 100 de 100 iguais; modo intacto verde; suíte da
+   placa 41/15/1 como antes. A opção segue chamada `CONFIG_ESPK_UCD_WRAP` (nome histórico).
+2. **TC-EXM-03 — feito:** o responsável liberou o som para esta rodada; o exemplo falou (volume 5, sem underrun, hash = R1).
+   `bench.yaml` voltou a `forbidden`; a placa ficou com o firmware de pesquisa de `/tmp/fw`.
 3. **Onda 1 fechada?** Lacunas da v0.1 sem teste: só FR-REL-01, FR-REL-03, FR-REL-05, FR-UPS-01 (atos dele). Rode o script
    de lacunas abaixo.
 4. **Relatório ASR completo e R2 `--all --cli`:** só no CI (rodar com a tag).
-5. **README e AI-USE.md/ORIGIN.md:** ele revisa de manhã; atualizar `AI-USE.md`/`ORIGIN.md` com o que a madrugada fez
-   (ASR, corpus Leipzig CC BY, achado do `compat`) ainda não foi feito.
+5. **AI-USE.md:** atualizado (corpus, ASR, frases); `components/espeak-ng/ORIGIN.md` registra o achado do `compat`.
 
 ## Ações que são do responsável (peça, não faça)
 
