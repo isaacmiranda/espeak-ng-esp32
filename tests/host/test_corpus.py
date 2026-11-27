@@ -18,7 +18,8 @@ WORDS = ROOT / "tools/corpus/wordlist-en.tsv"
 
 
 def rows(path):
-    return [ln.split("\t") for ln in path.read_text(encoding="utf-8").splitlines() if ln and not ln.startswith("#")]
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [ln.split("\t") for ln in lines if ln and not ln.startswith("#")]
 
 
 def test_the_automatic_corpus_is_numerals_a_date_and_a_time_and_nothing_else():

@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Semantically unpredictable sentences (Benoit et al., 1996), generated from a classified word list (FR-COR-05,
-FR-COR-07).
+"""Semantically unpredictable sentences (Benoit et al., 1996) from a classified word list (FR-COR-05, 07).
 
     sus.py --words wordlist-en.tsv --count 50 --seed 20261126 [--lang en|pt-br] --out sentences.tsv
 
 The sentences are grammatical and make no sense, so a listener cannot guess a word from its context. Five
-syntactic models take turns; words are drawn with a seeded generator (random.Random: the same sequence on every
-platform), without repeating a content word inside the file while the list lasts. The same seed and the same
-list give the same bytes (FR-COR-07). Word list: tab separated, `class word [gender-or-feminine-form]`, classes
+syntactic models take turns; words are drawn with a seeded generator (random.Random: the same sequence on
+every platform), without repeating a word of a class while the list lasts. The same seed and the same list
+give the same bytes (FR-COR-07). Word list: tab separated, `class word [gender-or-feminine-form]`, classes
 noun, adj, verb_t, verb_i, prep. For pt-br, nouns carry a gender (m|f) and adjectives their feminine form.
 """
 
