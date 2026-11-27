@@ -64,10 +64,10 @@ capabilities:
   dut:
     what: "the Waveshare ESP32-S3-RLCD-4.2 named by the FSD §2.2, running this project's artifact"
     available: yes
-    observed: {date: 2026-11-26, found: "alertalergo 0.0.1-dev.309+g60b6894", left: "espk_research 225e9f8 (CI run 45861574416 artifact)", psram: "8MB octal (AP)"}
+    observed: {date: 2026-11-27, found: "alertalergo 0.0.1-dev.309+g60b6894 (first session), then always the research firmware", left: "espk_research 2c7946a (local build with ESPK_DATA_DIR, bss=psram, languages pt-br en)", psram: "8MB octal (AP)"}
     note: "shared with alertalergo-v3-firmware: record the firmware found before flashing and the one left after"
     equivalence: "R3 = R1: 100 of 100 says equal over the pt-BR and en verification corpus in sequence (6951a9e); without the wrap every say after the first accented one differs"
-    data: "ESPK ready with the ESPK image (pt-br, en; 904 477 B) at 0x620000, init_ms=168"
+    data: "ESPK ready with the ESPK image (pt-br, en; 904 477 B) at 0x620000, init_ms=170"
     limitation: "every open of the port used to reset the board (DTR lowered before RTS); fixed in tools/bench/bench/ports.py — a reset during a test is a bench fault first"
   audio-out:
     what: "ES8311/I2S plays a test tone at bench volume 5 and the firmware reports underrun=0"
