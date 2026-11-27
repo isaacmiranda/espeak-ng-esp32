@@ -19,14 +19,14 @@ Consequências a decidir (do responsável):
    fora do CMake/autotools precisa de `src/include/compat` no caminho de inclusão.
 2. O shim tem um erro de digitação no upstream: `#define toupper udc_toupper` (deveria ser `ucd_toupper`). Hoje ninguém
    chama `toupper` nessas unidades, então não quebra; é candidato a PR pequeno e verdadeiro.
-3. Alternativa de projeto: trocar o wrap por `upstream/src/include/compat` no `PRIV_INCLUDE_DIRS` (igual ao upstream, sem
+3. **Feito em 2026-11-27 (FSD 0.5.0):** trocar o wrap por `upstream/src/include/compat` no `PRIV_INCLUDE_DIRS` (igual ao upstream, sem
    código nosso). Experimento a rodar antes de decidir: build com essa mudança, PCM da placa × R1 nos 100 itens
    (`tests/target/test_equivalence.py`, silencioso) e o modo intacto. Se igual, o wrap sai e o FR-ENG-04/FR-UPS-01 mudam
    (emenda da FSD).
 
-Até o experimento, **não afirmar** que o upstream tem um defeito.
+Experimento concluído: PCM da placa = R1 em 100 de 100 itens com o `compat` e sem o wrap; modo intacto verde. Mesmo assim, **não afirmar** que o upstream tem um defeito.
 
-## Rascunho do comentário na #1611 (em inglês; só depois do experimento)
+## Rascunho do comentário na #1611 (em inglês; experimento feito; aguardando aprovação do responsável)
 
 > For anyone building the sources outside CMake/autotools (we hit this with ESP-IDF on ESP32, newlib): the engine's
 > `isw*` calls only classify accented letters correctly when `src/include/compat` is on the include path, because

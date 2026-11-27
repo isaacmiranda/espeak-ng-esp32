@@ -6,6 +6,7 @@ publicado.** Cada rascunho diz o que falta antes de sair. Revisão: Isaac Mirand
 
 | Arquivo | O que é | Antes de sair |
 |---|---|---|
-| [`upstream-1611.md`](upstream-1611.md) | comentário/PR para o `espeak-ng/espeak-ng` sobre a #1611 | rodar o experimento da seção "O achado" |
+| [`upstream-1611.md`](upstream-1611.md) | comentário/PR para o `espeak-ng/espeak-ng` sobre a #1611 | experimento feito (2026-11-27, PCM igual ao R1); falta a sua aprovação do texto |
 | [`dfxpto-cyber.md`](dfxpto-cyber.md) | mensagem ao autor do porte `dfxpto-cyber/eSpeak-NG-.-Esp32` (FR-REL-05) | revisão e escolha do canal |
 | [`FSD-summary.en.md`](FSD-summary.en.md) | resumo da FSD em inglês (política de documentos públicos) | revisão |
+| [`protocolo-estudo-esqueleto.md`](protocolo-estudo-esqueleto.md) | esqueleto do protocolo do estudo de escuta para o CEP | suas decisões nos `[DECIDIR]` e o modelo do seu CEP |
