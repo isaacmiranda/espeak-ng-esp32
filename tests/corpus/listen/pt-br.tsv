@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Listening corpus pt-br (FR-COR-04, FR-COR-05): id, category, text.
+# Built by tools/corpus/build_listen.py; do not edit by hand.
+# daily: everyday sentences of a device that speaks, written for this project.
+# pending (FR-COR-04): the 200 most frequent words and the 50 unpredictable sentences wait for the choice of the pt-BR frequency list.
+D01	daily	O nível de pólen está alto hoje.
+D02	daily	Por favor, tome o seu remédio às oito horas.
+D03	daily	A bateria está fraca, carregue o aparelho.
+D04	daily	A conexão com o celular foi perdida.
+D05	daily	O nível de pólen está baixo, você pode abrir a janela.
+D06	daily	Está na hora da sua dose da tarde.
+D07	daily	Hoje o tempo será seco e com vento.
+D08	daily	O aparelho está pronto para usar.
+D09	daily	Confira o filtro do seu quarto, por favor.
+D10	daily	A pulseira está conectada.
+D11	daily	Vai chover hoje à noite, o ar ficará limpo.
+D12	daily	Você tem dois lembretes para amanhã.
+D13	daily	A temperatura é de vinte e dois graus.
+D14	daily	Sua próxima consulta é na segunda às dez horas.
+D15	daily	O alarme está marcado para as sete e meia.
+D16	daily	Lave as mãos antes de comer.
+D17	daily	A qualidade do ar está boa nesta tarde.
+D18	daily	Mantenha o aparelho longe da água.
+D19	daily	Seus dados foram salvos.
+D20	daily	Abra o aplicativo para ler a mensagem completa.
+D21	daily	A caixa de remédios está quase vazia.
+D22	daily	Lembre-se de beber água durante o dia.
+D23	daily	A atualização terminou com sucesso.
+D24	daily	Há um alerta de pólen para a sua região.
+D25	daily	Fique em casa até o fim da tarde, por favor.
+D26	daily	O volume está no cinco.
+D27	daily	Bom dia, hoje é quinta-feira.
+D28	daily	O sensor precisa ser limpo.
+D29	daily	Seu médico enviou uma nova mensagem.
+D30	daily	O aparelho vai desligar em um minuto.

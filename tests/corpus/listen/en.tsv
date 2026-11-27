@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Listening corpus en (FR-COR-04, FR-COR-05): id, category, text.
+# Built by tools/corpus/build_listen.py; do not edit by hand.
+# daily: everyday sentences of a device that speaks, written for this project.
+# sus: semantically unpredictable sentences (Benoit et al., 1996 method), seed 20261126.
+S01	sus-M1	The winter paints the island.
+S02	sus-M2	The cheerful window borrows the engine.
+S03	sus-M3	The candle collects the empty cloud.
+S04	sus-M4	The blanket sails with the moment.
+S05	sus-M5	The wild market laughs behind the ocean.
+S06	sus-M1	The neighbour polishes the letter.
+S07	sus-M2	The heavy farmer opens the valley.
+S08	sus-M3	The garden measures the ancient doctor.
+S09	sus-M4	The carpet waves under the painter.
+S10	sus-M5	The frozen kitchen argues without the basket.
+S11	sus-M1	The mirror cleans the station.
+S12	sus-M2	The round bottle repairs the village.
+S13	sus-M3	The harbour chooses the golden mountain.
+S14	sus-M4	The story walks near the teacher.
+S15	sus-M5	The wooden pocket wanders near the river.
+S16	sus-M1	The lantern shakes the clock.
+S17	sus-M2	The proud ticket copies the sister.
+S18	sus-M3	The machine hears the silent road.
+S19	sus-M4	The table listens behind the pencil.
+S20	sus-M5	The tired bridge hurries under the captain.
+S21	sus-M1	The farmer counts the market.
+S22	sus-M2	The rusty table invites the valley.
+S23	sus-M3	The window weighs the hollow road.
+S24	sus-M4	The cloud stands without the bridge.
+S25	sus-M5	The gentle lantern sleeps with the story.
+S26	sus-M1	The garden drops the blanket.
+S27	sus-M2	The sudden letter remembers the moment.
+S28	sus-M3	The teacher follows the distant mirror.
+S29	sus-M4	The painter hesitates with the candle.
+S30	sus-M5	The bright river sings under the basket.
+S31	sus-M1	The carpet trusts the island.
+S32	sus-M2	The narrow harbour hides the station.
+S33	sus-M3	The clock teaches the shallow kitchen.
+S34	sus-M4	The village rests without the ticket.
+S35	sus-M5	The careful pencil hides near the neighbour.
+S36	sus-M1	The captain forgets the bottle.
+S37	sus-M2	The crooked winter finds the pocket.
+S38	sus-M3	The mountain carries the quiet engine.
+S39	sus-M4	The doctor whispers behind the machine.
+S40	sus-M5	The slippery ocean waits with the sister.
+S41	sus-M1	The garden finds the machine.
+S42	sus-M2	The proud market chooses the story.
+S43	sus-M3	The valley measures the slippery winter.
+S44	sus-M4	The pencil hides behind the harbour.
+S45	sus-M5	The gentle cloud hesitates without the mirror.
+S46	sus-M1	The ticket invites the window.
+S47	sus-M2	The wooden village shakes the station.
+S48	sus-M3	The sister collects the round painter.
+S49	sus-M4	The captain sleeps near the carpet.
+S50	sus-M5	The cheerful table laughs under the basket.
+D01	daily	The pollen level is high today.
+D02	daily	Please take your medicine at eight o'clock.
+D03	daily	The battery is low, please charge the device.
+D04	daily	The connection to the phone was lost.
+D05	daily	The pollen level is low, you can open the window.
+D06	daily	It is time for your afternoon dose.
+D07	daily	Today will be dry and windy.
+D08	daily	The device is ready to use.
+D09	daily	Please check the filter in your room.
+D10	daily	The bracelet is connected.
+D11	daily	Rain is coming tonight, the air will be clean.
+D12	daily	You have two reminders for tomorrow.
+D13	daily	The temperature is twenty two degrees.
+D14	daily	Your next appointment is on Monday at ten.
+D15	daily	The alarm is set for seven thirty.
+D16	daily	Wash your hands before you eat.
+D17	daily	The air quality is good this afternoon.
+D18	daily	Please keep the device away from water.
+D19	daily	Your data was saved.
+D20	daily	Open the app to read the full message.
+D21	daily	The medicine box is almost empty.
+D22	daily	Remember to drink water during the day.
+D23	daily	The update finished successfully.
+D24	daily	There is a pollen alert for your area.
+D25	daily	Please stay indoors until the evening.
+D26	daily	The volume is set to five.
+D27	daily	Good morning, today is Thursday.
+D28	daily	The sensor needs to be cleaned.
+D29	daily	Your doctor sent you a new message.
+D30	daily	The device will turn off in one minute.
