@@ -962,5 +962,5 @@ tests:
     verifies: [FR-CAP-10]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_core.py::test_init_with_too_little_psram_is_refused_and_nothing_is_loaded"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 2c7946a, date: 2026-11-26, run: "artifact of 2c7946a (built with ESPK_DATA_DIR) flashed with bench flash; pytest tests/target tests/bench --run-bench; host: pytest tests/host"}

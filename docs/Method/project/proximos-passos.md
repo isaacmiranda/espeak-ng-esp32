@@ -27,6 +27,8 @@ atualiza este arquivo.** Última atualização: 2026-11-26, após FR-ENG-05.
 - **Volume (FR-RES-07, 08, 09):** `volume` sem argumento responde `ESPK volume ok=<n>`, argumento ruim `err=range`, `listen close` volta ao padrão 5 (propostas minhas, ainda sem aceite). O guarda do driver barra `volume` > 10 antes da placa; o teste de 11 é do host.
 - **Cancelar (JRN-06) verde** (`a55a70d`): `cancel` no meio de uma fala de 985 bytes → `ESPK cancelled id=<n> cancel_ms=5`; `cancel_ms` é proposta minha (medida no chip, da chamada ao evento). Os pedidos tirados da fila também recebem `cancelled` (para o dono liberar o contexto); um `say` durante `CANCELLING` fala logo depois do `CANCELLED` (a tabela não diz; proposta).\n- **`.bss` do motor na PSRAM (FR-MEM-02, `CONFIG_ESPK_BSS_IN_PSRAM`, padrão ligado):** fragmento `components/espeak-ng/linker.lf` (precisa de `LDFRAGMENTS` no CMake); a RAM interna livre depois do boot subiu de 250 KB para 341 KB. O teste do host lê o ELF (`ESPK_BUILD` aponta outro diretório de build).
 - **Variantes de build (`scripts/variants.sh [nome...]`, um build completo cada, ~10 min):** `intact`, `sync`, `nolabel`, `nosubtype`, `nopsram`, cada uma com o seu teste (`ESPK_<NOME>_BUILD`). Provam FR-ENG-05, FR-ASY-08, FR-DAT-01/02 e FR-MEM-01. Depois de rodar variantes, a placa fica com a última: regrave o artefato normal. Um build sem PSRAM não linka `esp_psram`: o componente trata como "sem PSRAM".
+- **Capacidade (FR-CAP-01..10):** `components/espeak-ng/tools/capacity.py` valida idiomas, voz inicial, tamanho da imagem × partição, orçamento de PSRAM e o aviso de 90 %, e emite o relatório; o CMake do componente a roda no configure (com `ESPK_DATA_DIR`), grava `build/espeak.img` e `build/espk_capacity.json` e passa o pico ao `espk_init` (`ESPK_PSRAM_PEAK_BYTES`). A RAM estática interna vem do `.map` (`--map`); o relatório pós-link ainda não é automático. Medido: imagem `pt-br en` = 904 477 B, pico 827 224 B, RAM estática interna do componente 482 B.
+- **Achados da capacidade para o responsável:** (1) a imagem de **todos** os idiomas tem 18,3 MB e **não cabe** na partição `espeak` de 9,9 MB do §2.2; (2) o upstream 1.52.0 lista as vozes `xex`, `fo` e `kaa` sem dicionário compilado nos próprios dados, e o `--all` as deixa de fora com aviso.
 - **Marcadores e comandos de pesquisa novos (propostas minhas):** `ESPK queued id= queue_us=` (resposta do `say`), `synth <texto>` → `ESPK sync sha256=` (caminho síncrono), `taskinfo` → `stack= psram= hwm=` ou `task=none`, `cancel` → `ESPK cancel err=` só em erro. Variantes de build: `sdkconfig.intact.defaults`, `sdkconfig.sync.defaults` (`-B build-intact` / `-B build-sync`, mesmo formato do intacto).
 - **JRN-03 verde** (`174a978`): `say` sem `--mute` por `research/firmware/components/audio_es8311` (I2C SDA 13/SCL 14, ES8311 0x18), `start` antes de `done`, `underrun` por estimativa (escrita que chega com o alto-falante já seco). Volume 5 é inaudível; a escuta do responsável (30 não, 70 sim, baixa) provou o caminho: `audio-out: yes`. A placa tem o firmware de `174a978`.
 - **Capacidades ainda `unproven`:** `release-verification` (o runner).
@@ -94,14 +96,14 @@ Do diretório do repositório, com o `venv` (`.venv/`, `requirements.txt`) e sem
 .venv/bin/pytest -q tools/bench tests/host                    # host + driver na porta falsa (~10 s; 1º R1 compila o upstream, minutos)
 .venv/bin/ruff check components tools tests conftest.py ; .venv/bin/reuse lint
 scripts/build-image.sh /tmp/espeak.img                        # imagem de dados (pt-br, en) a partir do R1
-cd research/firmware && ../../scripts/idf.sh env ESPK_IMAGE=/tmp/espeak.img \
+cd research/firmware && ../../scripts/idf.sh env ESPK_DATA_DIR=~/.cache/espk/r1-1.52.0-bb4338102ff3/espeak-ng-data \
     idf.py -B build -G Ninja build -- -j2                     # sem sdkconfig velho: apague research/firmware/sdkconfig ao mudar defaults
 scripts/package-artifact.sh research/firmware/build /tmp/fw   # artefato: flash_args + imagens + manifest.yaml
 ESPK_ARTIFACT=/tmp/fw .venv/bin/pytest tests/target tests/bench --run-bench -q   # ~3 min, na placa
 gh run download <run-id> -n espk-research-firmware -D /tmp/ci-fw   # os bytes que o CI construiu
 ```
 
-O build do firmware exige `ESPK_IMAGE`. O cache do R1 fica em `~/.cache/espk/` (nunca no repositório).
+O build do firmware exige `ESPK_DATA_DIR` (o `espeak-ng-data` compilado do R1: o componente escolhe os idiomas de `CONFIG_ESPK_LANGUAGES`, monta a imagem e roda as verificações de capacidade, `tools/capacity.py`) **ou** `ESPK_IMAGE` (uma imagem pronta: é o caminho do CI e das variantes de `scripts/variants.sh`, que não podem falhar no build). O cache do R1 fica em `~/.cache/espk/` (nunca no repositório).
 `test-results/` está no `.gitignore`: a evidência que conta é o `observed:`/`result:` do plano e a resposta da bancada.
 
 ## Armadilhas já pagas
