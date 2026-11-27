@@ -1204,8 +1204,8 @@ tests:
     verifies: [FR-LST-01]
     needs: []
     impl: "tests/host/test_listening_samples.py::test_one_wav_per_item_and_speed_with_a_pseudorandom_name_and_a_separate_map"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 2b5d1c1, date: 2026-11-26, run: "artifact of 2b5d1c1 (with the pcm command) flashed with bench flash; pytest tests/target/test_pcm_seam.py --run-bench; host: pytest tests/host/test_listening_samples.py"}
   - id: TC-LST-01-board
     title: "The sample generator writes the board's own PCM as WAV files (the artifact's, streamed by pcm)"
     shape: atomic
@@ -1215,8 +1215,8 @@ tests:
     verifies: [FR-LST-01]
     needs: [dut, bench-flash, bench-command, r1-host-reference]
     impl: "tests/target/test_pcm_seam.py::test_the_generator_writes_the_boards_pcm_as_wav_files"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 2b5d1c1, date: 2026-11-26, run: "artifact of 2b5d1c1 (with the pcm command) flashed with bench flash; pytest tests/target/test_pcm_seam.py --run-bench; host: pytest tests/host/test_listening_samples.py"}
   - id: TC-REF-04
     title: "The divergence analysis gives the first divergent sample, the maximum difference and the SNR; the board's PCM equals the host build's byte for byte"
     shape: atomic
@@ -1226,8 +1226,8 @@ tests:
     verifies: [FR-REF-04]
     needs: []
     impl: "tests/host/test_listening_samples.py::test_the_divergence_analysis_gives_the_first_sample_the_maximum_difference_and_the_snr"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 2b5d1c1, date: 2026-11-26, run: "artifact of 2b5d1c1 (with the pcm command) flashed with bench flash; pytest tests/target/test_pcm_seam.py --run-bench; host: pytest tests/host/test_listening_samples.py"}
   - id: TC-REF-04-board
     title: "The PCM streamed by the board equals the host build's byte for byte (no divergence to report)"
     shape: atomic
@@ -1237,5 +1237,5 @@ tests:
     verifies: [FR-REF-04]
     needs: [dut, bench-flash, bench-command, r1-host-reference]
     impl: "tests/target/test_pcm_seam.py::test_the_pcm_streamed_by_the_board_equals_the_host_build_byte_for_byte"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 2b5d1c1, date: 2026-11-26, run: "artifact of 2b5d1c1 (with the pcm command) flashed with bench flash; pytest tests/target/test_pcm_seam.py --run-bench; host: pytest tests/host/test_listening_samples.py"}
