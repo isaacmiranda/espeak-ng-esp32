@@ -25,4 +25,4 @@ The ESP32 libc knows no letter beyond ASCII, so the engine spells accented text 
 CMake build does; its `wctype.h` maps the `isw*` calls to the upstream's `ucd-tools` at compile time (checked on the
 board: PCM equal to the upstream's on the whole verification corpus). So there is no defect to fix upstream: the useful
 contribution is documentation for anyone building the sources outside CMake, and a one-line typo fix in that shim
-(`udc_toupper`). Neither is sent yet; the link goes here when it is.
+(`udc_toupper`). A comment with the first was posted on 2026-11-27: https://github.com/espeak-ng/espeak-ng/issues/1611#issuecomment-7216838717 . The typo fix is only mentioned there, no PR is open.

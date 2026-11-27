@@ -3,7 +3,7 @@
 Documento de **retomada**: onde o trabalho está e o que fazer a seguir, para uma sessão nova começar sem perguntar.
 A posição **derivada** (testes, requisitos, portões) está em [`testing/test-plan.yaml`](../../../testing/test-plan.yaml) e
 na [FSD](../../Functionality/FSD.md); este arquivo só aponta e lista o que o plano não diz. **Quem encerra uma sessão
-atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da fila da madrugada (itens 0–7 feitos).
+atualiza este arquivo.** Última atualização: 2026-11-27, pausa pedida pelo responsável (ele vai tocar outro projeto).
 
 ## Como abrir a sessão
 
@@ -12,8 +12,8 @@ atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da fila da ma
 2. Posição: Fase 3, **onda 1** (só testes `standard`; `deviation` e `negative` já escritos ficam, mas não escreva novos).
 3. **A placa é muda (decisão dele, 2026-11-27).** `bench.yaml` tem `audio.bench_sound: forbidden`; o driver recusa `say` sem
    `--mute`, `play` e a gravação de `espk_waveshare`. Não contorne, não edite para `allowed`. Use `--mute`, `pcm`, `synth`.
-4. Confira a árvore: `git status`, `git log --oneline -5`. **Nenhum `git push` foi feito** (≈ 80 commits locais): só ele
-   manda. Leia o que está na placa antes de gravar (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`):
+4. Confira a árvore: `git status`, `git log --oneline -5`. **Tudo está no `origin/main`** (último push `c5dece1` + o commit da pausa);
+   `git push` só quando ele pedir. Leia o que está na placa antes de gravar (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`):
    deve ser o firmware de pesquisa (`espk_research`); ela é compartilhada com o AlertAlergo V3.
 5. Builds de exemplos e ESP-IDF 6.1.1 já rodaram (ver abaixo); `/tmp` é tmpfs de 512 MB e enche: testes pesados usam
    `~/.cache/espk/tmp`.
@@ -83,7 +83,43 @@ Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as 
 - **Suítes ao fim:** `pytest tools/bench tests/host` 187 verdes; `tests/target tests/bench --run-bench` com o artefato
   `4d4b2fa` na placa: 41 passam, 15 pulados, 1 xfail (o vazamento do FR-SYN-11).
 
-## Depois da fila (o que um próximo passo pode fazer sozinho)
+## Decisões do responsável (2026-11-27, tarde) — valem até ele mudar
+
+| Tema | Decisão |
+|---|---|
+| Tag | só **depois do CI completo** (ASR completo + R2 `--all --cli`) e de fechar FR-REL-01/03/05 |
+| Runner da bancada | registrar **só na hora da tag**, restrito a este repositório |
+| Rascunhos | enviar só o **comentário na #1611** (feito: issuecomment-7216838717); PR do typo `udc_toupper`, mensagem ao `dfxpto-cyber` e `FSD-summary.en.md` **não** foram escolhidos: ficam como rascunho |
+| Estudo de escuta | o assistente redige o **esqueleto** (`docs/rascunhos/protocolo-estudo-esqueleto.md`); ele preenche os `[DECIDIR]` |
+| Som | liberado uma vez para o TC-EXM-03; `bench.yaml` voltou a `forbidden` e continua assim |
+| `compat` no lugar do wrap | feito (FSD 0.5.0); 100/100 itens iguais ao R1 |
+
+## Próximos passos definidos (em ordem; o assistente faz 1–4 sozinho, 5–8 são do responsável)
+
+1. **Fechar a onda 1 sem ato dele:** rodar o script de lacunas (abaixo) e confirmar que só restam FR-REL-01, FR-REL-03,
+   FR-REL-05 (atos dele). Conferir `reuse lint`, `ruff check`, `pytest -q tools/bench tests/host` e a suíte da placa
+   (`ESPK_ARTIFACT=/tmp/fw`, silenciosa). O firmware `b3aab21` já está na placa.
+2. **Preparar o job de release para rodar completo no CI:** o ASR completo (`tools/asr/report.py`, 19 min por 6 clipes
+   neste notebook, então só no runner/CI) e `tools/ref/r2.py --all --cli`. Garantir que o `release.yml` os executa e
+   guarda os relatórios como artefatos; escrever o teste de fatos do CI correspondente. Não rodar localmente.
+3. **Renomear a opção `CONFIG_ESPK_UCD_WRAP`** (nome histórico, agora é o `compat`) só se o responsável quiser; é mudança
+   de contrato (Kconfig, FSD §19, `sdkconfig.intact.defaults`, README do componente). Padrão: **não mexer**.
+4. **README do componente:** documentar que o `compat` vale só para as unidades do motor (o `--wrap` antigo valia para a
+   aplicação inteira; a nota sobre isso foi removida daqui).
+5. **Responsável — estudo:** preencher os `[DECIDIR]` do esqueleto do protocolo, escolher o CEP e o enquadramento
+   (466/2012 ou 510/2016), definir grupos, tamanho e lista de fármacos. Depois o assistente redige TCLE e a versão final.
+6. **Responsável — upstream e terceiros:** decidir sobre o PR do typo (`docs/rascunhos/upstream-1611.md`, patch de uma
+   linha; verificar antes compilando uma unidade que chame `toupper`), a mensagem ao `dfxpto-cyber` e o resumo em inglês.
+7. **Responsável — antes da tag:** registrar o runner (`tools/bench/runner/register.sh`), rodar o CI completo, revisar
+   `AI-USE.md`/`ORIGIN.md`/README, decidir a versão e criar a tag. Depois: publicação no Registro de Componentes
+   (FR-REL-*), também ato dele.
+8. **Responsável — som:** se quiser a bancada falando de vez, editar `bench.yaml` (`audio.bench_sound: allowed`); o
+   assistente nunca faz isso sozinho.
+
+**Não fazer sem ele:** `git push`, tag, registrar runner, enviar qualquer texto a terceiros, tocar som, afirmar
+inteligibilidade ou "primeiro TTS pt-BR offline no ESP32".
+
+## Depois da fila (histórico)
 
 1. **Experimento do `compat` — feito (2026-11-27):** o `include/compat` do upstream substituiu o wrap (FSD 0.5.0, FR-ENG-04
    e FR-UPS-01 emendados, `espk_wrap.c` removido). PCM da placa × R1: 100 de 100 iguais; modo intacto verde; suíte da
@@ -99,7 +135,7 @@ Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as 
 
 - **`git push`:** só quando ele pedir; até agora ele autorizou caso a caso.
 - **Registrar o runner** (`tools/bench/runner/register.sh`, instalado em `~/actions-runner/espeak-ng-esp32`, não
-  registrado): antes da primeira tag. O `release.yml` já passa `ESPK_ARTIFACT` ao `tests/bench --run-bench -k jrn`; o
+  registrado): antes da primeira tag. O `release.yml` (hoje **sem** ASR nem R2 completo: passo 2) já passa `ESPK_ARTIFACT` ao `tests/bench --run-bench -k jrn`; o
   notebook precisa de `cmake`, `ninja` e `cc` para o R1.
 - **Tag de release:** ato dele; o laço nunca cria tag.
 - **Texto do contato com o `dfxpto-cyber`** (FR-REL-05) e **texto do PR da #1611** (FR-UPS-01): redigir e mostrar a ele
@@ -148,7 +184,6 @@ PY
   Um teste com texto longo deve conferir `bytes`.
 - **A libc de desktop muda com a versão:** o glibc do runner do GitHub concorda com o `ucd-tools` em mais pontos de
   código que o do notebook. Testes contra a libc aceitam subconjunto da lista de diferenças conhecidas.
-- **`--wrap` vale para o link da aplicação inteira**, não só para o motor (documentar no README do componente).
 - **`pkill -f` derruba o próprio shell** (a linha de comando contém o padrão): mate por PID. Um `until grep -q DONE arquivo`
   pode ler um `DONE` de uma execução anterior: confira também que os processos terminaram.
 - **`espk_synth` na pilha da tarefa principal estoura** (o motor pede ≥ 48 KB): em `app_main` use `espk_say`.
