@@ -85,6 +85,25 @@ Valores e comportamentos que **eu propus** (não estão na FSD; entram como requ
 - **Armadilha nova (já aplicada):** `esp_partition_mmap`/`munmap` afirmam que a pilha de quem chama está na RAM interna;
   o componente mantém o mapeamento entre `deinit` e `init` e nunca desmapeia.
 
+## Decisões pendentes (2026-11-27, na ordem em que destravam trabalho)
+
+1. **Lista de frequência pt-BR (FR-COR-04).** O Leipzig não tem lista só de pt-BR (a API lista `por_news_2013_1M`; os
+   downloads são `por_*`, "Portuguese" genérico). Sugestão: usar `por_news_2022_10K` (CC BY 4.0, versão fixada por SHA-256),
+   rotulada como "português (Leipzig), não específica de pt-BR", com emenda da FSD. Alternativa: outra fonte com pt-BR.
+2. **ESP-IDF 6.x do CI (CON-PLT-03).** Sugestão: `v6.1.1` (a tag estável mais recente que vi).
+3. **R2 no CI (FR-REF-07).** Precisa do pacote `espeak-ng` do sistema com versão exata. Sugestão: job em contêiner com a
+   release do Ubuntu que traz 1.52.0 (a do notebook), versão do pacote fixada; ou rodar só no notebook.
+4. **Quebra da trava de ondas:** manter os 19 `negative` e 5 `deviation` reclassificados (sugestão) ou remover.
+5. **FR-SYN-11:** sugestão (c): afrouxar a tolerância ao vazamento medido (1 348 B) e levar a correção ao upstream.
+6. **Todos os idiomas não cabem:** imagem de 18,3 MB (partição `espeak` 9,9 MB, flash 16 MB) e o russo pede pico de 9,2 MB
+   de PSRAM (a placa tem 8 MB). Sugestão: documentar no README, sem mudar o §2.2.
+7. **Aceite das propostas minhas** (marcadores e comandos de pesquisa, leitura do NFR-SYN-04, `espk_synth` exige ≥ 48 KB de
+   pilha e os exemplos usam `espk_say`): sugestão, aceitar e eu emendo a FSD.
+8. **Textos públicos para revisar:** `AI-USE.md`, `ORIGIN.md`, README (tabela de chips e de capacidade).
+9. **Atos dele:** `git push` (≈ 75 commits locais), registrar o runner, tag, publicação e upload de teste ao *staging*
+   (conta do Registro), mensagem ao `dfxpto-cyber`, PR do upstream (posso redigir o patch e os textos como rascunho).
+10. **Sessão de som:** a bancada está muda (`bench_sound: forbidden`); sugestão: uma sessão planejada antes da tag.
+
 ## Ações que são do responsável (peça, não faça)
 
 - **`git push`:** só quando ele pedir; até agora ele autorizou caso a caso.
