@@ -43,7 +43,7 @@ def test_reuse_lint_passes_and_every_own_file_is_gpl():
         f for f in d["files"] if f["path"].startswith(("components/espeak-ng/src/", "tests/", "tools/ref/"))
     ]
     assert own
-    # the pt-BR listening corpus embeds Leipzig data (CC BY 4.0, one-way compatible with GPL-3.0): both are named
+    # the pt-BR listening corpus embeds Leipzig data (CC BY 4.0, one-way compatible with GPL-3.0)
     both = {"tests/corpus/listen/pt-br.tsv": ["GPL-3.0-or-later AND CC-BY-4.0"]}
     wrong = [
         f["path"]
@@ -112,7 +112,14 @@ def test_every_tool_the_ci_and_the_notebook_install_has_an_exact_version():
     assert (ROOT / "research/firmware/dependencies.lock").is_file()
     for wf in (ROOT / ".github/workflows").glob("*.yml"):
         text = wf.read_text()
-        assert "apt-get install" not in text, f"{wf.name}: an apt install has no exact version"
+        # the one apt install is the R2 job's: the packages under test are pinned exactly, the build tools are
+        # those of the pinned container release (ubuntu:26.04)
+        for m in re.finditer(r"apt-get install([^\n]*(?:\\\n[^\n]*)*)", text):
+            pkgs = m.group(1).replace("\\\n", " ").split()
+            assert all("=" in x for x in pkgs if x.startswith(("espeak", "libespeak"))), (
+                f"{wf.name}: an espeak package without an exact version"
+            )
+            assert "container: ubuntu:26.04" in text, f"{wf.name}: apt outside the pinned container"
         for m in re.finditer(r"pip install (?!-q )(?:-r \S+|(\S+))", text):
             assert m.group(1) is None or "==" in m.group(1), f"{wf.name}: {m.group(0)}"
         assert not re.search(r"container: \S+:(latest|\S*[a-z]$)", text), (
@@ -200,3 +207,15 @@ def test_the_hosted_ci_builds_hello_with_the_pinned_idf_6x():
     assert job["container"] == "espressif/idf:v6.1.1"
     text = json.dumps(job["steps"])
     assert "examples/hello" in text and "ESPK_DATA_DIR" in text
+
+
+def test_the_hosted_ci_runs_r2_in_a_container_with_the_pinned_package_version():
+    """FR-REF-07: R2 over every voice, API and CLI, on Ubuntu 26.04 with the exact package version."""
+    job = _workflow("ci.yml")["jobs"]["r2"]
+    assert job["container"] == "ubuntu:26.04"
+    text = json.dumps(job["steps"])
+    version = job["env"]["ESPEAK_PKG_VERSION"]
+    assert re.fullmatch(r"1\.52\.0\+dfsg-\d+build\d+", version)
+    for pkg in ("espeak-ng", "libespeak-ng1", "espeak-ng-data"):
+        assert f"{pkg}=$ESPEAK_PKG_VERSION" in text
+    assert "tools/ref/r2.py --all --cli" in text

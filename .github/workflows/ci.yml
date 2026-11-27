@@ -83,6 +83,29 @@ jobs:
           . "$IDF_PATH/export.sh"
           export ESPK_DATA_DIR="$GITHUB_WORKSPACE/espeak-ng-data"
           idf.py -C examples/hello -B build -D IDF_TARGET=${{ matrix.chip }} -D SDKCONFIG=build/sdkconfig build
+  r2:
+    # FR-REF-07: the system espeak-ng of the Ubuntu release that ships 1.52.0, the exact package version pinned
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.04
+    env:
+      ESPEAK_PKG_VERSION: 1.52.0+dfsg-5build1
+    steps:
+      - name: packages (espeak-ng at the pinned version, and the build tools of R1)
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y git python3 python3-venv curl cmake ninja-build gcc g++ \
+            espeak-ng=$ESPEAK_PKG_VERSION libespeak-ng1=$ESPEAK_PKG_VERSION espeak-ng-data=$ESPEAK_PKG_VERSION
+      - uses: actions/checkout@v4
+      - name: R1 against R2 over every voice, API and CLI
+        run: |
+          python3 -m venv .venv && . .venv/bin/activate
+          pip install -r requirements.txt
+          python tools/ref/r2.py --all --cli --report r2-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r2-report
+          path: r2-report.json
+          if-no-files-found: error
   hello-idf6:
     needs: host
     runs-on: ubuntu-24.04

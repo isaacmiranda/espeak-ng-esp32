@@ -1228,6 +1228,17 @@ tests:
     impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_hello_with_the_pinned_idf_6x"
     status: successful
     result: {commit: c85acc8, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py reads ci.yml job hello-idf6; the local build with v6.1.1 is recorded separately"}
+  - id: TC-REF-07-ci
+    title: "The hosted CI runs R2 over every voice, API and CLI, in an ubuntu:26.04 container with the exact espeak-ng package version"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REF-07]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_hosted_ci_runs_r2_in_a_container_with_the_pinned_package_version"
+    status: successful
+    result: {commit: 7586712, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py reads ci.yml job r2"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic
