@@ -21,13 +21,14 @@ import sus
 HERE = Path(__file__).resolve().parent
 OUT = HERE.parents[1] / "tests/corpus/listen"
 DEFAULT_SEED = 20261126
+SPDX = "SPDX-License" + "-Identifier: GPL-3.0-or-later"  # the header of the file written, not of this one
 
 
 def build(lang: str, seed: int) -> str:
     daily = [ln for ln in (HERE / f"daily-{lang}.txt").read_text(encoding="utf-8").splitlines() if ln.strip()]
     rows = [f"D{n:02d}\tdaily\t{t}" for n, t in enumerate(daily, 1)]
     head = [
-        "# SPDX-License-Identifier: GPL-3.0-or-later",
+        "# " + SPDX,
         f"# Listening corpus {lang} (FR-COR-04, FR-COR-05): id, category, text.",
         "# Built by tools/corpus/build_listen.py; do not edit by hand.",
         "# daily: everyday sentences of a device that speaks, written for this project.",

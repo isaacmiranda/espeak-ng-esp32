@@ -78,7 +78,9 @@ esp_err_t espk_list_voices(char *buf, size_t len);
 // Speech rate in words per minute, within the upstream range 80..450.
 esp_err_t espk_set_rate(int wpm);
 
-// Synthesises utf8 and calls cb with blocks of PCM until done or cancelled.
+// Synthesises utf8 and calls cb with blocks of PCM until done or cancelled. The engine runs on the CALLER's
+// stack, which must hold at least 48 KB (the engine's deepest call chain measured about 39 KB): from a task you
+// sized for it. From app_main() or a small task use espk_say(), which runs the engine on the component's task.
 esp_err_t espk_synth(const char *utf8, espk_pcm_cb_t cb, void *ctx);
 
 // Asynchronous layer (CONFIG_ESPK_ASYNC). espk_say() copies the text, queues the request and returns at once

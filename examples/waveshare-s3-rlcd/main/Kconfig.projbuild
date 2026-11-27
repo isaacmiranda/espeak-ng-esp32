@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+menu "waveshare-s3-rlcd example"
+
+    config EXAMPLE_CODEC_RATE
+        int "Sample rate the codec runs at, Hz"
+        default 22050
+        help
+            The engine makes 22 050 Hz. If the codec runs at another rate the example resamples the PCM
+            (main/resample.h); at 22 050 Hz the PCM goes to the codec as it is.
+
+    config EXAMPLE_VOLUME
+        int "Volume, 0 to 100"
+        default 5
+        range 0 100
+
+endmenu

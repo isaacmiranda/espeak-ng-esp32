@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Name,   Type, SubType, Offset,  Size
+nvs,      data, nvs,     ,        24K
+phy_init, data, phy,     ,        4K
+factory,  app,  factory, ,        1500K
+espeak,   data, 0x40,    ,        1M

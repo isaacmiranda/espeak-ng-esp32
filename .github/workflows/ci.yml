@@ -25,6 +25,13 @@ jobs:
       - run: reuse lint
       - run: python tools/docs/check_translations.py
       - run: pytest -q tools/bench tests/host
+      - name: the compiled upstream data, for the examples' builds
+        run: cp -r "$(python -c "import sys; sys.path.insert(0, 'tools/ref'); import r1; print(r1.build(r1.upstream()) / 'espeak-ng-data')")" espeak-ng-data
+      - uses: actions/upload-artifact@v4
+        with:
+          name: espeak-data
+          path: espeak-ng-data
+          if-no-files-found: error
       - name: data image for the research firmware (pt-br, en)
         run: scripts/build-image.sh espeak.img
       - uses: actions/upload-artifact@v4
@@ -55,3 +62,41 @@ jobs:
           name: espk-research-firmware
           path: artifact/
           if-no-files-found: error
+  examples:
+    needs: host
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v5.5.5
+    strategy:
+      fail-fast: false
+      matrix:
+        chip: [esp32, esp32s2, esp32s3, esp32p4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: espeak-data
+          path: espeak-ng-data
+      - name: build examples/hello for ${{ matrix.chip }}
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          . "$IDF_PATH/export.sh"
+          export ESPK_DATA_DIR="$GITHUB_WORKSPACE/espeak-ng-data"
+          idf.py -C examples/hello -B build -D IDF_TARGET=${{ matrix.chip }} -D SDKCONFIG=build/sdkconfig build
+  example-waveshare:
+    needs: host
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v5.5.5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: espeak-data
+          path: espeak-ng-data
+      - name: build examples/waveshare-s3-rlcd
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          . "$IDF_PATH/export.sh"
+          export ESPK_DATA_DIR="$GITHUB_WORKSPACE/espeak-ng-data"
+          idf.py -C examples/waveshare-s3-rlcd -B build -D SDKCONFIG=build/sdkconfig build

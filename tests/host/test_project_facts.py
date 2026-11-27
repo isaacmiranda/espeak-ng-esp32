@@ -9,7 +9,6 @@ import re
 import subprocess
 from pathlib import Path
 
-import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -129,15 +128,19 @@ def test_the_hosted_ci_runs_on_every_push_with_lint_licences_host_tests_and_the_
         assert needed in steps, f"the CI does not run {needed!r}"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="the examples of FSD 18 (hello for four chips, waveshare-s3-rlcd) are not "
-    "built yet, so the CI cannot build them",
-)
 def test_the_hosted_ci_builds_the_examples_for_each_chip():
-    steps = " ".join(str(s.get("run", "")) for j in _workflow("ci.yml")["jobs"].values() for s in j["steps"])
-    for chip in ("esp32", "esp32s2", "esp32s3", "esp32p4"):
-        assert re.search(rf"examples/hello.*{chip}|{chip}.*examples/hello", steps), chip
+    """FR-BLD-02 (the builds of FSD 18) and FR-EXM-02: hello for esp32, esp32s2, esp32s3 and esp32p4, and the
+    waveshare example, in the pinned ESP-IDF container, from the compiled data the host job publishes."""
+    jobs = _workflow("ci.yml")["jobs"]
+    ex = jobs["examples"]
+    assert sorted(ex["strategy"]["matrix"]["chip"]) == ["esp32", "esp32p4", "esp32s2", "esp32s3"]
+    assert ex["container"] == "espressif/idf:v5.5.5"
+    text = json.dumps(ex["steps"])
+    assert "examples/hello" in text and "IDF_TARGET=${{ matrix.chip }}" in text and "ESPK_DATA_DIR" in text
+    assert "examples/waveshare-s3-rlcd" in json.dumps(jobs["example-waveshare"]["steps"])
+    assert any("espeak-data" in json.dumps(s) for s in jobs["host"]["steps"]), (
+        "the host does not publish the data"
+    )
 
 
 def test_board_tests_run_only_from_a_tag_on_the_notebook_runner_with_the_tags_artifact():

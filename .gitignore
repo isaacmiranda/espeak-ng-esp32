@@ -40,3 +40,10 @@ secrets.*
 /components/espeak-ng/data/
 /components/espeak-ng/phsource/
 /components/espeak-ng/dictsource/
+
+# example builds
+/examples/*/build-*/
+/examples/*/sdkconfig
+/examples/*/sdkconfig.old
+/examples/*/managed_components/
+/examples/*/dependencies.lock
