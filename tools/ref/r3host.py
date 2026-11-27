@@ -95,6 +95,16 @@ def run(script: str, sanitize: bool = False) -> list[dict]:
     return recs
 
 
+def pcm(script: str, sanitize: bool = False) -> list[bytes]:
+    """The PCM bytes of each say, in order (what the board's `pcm` command streams, from the host build)."""
+    steps = r1.parse_script(script)
+    n_say = sum(1 for cmd, _ in steps if cmd == "say")
+    p, tmp = run_raw(script.encode("utf-8"), sanitize)
+    if p.returncode != 0:
+        sys.exit(f"FATAL: pcm_script exited {p.returncode}: {p.stderr.decode(errors='replace').strip()}")
+    return [(tmp / f"{k:04d}.pcm").read_bytes() for k in range(n_say)]
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--script", type=Path, required=True)

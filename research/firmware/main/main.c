@@ -299,6 +299,48 @@ static void cmd_vfswrite(const char *path)
     printf("ESPK vfswrite open=%d create=%d\n", e_open, e_create);
 }
 
+// The PCM seam (FR-LST-01, FR-REF-04): the synthesis of a text, streamed over the console as hex, so that a tool
+// on the PC can save the board's own PCM (the artifact's, not a host copy) and compare it with R1's.
+typedef struct {
+    mbedtls_sha256_context sha;
+    size_t samples;
+} pcm_dump_t;
+
+static bool on_dump(const int16_t *pcm, size_t n, void *arg)
+{
+    pcm_dump_t *d = arg;
+    mbedtls_sha256_update(&d->sha, (const unsigned char *)pcm, n * sizeof *pcm);
+    for (size_t i = 0; i < n;) {
+        size_t k = n - i < 256 ? n - i : 256;
+        char hex[2 * 2 * 256 + 1];
+        const unsigned char *b = (const unsigned char *)(pcm + i);
+        for (size_t j = 0; j < k * 2; j++) sprintf(hex + 2 * j, "%02x", b[j]);
+        printf("ESPK pcmdata off=%u hex=%s\n", (unsigned)(d->samples + i), hex);
+        i += k;
+    }
+    d->samples += n;
+    return true;
+}
+
+static void cmd_pcm(const char *text)
+{
+    pcm_dump_t d = {0};
+    mbedtls_sha256_init(&d.sha);
+    mbedtls_sha256_starts(&d.sha, 0);
+    printf("ESPK pcmstart rate=%d\n", espk_sample_rate());
+    esp_err_t err = espk_synth(text, on_dump, &d);
+    unsigned char h[32];
+    mbedtls_sha256_finish(&d.sha, h);
+    mbedtls_sha256_free(&d.sha);
+    char hex[65];
+    for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", h[i]);
+    if (err != ESP_OK) {
+        printf("ESPK error code=%s\n", esp_err_to_name(err));
+    } else {
+        printf("ESPK pcmdone samples=%u sha256=%s\n", (unsigned)d.samples, hex);
+    }
+}
+
 static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
 {
     espk_task_info_t ti;
@@ -324,6 +366,8 @@ static void dispatch(char *line)
         if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
     } else if (strncmp(line, "synth ", 6) == 0) {
         cmd_synth(line + 6);
+    } else if (strncmp(line, "pcm ", 4) == 0) {
+        cmd_pcm(line + 4);
     } else if (strncmp(line, "hog ", 4) == 0) {
         cmd_hog(line + 4);
     } else if (strcmp(line, "unhog") == 0) {
