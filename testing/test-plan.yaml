@@ -154,7 +154,7 @@ tests:
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-RES-10, FR-RES-11, FR-ASY-03]
+    verifies: [FR-RES-10, FR-RES-11, FR-RES-18, FR-ASY-03]
     needs: [dut, bench-command, bench-telemetry]
     impl: "tests/bench/test_journey.py::test_jrn_06_cancel_in_the_middle_of_a_long_utterance"
     status: successful
@@ -420,7 +420,7 @@ tests:
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-RES-08]
+    verifies: [FR-RES-08, FR-RES-19]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_research_fw.py::test_default_volume_5_and_10_accepted"
     status: successful
@@ -1069,11 +1069,11 @@ tests:
     kind: standard
     tier: host
     wave: 1
-    verifies: [FR-BLD-02]
+    verifies: [FR-BLD-02, FR-EXM-02]
     needs: []
     impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_the_examples_for_each_chip"
-    status: not done
-    reason: "not implemented: the examples of FSD 18 are not built yet"
+    status: successful
+    result: {commit: 4af2bbb, date: 2026-11-26, run: "local scripts/examples.sh hello:esp32 hello:esp32s2 hello:esp32p4 waveshare-s3-rlcd:esp32s3 built clean (rc=0); pytest tests/host/test_project_facts.py reads ci.yml; the board test of the waveshare example is skipped by the silent-bench guard"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic
@@ -1322,7 +1322,7 @@ tests:
     kind: standard
     tier: target
     wave: 1
-    verifies: [FR-RES-04]
+    verifies: [FR-RES-04, FR-RES-17]
     needs: [dut, bench-flash, bench-command]
     impl: "tests/target/test_performance.py::test_a_muted_session_never_touches_the_codec"
     status: successful

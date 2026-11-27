@@ -2,7 +2,7 @@
 
 ```yaml
 document_status: approved
-fsd_version: 0.3.2
+fsd_version: 0.4.0
 repository: https://github.com/isaacmiranda/espeak-ng-esp32
 baseline_commit: fc1d08a
 applicable_firmware_version: nenhuma (antes da Fase 3)
@@ -10,7 +10,7 @@ author: Isaac Miranda (responsável); redação assistida por IA (AI-USE.md)
 reviewers: Isaac Miranda
 approval_status: approved (Isaac Miranda, 2026-11-26)
 created: 2026-11-26
-last_updated: 2026-11-26
+last_updated: 2026-11-27
 change_history:
   - 0.1.0 (2026-11-26): primeira versão, a partir de docs/Ideia/ e do /grill-me de 2026-11-26; valores propostos aceitos pelo responsável no mesmo dia
   - 0.1.1 (2026-11-26): FR-RES-15 e FR-RES-16 usam `ESPK error code=…`, no formato do FR-LOG-01 (achado do /commission)
@@ -26,6 +26,9 @@ change_history:
   - 0.3.1 (2026-11-26): `ESPK done` ganha `bytes=` (FR-RES-03): bytes se perdiam na linha de console com texto longo
   - 0.3.2 (2026-11-26): FR-ENG-04 lista as sete funções isw* e as faixas Unicode em que o ucd-tools e a libc de desktop
     concordam (medido no host); o motor não chama `towlower`
+  - 0.4.0 (2026-11-27): decisões do responsável da noite de 2026-11-27: bancada muda (FR-RES-17); comandos e marcadores de
+    pesquisa (FR-RES-18..20); FR-SYN-11 com a tolerância medida; NFR-SYN-04 lido como heap estável; `espk_synth` exige
+    48 KB de pilha; IDF 6.x = v6.1.1; R2 no CI em contêiner; lista pt-BR rotulada; nota de capacidade (todos os idiomas)
 superseded_requirements: []
 open_decisions: ver open-issues.md (cada item nomeia o requisito que bloqueia)
 related_test_baseline: testing/test-plan.yaml (criado no /harness)
@@ -133,7 +136,7 @@ Estes números são lidos pelo build. Cada um é uma restrição.
 | Codec de áudio | ES8311 por I2S | [seed:alertalergo] |
 | ESP-IDF do firmware de pesquisa e dos exemplos | v5.5.5 | [user] |
 | ESP-IDF declarado pelo componente | `>=5.5` | [user] |
-| ESP-IDF verificado só por build | uma versão 6.x fixada no CI (a última 6.x estável na data do `/harness`) | [user] |
+| ESP-IDF verificado só por build | **v6.1.1**, fixada no CI (decisão de 2026-11-27) | [user] |
 | eSpeak NG | 1.52.0, tarball com SHA-256 `bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23` | [user] [seed:alertalergo] |
 | Taxa de amostragem esperada | 22 050 Hz | [user] |
 | Tamanho do `espeak-ng-data` completo | ≈ 24 MB instalado (pacote Ubuntu `espeak-ng-data` 1.52.0); o valor exato da nossa imagem é medido pelo gerador | [derived] |
@@ -150,7 +153,8 @@ Estes números são lidos pelo build. Cada um é uma restrição.
 | `espeak` | data | `0x40` | o restante da flash (≈ 9,9 MB) |
 
 Os deslocamentos são os que o `gen_esp32part.py` calcula a partir dessa ordem, com alinhamento de 64 KB nas
-partições `app`. A imagem com todos os idiomas não cabe na placa de referência. A placa verifica subconjuntos, e o
+partições `app`. A imagem com todos os idiomas (≈ 18,3 MB) não cabe na placa de referência, e o russo sozinho pede ≈ 9,2 MB de PSRAM; o README
+documenta isso, e a partição não muda (decisão de 2026-11-27). A imagem com todos os idiomas não cabe na placa de referência. A placa verifica subconjuntos, e o
 host verifica todos os idiomas (§7).
 
 ### 2.3 Arquitetura de software
@@ -322,6 +326,15 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
   efeito na fala em curso.
 - **FR-RES-16** [Should · user · v0.1] O firmware deve aceitar textos de até 1 024 bytes por `say` e responder
   `ESPK error code=too_long` acima disso (1 024).
+- **FR-RES-17** [Must · user · v0.1] A bancada é muda: com `audio.bench_sound: forbidden` em `bench.yaml`, o driver recusa
+  `say` sem `--mute`, `play` e aplicações que falem no boot; o firmware só acorda o codec quando som é pedido.
+- **FR-RES-18** [Must · user · v0.1] `say` responde `ESPK queued id=<n> queue_us=<n>`; `cancel` responde
+  `ESPK cancelled id=<n> cancel_ms=<n>` (também para os pedidos tirados da fila); um `say` durante `CANCELLING` fala depois do
+  `CANCELLED`; `underrun` é estimado.
+- **FR-RES-19** [Must · user · v0.1] Comandos de pesquisa: `init`, `deinit`, `cut`, `synth`, `mem`, `info`, `rate`, `pcm`,
+  `audio`, `play`, `hog`, `vfs`, `taskinfo`. `volume` sem argumento responde `ESPK volume ok=<n>`; argumento ruim
+  `err=range`; `listen close` volta ao padrão 5; `say` acima do limite dá `INVALID_SIZE` em todo estado vivo.
+- **FR-RES-20** [Must · derived · v0.1] `espk_synth` exige pilha de ≥ 48 KB; os exemplos usam `espk_say`.
 
 ### 5.3 Contratos
 
@@ -342,6 +355,10 @@ de console na USB-Serial/JTAG e emite marcadores de uma linha. Toda medição de
 | FR-RES-13 | `ready` · `info` | campos completos e coerentes com `ESPK boot` | divergência com o boot | target |
 | FR-RES-14 | `mem` | quatro números em bytes | campos ausentes | target |
 | FR-RES-15 | `xyzzy` | `ESPK error code=unknown_command`; a fala em curso continua | reinício; cancelamento | host (parser) · target |
+| FR-RES-17 | `bench.yaml` com `bench_sound: forbidden` · `say T`, `play`, aplicação que fala no boot | recusados pelo driver antes da placa; `--mute` aceito | `say` sem `--mute` chega à placa | host |
+| FR-RES-18 | `say` longo · `cancel` | `queued` com `queue_us`; `cancelled` com `cancel_ms` | marcador ausente | target |
+| FR-RES-19 | `volume`, `volume 99`, `listen close` · comandos de pesquisa | `ok=<n>`; `err=range`; volta ao 5 | comando desconhecido | target |
+| FR-RES-20 | `espk_synth` com pilha pequena | recusado ou documentado; exemplos usam `espk_say` | estouro de pilha | host |
 | FR-RES-16 | `say` com 1 024 e com 1 025 bytes | o primeiro fala; o segundo recebe `ESPK error code=too_long` | estouro; reinício | target |
 
 ## 6. Perfis de carga e convivência
@@ -428,7 +445,8 @@ ordem k de R1 executando o mesmo roteiro. Não existe "o hash de um texto" fora 
 - **FR-REF-06** [Must · user · v0.1] Uma divergência em R2 deve gerar uma linha no relatório com o idioma, o item, o
   tipo (fonemas, PCM ou ambos), a diferença máxima por amostra, a SNR e a causa atribuída, sem falhar o build.
 - **FR-REF-07** [Must · user · v0.1] R1 e R2 devem rodar para **todos** os idiomas do upstream, com o corpus
-  automático de §8 (FR-COR-03), no CI hospedado.
+  automático de §8 (FR-COR-03), no CI hospedado, em job de contêiner com a release do Ubuntu que traz o `espeak-ng`
+  1.52.0 (versão do pacote fixada).
 - **FR-REF-08** [Should · user · v0.2] O relatório de comparação de portes deve medir, na placa de referência e com o
   corpus de verificação pt-BR: este componente, o `dfxpto-cyber/eSpeak-NG-.-Esp32` e o `arduino-espeak-ng`. As
   medidas são flash, `.bss`, pico de PSRAM, RTF, primeira amostra e igualdade do hash com R1.
@@ -482,7 +500,7 @@ verification:
 - **FR-COR-03** [Must · user · v0.1] O corpus automático, usado em todos os idiomas, deve ser gerado sem texto em
   idioma natural: os numerais `0 1 2 3 4 5 6 7 8 9 10 100 1000`, a data `2026-11-26` e a hora `14:30`.
 - **FR-COR-04** [Must · user · v0.1] O corpus de escuta pt-BR deve conter: as 200 palavras mais frequentes da lista
-  Leipzig pt-BR (CC BY 4.0), excluídas as palavras de uma letra (200); 50 frases semanticamente
+  Leipzig `por_news_2022_10K` (CC BY 4.0, SHA-256 fixado, rotulada "português (Leipzig), não específica de pt-BR"), excluídas as palavras de uma letra (200); 50 frases semanticamente
   imprevisíveis geradas por modelos gramaticais a partir dessas palavras, pelo método de Benoît et al. (1996)
   (50); e 30 frases do dia a dia de aparelho com fala (30).
 - **FR-COR-05** [Should · user · v0.1] O corpus de escuta en deve conter 50 frases semanticamente imprevisíveis geradas
@@ -825,7 +843,8 @@ verification:
 - **FR-SYN-10** [Must · derived · v0.1] Uma chamada a `espk_synth()` de outra tarefa enquanto uma síntese está em
   curso deve devolver `ESP_ERR_INVALID_STATE`.
 - **FR-SYN-11** [Must · derived · v0.1] `espk_deinit()` seguido de `espk_init()` deve deixar o componente pronto, com
-  a mesma heap livre de antes, numa tolerância de 1 KB.
+  a heap livre de antes, numa tolerância que cobre o vazamento medido do upstream (1 348 B por ciclo; correção
+  preparada para o upstream).
 - **NFR-SYN-01** [Must · user · v0.1] Na placa de referência, sem carga (`idle`), com a `.bss` no modo padrão, o RTF
   de cada item do corpus de verificação pt-BR a 175 ppm deve ser ≤ 0,5.
 - **NFR-SYN-02** [Must · user · v0.1] Nas mesmas condições, o tempo do pedido até o primeiro callback deve ser
@@ -833,7 +852,7 @@ verification:
 - **NFR-SYN-03** [Must · pack:esp32 · v0.1] A síntese do texto de mais de 500 caracteres do corpus não deve disparar o
   task watchdog com o tempo padrão do ESP-IDF (5 s).
 - **NFR-SYN-04** [Must · user · v0.1] 50 sínteses seguidas do corpus de verificação pt-BR, em `idle`, devem terminar
-  sem reinício, sem watchdog e com a heap interna livre final a até 1 KB da inicial.
+  sem reinício, sem watchdog, com a heap interna livre sem encolher mais de 1 KB e constante a partir da 2ª síntese.
 
 ### 14.3 Contratos
 
@@ -1037,7 +1056,7 @@ verification:
 - **CON-PLT-02** [Must · user · v0.1] O manifesto do componente deve declarar `idf: ">=5.5"` e os `targets` `esp32`,
   `esp32s2`, `esp32s3` e `esp32p4` (esses quatro; outros chips com PSRAM entram por contribuição com
   evidência).
-- **CON-PLT-03** [Must · user · v0.1] O exemplo `hello` deve compilar no CI também com a versão 6.x fixada de §2.2.
+- **CON-PLT-03** [Must · user · v0.1] O exemplo `hello` deve compilar no CI também com a v6.1.1 fixada de §2.2 (imagem `espressif/idf:v6.1.1`).
 - **CON-PLT-04** [Must · user · v0.1] O README deve dizer, por chip, o nível de suporte: "verificado na placa" (só o
   ESP32-S3 na v0.1) ou "compilado no CI".
 - **CON-PLT-05** [Must · user · v0.1] A tabela de partições do firmware de pesquisa deve ser a de §2.2.
