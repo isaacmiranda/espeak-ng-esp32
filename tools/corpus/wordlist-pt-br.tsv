@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Word classes for the semantically unpredictable pt sentences (FR-COR-04). Every word is a word of the Leipzig list
+# por_news_2022_10K (checked by tests/host/test_corpus_pt.py), chosen by hand among its frequent content words and
+# classed by this project. Columns: class, word, then gender (nouns: m|f) or the feminine form (adjectives).
+# Classes: noun, adj, verb_t (takes an object; past, 3rd person), verb_i (takes a preposition), prep.
+noun	carro	m
+noun	jogador	m
+noun	médico	m
+noun	filho	m
+noun	caminho	m
+noun	livro	m
+noun	prédio	m
+noun	banco	m
+noun	vídeo	m
+noun	celular	m
+noun	jornal	m
+noun	povo	m
+noun	professor	m
+noun	motorista	m
+noun	hospital	m
+noun	ônibus	m
+noun	ator	m
+noun	senhor	m
+noun	telefone	m
+noun	bebê	m
+noun	mulher	f
+noun	escola	f
+noun	cidade	f
+noun	música	f
+noun	porta	f
+noun	praia	f
+noun	rua	f
+noun	mãe	f
+noun	loja	f
+noun	bola	f
+noun	água	f
+noun	camisa	f
+noun	igreja	f
+noun	festa	f
+noun	terra	f
+noun	cantora	f
+adj	grande	grande
+adj	forte	forte
+adj	feliz	feliz
+adj	novo	nova
+adj	longo	longa
+adj	alto	alta
+adj	branco	branca
+adj	rápido	rápida
+adj	simples	simples
+adj	claro	clara
+adj	baixo	baixa
+adj	completo	completa
+adj	natural	natural
+adj	difícil	difícil
+adj	fácil	fácil
+adj	central	central
+adj	bom	boa
+adj	pequeno	pequena
+verb_t	levou
+verb_t	recebeu
+verb_t	perdeu
+verb_t	venceu
+verb_t	escreveu
+verb_t	deixou
+verb_t	criou
+verb_t	contou
+verb_t	explicou
+verb_t	anunciou
+verb_t	confirmou
+verb_t	apresentou
+verb_t	mostrou
+verb_i	chegou
+verb_i	saiu
+verb_i	passou
+verb_i	voltou
+verb_i	ficou
+verb_i	caiu
+verb_i	acabou
+verb_i	morreu
+verb_i	subiu
+verb_i	começou
+verb_i	terminou
+prep	para
+prep	com
+prep	sobre
+prep	sem
+prep	contra
+prep	entre
+prep	durante
+prep	após

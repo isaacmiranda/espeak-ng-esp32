@@ -39,10 +39,24 @@ def build(lang: str, seed: int) -> str:
         rows = [f"S{n:02d}\tsus-{label}\t{text}" for n, (label, text) in enumerate(unpredictable, 1)] + rows
         head.append(f"# sus: semantically unpredictable sentences (Benoit et al., 1996 method), seed {seed}.")
     else:
-        head.append(
-            "# pending (FR-COR-04): the 200 most frequent words and the 50 unpredictable sentences "
-            "wait for the choice of the pt-BR frequency list."
+        import leipzig
+
+        words = sus.load(HERE / "wordlist-pt-br.tsv")
+        unpredictable = sus.generate(words, 50, seed, "pt-br")
+        listed = [f"W{n:03d}\tword\t{w}" for n, w in enumerate(leipzig.top(200), 1)]
+        rows = (
+            listed
+            + [f"S{n:02d}\tsus-{label}\t{text}" for n, (label, text) in enumerate(unpredictable, 1)]
+            + rows
         )
+        head[0] = "# " + SPDX + " AND CC-BY-4.0"
+        head += [
+            f"# word: the 200 most frequent words of the Leipzig list {leipzig.NAME}",
+            f"#   ({leipzig.LABEL}), one-letter words excluded.",
+            "#   Source: Leipzig Corpora Collection (https://corpora.uni-leipzig.de), CC BY 4.0.",
+            f"# sus: semantically unpredictable sentences (Benoit et al., 1996 method), seed {seed},",
+            "#   words of wordlist-pt-br.tsv.",
+        ]
     return "\n".join(head + rows) + "\n"
 
 

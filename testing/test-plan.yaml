@@ -1129,6 +1129,50 @@ tests:
     impl: "tests/host/test_package.py::test_an_extra_listx_reaches_the_dictionary_of_its_language"
     status: successful
     result: {commit: 06d0c8a, date: 2026-11-26, run: "local pytest tests/host/test_package.py (scripts/package-component.sh + regen-data.sh with the R1 binary)"}
+  - id: TC-COR-04-list
+    title: "The pt list is pinned by SHA-256 and labelled as not specific to pt-BR"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-04]
+    needs: []
+    impl: "tests/host/test_corpus_pt.py::test_the_list_is_pinned_by_sha256_and_labelled_as_not_specific_to_pt_br"
+    status: successful
+    result: {commit: 2bed194, date: 2026-11-26, run: "local pytest tests/host/test_corpus_pt.py"}
+  - id: TC-COR-04-counts
+    title: "200 words without one-letter words, 50 sentences, 30 daily"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-04]
+    needs: []
+    impl: "tests/host/test_corpus_pt.py::test_the_corpus_has_200_words_50_sentences_and_30_daily_and_no_one_letter_word"
+    status: successful
+    result: {commit: 2bed194, date: 2026-11-26, run: "local pytest tests/host/test_corpus_pt.py"}
+  - id: TC-COR-04-sus
+    title: "The sentences use words of the Leipzig list with gender agreement"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-04]
+    needs: []
+    impl: "tests/host/test_corpus_pt.py::test_every_word_of_the_sentences_is_a_word_of_the_leipzig_list_and_genders_agree"
+    status: successful
+    result: {commit: 2bed194, date: 2026-11-26, run: "local pytest tests/host/test_corpus_pt.py"}
+  - id: TC-COR-04-bytes
+    title: "The committed corpus is what the generator makes from its seed"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-COR-04]
+    needs: []
+    impl: "tests/host/test_corpus_pt.py::test_the_committed_file_is_what_the_generator_makes_from_its_seed"
+    status: successful
+    result: {commit: 2bed194, date: 2026-11-26, run: "local pytest tests/host/test_corpus_pt.py"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic

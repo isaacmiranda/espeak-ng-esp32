@@ -80,7 +80,7 @@ def generate(words, count: int, seed: int, lang: str = "en") -> list[tuple[str, 
             if slot in ("det", "adj"):
                 j = next(k for k in range(i, len(slots)) if slots[k] == "noun")
                 noun = nouns[sum(1 for s in slots[: j + 1] if s == "noun") - 1]
-                gender = noun[0] if noun else "m"
+                gender = noun[1] if len(noun) > 1 else "m"
                 if slot == "det":
                     toks[i] = article(lang, gender)
                 else:

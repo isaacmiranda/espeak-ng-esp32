@@ -1,8 +1,262 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later AND CC-BY-4.0
 # Listening corpus pt-br (FR-COR-04, FR-COR-05): id, category, text.
 # Built by tools/corpus/build_listen.py; do not edit by hand.
 # daily: everyday sentences of a device that speaks, written for this project.
-# pending (FR-COR-04): the 200 most frequent words and the 50 unpredictable sentences wait for the choice of the pt-BR frequency list.
+# word: the 200 most frequent words of the Leipzig list por_news_2022_10K
+#   (português (Leipzig), não específica de pt-BR), one-letter words excluded.
+#   Source: Leipzig Corpora Collection (https://corpora.uni-leipzig.de), CC BY 4.0.
+# sus: semantically unpredictable sentences (Benoit et al., 1996 method), seed 20261126,
+#   words of wordlist-pt-br.tsv.
+W001	word	de
+W002	word	que
+W003	word	do
+W004	word	da
+W005	word	em
+W006	word	para
+W007	word	com
+W008	word	no
+W009	word	na
+W010	word	um
+W011	word	os
+W012	word	uma
+W013	word	não
+W014	word	por
+W015	word	as
+W016	word	se
+W017	word	foi
+W018	word	mais
+W019	word	dos
+W020	word	ao
+W021	word	como
+W022	word	das
+W023	word	mas
+W024	word	também
+W025	word	são
+W026	word	pelo
+W027	word	ser
+W028	word	pela
+W029	word	ele
+W030	word	já
+W031	word	anos
+W032	word	está
+W033	word	ou
+W034	word	ainda
+W035	word	tem
+W036	word	até
+W037	word	sua
+W038	word	sobre
+W039	word	ano
+W040	word	isso
+W041	word	dia
+W042	word	nos
+W043	word	foram
+W044	word	seu
+W045	word	nas
+W046	word	entre
+W047	word	após
+W048	word	segundo
+W049	word	quando
+W050	word	muito
+W051	word	ter
+W052	word	pessoas
+W053	word	há
+W054	word	aos
+W055	word	disse
+W056	word	às
+W057	word	dois
+W058	word	pode
+W059	word	será
+W060	word	além
+W061	word	vai
+W062	word	presidente
+W063	word	brasil
+W064	word	eu
+W065	word	contra
+W066	word	ela
+W067	word	mesmo
+W068	word	nesta
+W069	word	durante
+W070	word	estado
+W071	word	governo
+W072	word	esse
+W073	word	todos
+W074	word	sem
+W075	word	estão
+W076	word	depois
+W077	word	grande
+W078	word	você
+W079	word	desde
+W080	word	hoje
+W081	word	acordo
+W082	word	era
+W083	word	saúde
+W084	word	só
+W085	word	casa
+W086	word	fazer
+W087	word	caso
+W088	word	tempo
+W089	word	três
+W090	word	parte
+W091	word	país
+W092	word	quem
+W093	word	apenas
+W094	word	dias
+W095	word	maior
+W096	word	onde
+W097	word	sendo
+W098	word	mundo
+W099	word	trabalho
+W100	word	agora
+W101	word	cidade
+W102	word	paulo
+W103	word	primeiro
+W104	word	vez
+W105	word	essa
+W106	word	momento
+W107	word	duas
+W108	word	polícia
+W109	word	todo
+W110	word	assim
+W111	word	forma
+W112	word	outros
+W113	word	milhões
+W114	word	neste
+W115	word	estava
+W116	word	federal
+W117	word	nacional
+W118	word	porque
+W119	word	novo
+W120	word	local
+W121	word	bolsonaro
+W122	word	seus
+W123	word	diz
+W124	word	mil
+W125	word	vida
+W126	word	antes
+W127	word	região
+W128	word	meio
+W129	word	conta
+W130	word	bem
+W131	word	suas
+W132	word	rio
+W133	word	eles
+W134	word	primeira
+W135	word	então
+W136	word	final
+W137	word	nova
+W138	word	sempre
+W139	word	desta
+W140	word	jogo
+W141	word	podem
+W142	word	deve
+W143	word	este
+W144	word	tudo
+W145	word	enquanto
+W146	word	partir
+W147	word	alguns
+W148	word	cada
+W149	word	projeto
+W150	word	seja
+W151	word	casos
+W152	word	esta
+W153	word	janeiro
+W154	word	passado
+W155	word	teve
+W156	word	início
+W157	word	afirmou
+W158	word	equipe
+W159	word	público
+W160	word	menos
+W161	word	semana
+W162	word	valor
+W163	word	empresa
+W164	word	outras
+W165	word	pelos
+W166	word	possível
+W167	word	todas
+W168	word	outro
+W169	word	fez
+W170	word	história
+W171	word	redes
+W172	word	evento
+W173	word	gente
+W174	word	grupo
+W175	word	nós
+W176	word	período
+W177	word	sido
+W178	word	volta
+W179	word	deste
+W180	word	melhor
+W181	word	homem
+W182	word	importante
+W183	word	meses
+W184	word	noite
+W185	word	sábado
+W186	word	fim
+W187	word	minha
+W188	word	municipal
+W189	word	tinha
+W190	word	cerca
+W191	word	me
+W192	word	pontos
+W193	word	processo
+W194	word	sociais
+W195	word	apoio
+W196	word	mercado
+W197	word	mês
+W198	word	serão
+W199	word	frente
+W200	word	programa
+S01	sus-M1	A água criou a loja.
+S02	sus-M2	O fácil médico escreveu o livro.
+S03	sus-M3	O telefone levou o baixo jornal.
+S04	sus-M4	A mulher subiu durante o banco.
+S05	sus-M5	A natural bola terminou contra a mãe.
+S06	sus-M1	O celular perdeu o filho.
+S07	sus-M2	O claro motorista contou o povo.
+S08	sus-M3	A terra deixou o central senhor.
+S09	sus-M4	O caminho saiu sobre a rua.
+S10	sus-M5	O pequeno professor acabou sem a camisa.
+S11	sus-M1	A cidade recebeu a igreja.
+S12	sus-M2	A rápida porta mostrou a escola.
+S13	sus-M3	O jogador explicou a branca praia.
+S14	sus-M4	A música caiu para o ônibus.
+S15	sus-M5	O forte hospital passou com o bebê.
+S16	sus-M1	A cantora apresentou a festa.
+S17	sus-M2	O bom prédio anunciou o vídeo.
+S18	sus-M3	O carro venceu o grande ator.
+S19	sus-M4	O ator ficou entre o povo.
+S20	sus-M5	A nova escola voltou após a cantora.
+S21	sus-M1	O jornal confirmou o prédio.
+S22	sus-M2	A difícil terra recebeu a água.
+S23	sus-M3	O senhor perdeu o longo bebê.
+S24	sus-M4	A igreja chegou para a loja.
+S25	sus-M5	O completo professor começou com o celular.
+S26	sus-M1	O carro escreveu o hospital.
+S27	sus-M2	O feliz caminho anunciou a mulher.
+S28	sus-M3	A bola levou o simples motorista.
+S29	sus-M4	A praia morreu sobre a rua.
+S30	sus-M5	A alta mãe saiu durante o jogador.
+S31	sus-M1	A festa explicou a porta.
+S32	sus-M2	A grande cidade deixou o ônibus.
+S33	sus-M3	O livro contou a fácil música.
+S34	sus-M4	O filho morreu contra a camisa.
+S35	sus-M5	O completo banco começou entre o vídeo.
+S36	sus-M1	O médico confirmou o telefone.
+S37	sus-M2	A natural igreja venceu o professor.
+S38	sus-M3	O carro apresentou a longa festa.
+S39	sus-M4	O bebê ficou após o senhor.
+S40	sus-M5	A baixa loja passou sem a cantora.
+S41	sus-M1	O hospital criou a mulher.
+S42	sus-M2	O forte livro mostrou a cidade.
+S43	sus-M3	A rua anunciou a difícil água.
+S44	sus-M4	A porta acabou sobre o motorista.
+S45	sus-M5	O central médico chegou durante o banco.
+S46	sus-M1	O ônibus perdeu a praia.
+S47	sus-M2	A alta mãe mostrou o caminho.
+S48	sus-M3	O vídeo venceu o branco filho.
+S49	sus-M4	A música subiu após o jornal.
+S50	sus-M5	A nova camisa terminou contra a escola.
 D01	daily	O nível de pólen está alto hoje.
 D02	daily	Por favor, tome o seu remédio às oito horas.
 D03	daily	A bateria está fraca, carregue o aparelho.
