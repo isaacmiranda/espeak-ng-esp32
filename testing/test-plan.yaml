@@ -1096,6 +1096,39 @@ tests:
     impl: "tests/host/test_readme.py::test_the_readme_levels_per_chip_match_what_the_ci_builds"
     status: successful
     result: {commit: fa1ec45, date: 2026-11-26, run: "local pytest tests/host/test_readme.py"}
+  - id: TC-LIC-03
+    title: "The package holds the compiled data of every language, phsource, dictsource, the script and the licences"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-LIC-03]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_package.py::test_the_package_has_the_data_the_sources_the_script_and_the_licences"
+    status: successful
+    result: {commit: 06d0c8a, date: 2026-11-26, run: "local pytest tests/host/test_package.py (scripts/package-component.sh + regen-data.sh with the R1 binary)"}
+  - id: TC-LIC-04
+    title: "Regenerating from the package's own sources reproduces its data byte for byte"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-LIC-04]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_package.py::test_regeneration_from_the_package_sources_reproduces_the_data_byte_for_byte"
+    status: successful
+    result: {commit: 06d0c8a, date: 2026-11-26, run: "local pytest tests/host/test_package.py (scripts/package-component.sh + regen-data.sh with the R1 binary)"}
+  - id: TC-DAT-08
+    title: "An integrator's pt_listx entry changes the phonemes of its word through the regeneration path"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DAT-08]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_package.py::test_an_extra_listx_reaches_the_dictionary_of_its_language"
+    status: successful
+    result: {commit: 06d0c8a, date: 2026-11-26, run: "local pytest tests/host/test_package.py (scripts/package-component.sh + regen-data.sh with the R1 binary)"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic
