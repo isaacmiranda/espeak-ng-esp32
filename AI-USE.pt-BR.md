@@ -36,3 +36,16 @@ método escrito (`docs/Method/AI-Workflow.md`). Esta página diz o que o assiste
 Um teste que passa na placa é evidência sobre a placa, não sobre ouvintes. As pontuações de reconhecimento
 automático de fala, quando existirem, são estimativas e levam esse rótulo. O projeto não afirma ser o primeiro
 sintetizador de fala pt-BR offline no ESP32.
+
+## Material de terceiros que o assistente trouxe
+
+Cada item tem versão fixada e origem registrada; uma pessoa os revisa antes de uma versão.
+
+- **Lista de palavras**: a lista `por_news_2022_10K` do Leipzig Corpora Collection (CC BY 4.0, `LICENSES/CC-BY-4.0.txt`)
+  alimenta o corpus de escuta em pt-BR. É texto de notícias em português, não específico do português do Brasil, e
+  recebe esse rótulo.
+- **Reconhecimento automático de fala**: whisper.cpp `v1.9.6` com o modelo `ggml-small.bin`, ambos fixados por SHA-256
+  em `tools/asr/pins.env`, dão a taxa de erro de caracteres e de palavras. Todo número desses leva a ressalva
+  "estimativa por reconhecimento automático; não é medida de inteligibilidade com ouvintes".
+- **Frases**: as frases "semanticamente imprevisíveis" seguem o desenho de Benoit et al. (1996); o gerador é
+  `tools/corpus/sus.py`.

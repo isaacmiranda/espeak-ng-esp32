@@ -35,3 +35,15 @@ This repository is built with an AI coding assistant (Claude Code, from Anthropi
 A test that passes on the board is evidence about the board, not about listeners. Automatic speech-recognition
 scores, when they exist, are estimates and are labelled so. The project does not claim to be the first offline
 pt-BR text to speech on the ESP32.
+
+## Third-party material the assistant brought in
+
+Each item is pinned and its origin is recorded; a person reviews them before a release.
+
+- **Word list**: the Leipzig Corpora Collection `por_news_2022_10K` list (CC BY 4.0, `LICENSES/CC-BY-4.0.txt`) feeds the
+  pt-BR listening corpus. It is Portuguese news text, not specific to Brazilian Portuguese, and is labelled so.
+- **Automatic speech recognition**: whisper.cpp `v1.9.6` with the `ggml-small.bin` model, both pinned by SHA-256 in
+  `tools/asr/pins.env`, give a character and word error rate. Every such number carries the caveat "estimate by
+  automatic recognition; not a measure of intelligibility with listeners".
+- **Sentences**: the "semantically unpredictable" sentences follow the design of Benoit et al. (1996); the generator is
+  `tools/corpus/sus.py`.
