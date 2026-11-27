@@ -14,6 +14,7 @@
 #include "esp_app_desc.h"
 #include "espk_audio.h"
 #include "espk_volume.h"
+#include "listen_corpus.h"
 #include "esp_heap_caps.h"
 #include "esp_idf_version.h"
 #include "esp_timer.h"
@@ -352,6 +353,27 @@ static void cmd_taskinfo(void)  // FR-ASY-05, FR-ASY-08
     }
 }
 
+// play <id>: speak an item of the listening corpus of the current voice through the speaker, at the volume of the
+// session (FR-LST-03). The answer is the same events as say, ending in ESPK done with the PCM hash.
+static void cmd_play(const char *id)
+{
+    espk_info_t info;
+    if (espk_get_info(&info) != ESP_OK) {
+        printf("ESPK error code=ESP_ERR_INVALID_STATE\n");
+        return;
+    }
+    for (unsigned s = 0; s < sizeof listen_sets / sizeof listen_sets[0]; s++) {
+        if (strcmp(listen_sets[s].voice, info.voice) != 0) continue;
+        for (unsigned i = 0; i < listen_sets[s].n; i++) {
+            if (strcmp(listen_sets[s].items[i].id, id) == 0) {
+                cmd_say(listen_sets[s].items[i].text, true);
+                return;
+            }
+        }
+    }
+    printf("ESPK error code=unknown_id\n");
+}
+
 static void dispatch(char *line)
 {
     char reply[64];
@@ -366,6 +388,8 @@ static void dispatch(char *line)
         if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
     } else if (strncmp(line, "synth ", 6) == 0) {
         cmd_synth(line + 6);
+    } else if (strncmp(line, "play ", 5) == 0) {
+        cmd_play(line + 5);
     } else if (strncmp(line, "pcm ", 4) == 0) {
         cmd_pcm(line + 4);
     } else if (strncmp(line, "hog ", 4) == 0) {

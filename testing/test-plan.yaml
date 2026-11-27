@@ -1272,3 +1272,14 @@ tests:
     impl: "tests/host/test_r2.py::test_r2_runs_for_every_voice_of_the_upstream_and_every_divergence_is_explained"
     status: successful
     result: {commit: 5ae3257, date: 2026-11-26, run: "local pytest tests/host/test_r2.py against espeak-ng 1.52.0+dfsg-5build1 (141 voices through the API; the CLI pass over all voices is not run here)"}
+  - id: TC-LST-03
+    title: "play <id> speaks an item of the listening corpus of the current voice through the speaker, at the session's volume, and ends in ESPK done with the PCM hash"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-LST-03]
+    needs: [dut, bench-flash, bench-command, audio-out, r1-host-reference]
+    impl: "tests/target/test_listen.py::test_play_speaks_a_listening_item_with_the_hash_of_its_pcm"
+    status: not done
+    reason: "not implemented: the test has not run yet"

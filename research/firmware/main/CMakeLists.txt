@@ -1,6 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
+# FR-LST-03: the listening corpus, as a header for the `play` command
+idf_build_get_property(_python PYTHON)
+execute_process(COMMAND ${_python} ${CMAKE_CURRENT_LIST_DIR}/../../../scripts/gen-listen-header.py
+                ${CMAKE_CURRENT_LIST_DIR}/../../../tests/corpus/listen ${CMAKE_BINARY_DIR}/gen/listen_corpus.h
+                RESULT_VARIABLE _listen_rc)
+if(_listen_rc)
+    message(FATAL_ERROR "the listening corpus header could not be generated")
+endif()
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+             ${CMAKE_CURRENT_LIST_DIR}/../../../tests/corpus/listen/en.tsv
+             ${CMAKE_CURRENT_LIST_DIR}/../../../tests/corpus/listen/pt-br.tsv)
 idf_component_register(SRCS "main.c" "espk_volume.c"
-                       PRIV_REQUIRES espeak-ng audio_es8311 esp_app_format esp_driver_usb_serial_jtag esp_timer mbedtls heap)
+                       INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gen" PRIV_REQUIRES espeak-ng audio_es8311 esp_app_format esp_driver_usb_serial_jtag esp_timer mbedtls heap)
 # The short commit the artifact was built from goes into the boot marker (FSD FR-RES-01).
 execute_process(COMMAND git rev-parse --short=7 HEAD
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
