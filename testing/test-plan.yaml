@@ -1217,6 +1217,17 @@ tests:
     impl: "tests/host/test_asr.py::test_a_language_the_model_does_not_support_is_listed_as_omitted"
     status: successful
     result: {commit: 410b75d, date: 2026-11-26, run: "local pytest tests/host/test_asr.py (stand-in transcriber); real whisper.cpp v1.9.6 + small model smoke run of 3 pt-br items twice gave identical JSON (19 min for 6 clips on the notebook without AVX; the full report is the release job's)"}
+  - id: TC-PLT-03
+    title: "The hosted CI builds hello with the pinned ESP-IDF v6.1.1"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-PLT-03]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_hello_with_the_pinned_idf_6x"
+    status: successful
+    result: {commit: c85acc8, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py reads ci.yml job hello-idf6; the local build with v6.1.1 is recorded separately"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic

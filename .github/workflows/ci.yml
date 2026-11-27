@@ -83,6 +83,23 @@ jobs:
           . "$IDF_PATH/export.sh"
           export ESPK_DATA_DIR="$GITHUB_WORKSPACE/espeak-ng-data"
           idf.py -C examples/hello -B build -D IDF_TARGET=${{ matrix.chip }} -D SDKCONFIG=build/sdkconfig build
+  hello-idf6:
+    needs: host
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v6.1.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: espeak-data
+          path: espeak-ng-data
+      - name: build examples/hello with the pinned ESP-IDF 6.x (CON-PLT-03)
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          . "$IDF_PATH/export.sh"
+          export ESPK_DATA_DIR="$GITHUB_WORKSPACE/espeak-ng-data"
+          idf.py -C examples/hello -B build -D IDF_TARGET=esp32s3 -D SDKCONFIG=build/sdkconfig build
   example-waveshare:
     needs: host
     runs-on: ubuntu-24.04

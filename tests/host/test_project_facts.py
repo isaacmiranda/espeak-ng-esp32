@@ -43,7 +43,13 @@ def test_reuse_lint_passes_and_every_own_file_is_gpl():
         f for f in d["files"] if f["path"].startswith(("components/espeak-ng/src/", "tests/", "tools/ref/"))
     ]
     assert own
-    wrong = [f["path"] for f in own if [x["value"] for x in f["spdx_expressions"]] != ["GPL-3.0-or-later"]]
+    # the pt-BR listening corpus embeds Leipzig data (CC BY 4.0, one-way compatible with GPL-3.0): both are named
+    both = {"tests/corpus/listen/pt-br.tsv": ["GPL-3.0-or-later AND CC-BY-4.0"]}
+    wrong = [
+        f["path"]
+        for f in own
+        if [x["value"] for x in f["spdx_expressions"]] != both.get(f["path"], ["GPL-3.0-or-later"])
+    ]
     assert not wrong, f"own files not GPL-3.0-or-later: {wrong[:5]}"
 
 
@@ -184,3 +190,13 @@ def test_ai_use_exists_in_english_and_portuguese_and_names_the_human_decisions()
     assert "What only a person decides" in en and "O que só uma pessoa decide" in pt
     for text in (en, pt):
         assert "tag" in text.lower() and "CEP" in text and len(text.splitlines()) > 20
+
+
+def test_the_hosted_ci_builds_hello_with_the_pinned_idf_6x():
+    """CON-PLT-03: the 6.x of FSD 2.2 is v6.1.1, in its own job, on the same data as the other builds."""
+    fsd = (ROOT / "docs/Functionality/FSD.md").read_text(encoding="utf-8")
+    assert "**v6.1.1**" in fsd
+    job = _workflow("ci.yml")["jobs"]["hello-idf6"]
+    assert job["container"] == "espressif/idf:v6.1.1"
+    text = json.dumps(job["steps"])
+    assert "examples/hello" in text and "ESPK_DATA_DIR" in text
