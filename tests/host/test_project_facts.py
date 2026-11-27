@@ -219,3 +219,13 @@ def test_the_hosted_ci_runs_r2_in_a_container_with_the_pinned_package_version():
     for pkg in ("espeak-ng", "libespeak-ng1", "espeak-ng-data"):
         assert f"{pkg}=$ESPEAK_PKG_VERSION" in text
     assert "tools/ref/r2.py --all --cli" in text
+
+
+def test_espk_synth_documents_the_48_kb_stack_and_the_examples_use_espk_say():
+    """FR-RES-20: the header says the caller's stack must hold 48 KB; no example calls espk_synth()."""
+    header = (ROOT / "components/espeak-ng/include/espk.h").read_text(encoding="utf-8")
+    assert "at least 48 KB" in header
+    for src in (ROOT / "examples").rglob("*.c"):
+        lines = src.read_text(encoding="utf-8").splitlines()
+        code = "\n".join(ln for ln in lines if not ln.lstrip().startswith("//"))
+        assert "espk_synth(" not in code, src

@@ -1227,7 +1227,7 @@ tests:
     needs: []
     impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_hello_with_the_pinned_idf_6x"
     status: successful
-    result: {commit: c85acc8, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py reads ci.yml job hello-idf6; the local build with v6.1.1 is recorded separately"}
+    result: {commit: c85acc8, date: 2026-11-26, run: "local pytest reads ci.yml job hello-idf6; and examples/hello built clean for esp32s3 with ESP-IDF v6.1.1 (scripts/idf.sh with IDF_DIR=~/esp/esp-idf-v6.1.1, 4m50s) on 2026-11-27; local pytest tests/host/test_project_facts.py reads ci.yml job hello-idf6; the local build with v6.1.1 is recorded separately"}
   - id: TC-REF-07-ci
     title: "The hosted CI runs R2 over every voice, API and CLI, in an ubuntu:26.04 container with the exact espeak-ng package version"
     shape: atomic
@@ -1239,6 +1239,17 @@ tests:
     impl: "tests/host/test_project_facts.py::test_the_hosted_ci_runs_r2_in_a_container_with_the_pinned_package_version"
     status: successful
     result: {commit: 7586712, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py reads ci.yml job r2"}
+  - id: TC-RES-20
+    title: "espk_synth documents the 48 KB stack and the examples use espk_say"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-RES-20]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_espk_synth_documents_the_48_kb_stack_and_the_examples_use_espk_say"
+    status: successful
+    result: {commit: d99ae14, date: 2026-11-26, run: "local pytest tests/host/test_project_facts.py"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic

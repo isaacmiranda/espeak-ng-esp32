@@ -3,27 +3,26 @@
 Documento de **retomada**: onde o trabalho está e o que fazer a seguir, para uma sessão nova começar sem perguntar.
 A posição **derivada** (testes, requisitos, portões) está em [`testing/test-plan.yaml`](../../../testing/test-plan.yaml) e
 na [FSD](../../Functionality/FSD.md); este arquivo só aponta e lista o que o plano não diz. **Quem encerra uma sessão
-atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da sessão da noite (decisões aceitas, fila da madrugada).
+atualiza este arquivo.** Última atualização: 2026-11-27, ao fim da fila da madrugada (itens 0–7 feitos).
 
 ## Como abrir a sessão
 
-1. Leia `CLAUDE.md`, [`AI-Workflow.md`](../AI-Workflow.md) e a seção **Fila da madrugada** abaixo: o responsável foi dormir
-   e mandou continuar sozinho. Não pergunte; trabalhe a fila em ordem e pare só diante de um empecilho real.
+1. Leia `CLAUDE.md`, [`AI-Workflow.md`](../AI-Workflow.md) e **O que a madrugada fez** abaixo. A fila da madrugada acabou;
+   o que sobra depende do responsável (seção "Ações que são do responsável") ou é do passo "Depois da fila".
 2. Posição: Fase 3, **onda 1** (só testes `standard`; `deviation` e `negative` já escritos ficam, mas não escreva novos).
 3. **A placa é muda (decisão dele, 2026-11-27).** `bench.yaml` tem `audio.bench_sound: forbidden`; o driver recusa `say` sem
    `--mute`, `play` e a gravação de `espk_waveshare`. Não contorne, não edite para `allowed`. Use `--mute`, `pcm`, `synth`.
 4. Confira a árvore: `git status`, `git log --oneline -5`. **Nenhum `git push` foi feito** (≈ 80 commits locais): só ele
    manda. Leia o que está na placa antes de gravar (`python -m bench wait-event dut '^ESPK boot' --timeout 15 --reset`):
    deve ser o firmware de pesquisa (`espk_research`); ela é compartilhada com o AlertAlergo V3.
-5. Havia um build em segundo plano ao encerrar: `scripts/examples.sh hello:esp32 hello:esp32s2 hello:esp32p4
-   waveshare-s3-rlcd:esp32s3`, saída em `/tmp/ex3.out` (termina com `rc=`). Se `/tmp` ainda existir, leia-o: os quatro
-   `hello` compilados fecham o TC-EXM-02; a gravação do exemplo da Waveshare é barrada pelo guarda (esperado, teste pulado).
+5. Builds de exemplos e ESP-IDF 6.1.1 já rodaram (ver abaixo); `/tmp` é tmpfs de 512 MB e enche: testes pesados usam
+   `~/.cache/espk/tmp`.
 
 ## Onde estamos
 
 - **Portões abertos:** Load defined, AI harnessed, DUT ready (veredito `OPEN` em `testing/test-plan.yaml` → `gates`).
   Os de Ready for shipment e Shipped esperam o fim da onda.
-- **Testes:** 109 de 112 declarados `successful` (o resto: TC-SYN-11-heap `failed` por vazamento do upstream; TC-BLD-02-examples e o que
+- **Testes:** 126 de 128 declarados `successful` (o resto: TC-SYN-11-heap `failed` por vazamento do upstream; TC-EXM-03 que espera a placa não muda; antes: e o que
   ainda não rodou). Suítes: `pytest -q tools/bench tests/host` (≈ 170, 3 min) e `pytest tests/target tests/bench --run-bench` (≈ 8 min).
 - **Prova central já feita (F2):** a placa produz o mesmo PCM que o upstream no host, bit a bit, em 100 de 100 itens do
   corpus de verificação, depois de redirecionar as `isw*` para o `ucd-tools` (FR-ENG-04). Sem o redirecionamento, a
@@ -61,44 +60,40 @@ Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as 
    `ORIGIN.md` também esperam a revisão dele.
 9. **Rascunhos (nunca enviados):** patch do PR do upstream, mensagem ao `dfxpto-cyber`, `FSD-summary.en.md`.
 
-## Fila da madrugada (em ordem; só o que depende de mim; nada de som, push, tag, publicação ou contato)
+## O que a madrugada fez (2026-11-27, commits `3142005`…`d99ae14` e seguintes)
 
-Regras: testes **standard** apenas; um processo pesado por vez, `nice -n 15 ionice -c 2 -n 7`, 2 jobs; ESP-IDF só por
-`scripts/idf.sh`; commits com `-s`, em inglês, com o id do requisito e o trailer do assistente; a cada passo atualize o plano
-(`testing/test-plan.yaml`) com o commit em que o teste rodou; ao fim de cada bloco rode as duas suítes e registre.
+- **0 · exemplos:** `hello` compila para esp32, esp32s2, esp32p4 e esp32s3; o da Waveshare compila (teste da placa pulado
+  pelo guarda mudo). `TC-BLD-02-examples` declara também o FR-EXM-02.
+- **1 · FSD 0.4.0:** FR-RES-17..20 e as decisões; plano reconciliado.
+- **2 · README** (en e pt-BR): status da Fase 3, tabela por chip, bloco de capacidade gerado
+  (`tools/docs/capacity_table.py`), testes `test_readme.py`. O `source-revision` da tradução é o commit do README.
+- **3 · pacote:** `scripts/package-component.sh` (pasta com dados, `phsource/`, `dictsource/`, licenças) e
+  `regen-data.sh` (`--check`, `--out`, `--listx`, `--langs`; `ESPEAK_NG=` o binário 1.52.0). `tests/host/test_package.py`.
+- **4 · corpus pt-BR e ASR:** `tools/corpus/leipzig.py` (SHA-256 fixado), `wordlist-pt-br.tsv`, `tests/corpus/listen/pt-br.tsv`
+  (200 + 50 + 30); corrigi o gênero do substantivo em `sus.py`. ASR: `tools/asr/pins.env` (whisper.cpp `v1.9.6`, modelo
+  `small`), `scripts/whisper-setup.sh` (sem AVX, o notebook só tem SSE4.2), `tools/asr/report.py`. Uma execução real de 3
+  itens saiu idêntica duas vezes, mas custou 19 min por 6 clipes: **o relatório completo é do CI da tag**.
+- **5 · ESP-IDF 6.1.1:** instalado em `~/esp/esp-idf-v6.1.1`; `hello` compila para esp32s3 (4 min 50 s; build em
+  `examples/hello/build-idf6`, ignorado). CI: job `hello-idf6` (`espressif/idf:v6.1.1`).
+- **6 · R2 no CI:** job `r2` em `ubuntu:26.04` com `espeak-ng` 1.52.0+dfsg-5build1 fixado; o teste de "sem apt sem versão"
+  agora só admite apt nesse contêiner e com os pacotes espeak fixados (as ferramentas de build são as da release).
+- **7 · rascunhos:** `docs/rascunhos/` (nunca enviados). **Achado:** o build CMake do upstream já usa o shim
+  `src/include/compat/wctype.h` (isw* → ucd-tools); o componente não põe esse diretório no include, daí o wrap.
+  Ver `upstream-1611.md`.
+- **Suítes ao fim:** `pytest tools/bench tests/host` 187 verdes; `tests/target tests/bench --run-bench` com o artefato
+  `4d4b2fa` na placa: 41 passam, 15 pulados, 1 xfail (o vazamento do FR-SYN-11).
 
-0. **Fechar o que ficou aberto:** ler `/tmp/ex3.out`; declarar `TC-EXM-02` (hello compila para esp32, esp32s2, esp32s3 e
-   esp32p4; os jobs do CI estão no `ci.yml` e cobertos por `TC-BLD-02-examples`) e registrar; conferir que a placa está com o
-   `espk_research`.
-1. **Emenda da FSD** (skill `/define`): absorver as decisões acima (versão 0.4.0 no histórico da FSD): comandos e marcadores,
-   FR-SYN-11 com a tolerância medida, NFR-SYN-04, pilha do `espk_synth`, bancada muda, nota de capacidade (todos os idiomas),
-   IDF `v6.1.1`, R2 no CI, rótulo da lista Leipzig. Depois reconcilie `testing/test-plan.yaml` (requisitos novos sem teste).
-2. **README** (+ `README.pt-BR.md`): status atual (Fase 3), tabela de suporte por chip (CON-PLT-04: ESP32-S3 "verificado na
-   placa"; esp32, esp32s2, esp32p4 "compilado no CI", só se os builds acima passaram), bloco de capacidade gerado por
-   `python tools/docs/capacity_table.py --write README.md` (FR-CAP-11), nota de que o russo e "todos os idiomas" não cabem
-   na placa. Teste do host: o bloco do README é igual ao gerado; a tradução ganha o `source-revision` novo (o
-   `tools/docs/check_translations.py --release` tem de passar).
-3. **Empacotamento e regeneração (FR-LIC-03, FR-LIC-04, FR-DAT-08):** `scripts/package-component.sh` monta a pasta do pacote
-   (`components/espeak-ng` + dados compilados de todos os idiomas + `phsource/` + `dictsource/` do mesmo tarball + script de
-   regeneração, fora do git); o script, rodado no host, reproduz os dados byte a byte (`espeak-ng --compile-phonemes`,
-   `--compile=<idioma>`); arquivos `*_listx` extras entram na compilação do idioma. Testes no host.
-4. **Corpus pt-BR e ASR (FR-COR-04, FR-ASR-01..06):** baixar `por_news_2022_10K` (fixar o SHA-256), 200 palavras mais
-   frequentes sem as de uma letra, 50 frases imprevisíveis pt-BR (lista com classes e gênero, `tools/corpus/sus.py --lang pt-br`),
-   registrar a licença no `REUSE.toml`. ASR: `whisper.cpp` numa tag fixada e modelo `small` multilíngue com SHA-256 fixado,
-   relatório determinístico com CER/WER por idioma × velocidade (140, 175, 220 ppm) × corpus, mais com/sem acento no pt-BR, com a
-   ressalva do FR-ASR-05. Amostras pelo `tools/listening/samples.py --source host` (silencioso).
-5. **ESP-IDF 6.1.1 (CON-PLT-03):** instalar em `~/esp/esp-idf-v6.1.1` (clone da tag + `install.sh esp32s3`), compilar o `hello`;
-   no CI, um job com `espressif/idf:v6.1.1`.
-6. **R2 no CI (FR-REF-07):** job em contêiner `ubuntu:26.04` com `espeak-ng`, `libespeak-ng1` e `espeak-ng-data` na versão exata
-   do notebook, rodando `python tools/ref/r2.py --all --cli`; teste que lê o workflow.
-7. **Rascunhos para ele, em `docs/rascunhos/` (nunca enviados, nunca em issue ou PR):** patch do PR do upstream com teste
-   (trocar `iswalpha` e parentes pelas do `ucd-tools`, registrar o link no `ORIGIN.md` só depois que ele abrir o PR),
-   mensagem ao `dfxpto-cyber`, `FSD-summary.en.md` (com `source-revision`).
-8. **Se a fila acabar:** recalcule as lacunas (script no fim deste arquivo) e feche as que dependem só de você; o que
-   sobrar espera as ações dele.
+## Depois da fila (o que um próximo passo pode fazer sozinho)
 
-Lacunas da v0.1 sem teste declarado ao encerrar: FR-COR-04, FR-ASR-01..06, FR-DAT-08, FR-CAP-11, CON-PLT-03, CON-PLT-04,
-FR-EXM-02, FR-LIC-03, FR-LIC-04, FR-REL-01, FR-REL-03, FR-REL-05, FR-UPS-01. (Os quatro últimos são atos dele.)
+1. **Experimento do `compat`** (ver `docs/rascunhos/upstream-1611.md`): `PRIV_INCLUDE_DIRS` com
+   `upstream/src/include/compat` no lugar do wrap; build, PCM da placa × R1 (silencioso), modo intacto. Se igual, emenda da
+   FSD (FR-ENG-04, FR-UPS-01) e o wrap sai. É decisão de projeto: mostre ao responsável antes de remover o wrap.
+2. **TC-EXM-03** (exemplo da Waveshare fala): precisa da placa não muda; espera o responsável.
+3. **Onda 1 fechada?** Lacunas da v0.1 sem teste: só FR-REL-01, FR-REL-03, FR-REL-05, FR-UPS-01 (atos dele). Rode o script
+   de lacunas abaixo.
+4. **Relatório ASR completo e R2 `--all --cli`:** só no CI (rodar com a tag).
+5. **README e AI-USE.md/ORIGIN.md:** ele revisa de manhã; atualizar `AI-USE.md`/`ORIGIN.md` com o que a madrugada fez
+   (ASR, corpus Leipzig CC BY, achado do `compat`) ainda não foi feito.
 
 ## Ações que são do responsável (peça, não faça)
 
