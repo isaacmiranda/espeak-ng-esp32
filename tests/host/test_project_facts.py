@@ -172,3 +172,12 @@ def test_no_document_claims_the_first_offline_ptbr_tts_or_a_listener_result():
             if any(c.search(line) for c in CLAIMS) and not MARKERS.search(line):
                 hits.append(f"{rel}:{n}: {line.strip()[:100]}")
     assert not hits, "claims without a prohibition around them:\n" + "\n".join(hits)
+
+
+def test_ai_use_exists_in_english_and_portuguese_and_names_the_human_decisions():
+    """FR-AIU-01."""
+    en = (ROOT / "AI-USE.md").read_text(encoding="utf-8")
+    pt = (ROOT / "AI-USE.pt-BR.md").read_text(encoding="utf-8")
+    assert "What only a person decides" in en and "O que só uma pessoa decide" in pt
+    for text in (en, pt):
+        assert "tag" in text.lower() and "CEP" in text and len(text.splitlines()) > 20

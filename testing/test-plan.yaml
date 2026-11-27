@@ -986,3 +986,146 @@ tests:
     impl: "tests/host/test_r3host.py::test_invalid_utf8_does_not_crash_the_engine_under_asan"
     status: successful
     result: {commit: f7a830e, date: 2026-11-26, run: "local pytest tests/host/test_r3host.py (host-built component sources and config.h; ASan build, 26 inputs)"}
+  - id: TC-LIC-01
+    title: "reuse lint is green and the project's own sources carry GPL-3.0-or-later"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-LIC-01]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_reuse_lint_passes_and_every_own_file_is_gpl"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-LIC-02
+    title: "The package carries LICENSE and the upstream's COPYING, COPYING.APACHE, COPYING.BSD2, COPYING.UCD"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-LIC-02]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_package_carries_the_licences"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-LIC-05
+    title: "Every file of the package is under a GPL-compatible licence and no logo is in it"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-LIC-05]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_every_file_of_the_package_is_gpl_compatible_and_there_is_no_logo"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-REL-02
+    title: "The component's version is its own SemVer 0.1.0 and the upstream's version is in ORIGIN.md and the manifest"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REL-02]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_component_version_is_its_own_semver_and_the_upstream_is_in_origin"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-REL-04
+    title: "The package folder holds no research, seed, bench or docs"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REL-04]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_package_folder_has_no_research_seed_bench_or_docs"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-BLD-01
+    title: "Every tool installed in use has an exact version (requirements, ESP-IDF, upstream SHA-256, dependency lock, no unpinned install in the workflows); whisper.cpp and its model are pinned when the ASR lands"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [CON-BLD-01]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_every_tool_the_ci_and_the_notebook_install_has_an_exact_version"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-BLD-02
+    title: "The hosted CI runs on every push: lint, reuse lint, host and driver tests, the firmware build"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-BLD-02]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_hosted_ci_runs_on_every_push_with_lint_licences_host_tests_and_the_build"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-BLD-02-examples
+    title: "The hosted CI also builds the examples for each chip"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-BLD-02]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_the_hosted_ci_builds_the_examples_for_each_chip"
+    status: not done
+    reason: "not implemented: the examples of FSD 18 are not built yet"
+  - id: TC-BLD-03
+    title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-BLD-03]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_board_tests_run_only_from_a_tag_on_the_notebook_runner_with_the_tags_artifact"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DOC-03
+    title: "No document claims the first offline pt-BR TTS on the ESP32 or a listener result"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DOC-03]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_no_document_claims_the_first_offline_ptbr_tts_or_a_listener_result"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-AIU-01
+    title: "AI-USE.md exists in English and pt-BR and names the human decisions"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-AIU-01]
+    needs: []
+    impl: "tests/host/test_project_facts.py::test_ai_use_exists_in_english_and_portuguese_and_names_the_human_decisions"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DOC-01
+    title: "Every translation of the table carries source-revision and a missing one is refused"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DOC-01]
+    needs: []
+    impl: "tests/host/test_translations.py::test_a_translation_without_the_field_is_refused"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-DOC-02
+    title: "A source changed after its translation fails the release check, and the release workflow runs it"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-DOC-02]
+    needs: []
+    impl: "tests/host/test_translations.py::test_a_source_changed_after_its_translation_fails_the_release_check"
+    status: not done
+    reason: "not implemented: the test has not run yet"
