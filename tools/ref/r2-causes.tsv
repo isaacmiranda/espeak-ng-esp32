@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Attributed causes of R1 x R2 divergences (FR-REF-06): voice, entry (api|cli|*), kind (pcm|phonemes|both|*), cause.
+fo	*	*	R1's data build has no dictionary for this voice (the upstream's own build does not compile fo_dict); the Ubuntu package compiles it
+kaa	*	*	R1's data build has no dictionary for this voice (the upstream's own build does not compile kaa_dict); the Ubuntu package compiles it
+xex	*	*	R1's data build has no dictionary for this voice (the upstream's own build does not compile xex_dict); the Ubuntu package compiles it

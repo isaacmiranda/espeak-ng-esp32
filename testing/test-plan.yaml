@@ -1239,3 +1239,36 @@ tests:
     impl: "tests/target/test_pcm_seam.py::test_the_pcm_streamed_by_the_board_equals_the_host_build_byte_for_byte"
     status: successful
     result: {commit: 2b5d1c1, date: 2026-11-26, run: "artifact of 2b5d1c1 (with the pcm command) flashed with bench flash; pytest tests/target/test_pcm_seam.py --run-bench; host: pytest tests/host/test_listening_samples.py"}
+  - id: TC-REF-05
+    title: "R2 compares R1 with the system package by the same entry point: API PCM, CLI PCM and CLI phonemes, per voice, with the package version in the report"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REF-05]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_r2.py::test_r2_compares_the_api_and_the_cli_of_r1_and_the_system_package"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-REF-06
+    title: "A divergence is a report row with voice, item, kind, greatest difference, SNR and an attributed cause, and does not fail the run"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REF-06]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_r2.py::test_a_divergence_is_a_report_row_and_does_not_fail_the_run"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-REF-07
+    title: "R2 runs over every voice of the upstream with the automatic corpus and every divergence has a cause (the CLI pass over all voices is for the CI)"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-REF-07]
+    needs: [r1-host-reference]
+    impl: "tests/host/test_r2.py::test_r2_runs_for_every_voice_of_the_upstream_and_every_divergence_is_explained"
+    status: not done
+    reason: "not implemented: the test has not run yet"
