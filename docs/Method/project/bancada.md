@@ -66,6 +66,12 @@ Um único processo segura a porta serial. Nada de terminal aberto à mão.
 
 ## Riscos físicos
 
+0. **A placa não faz barulho (decisão do responsável, 2026-11-27).** `bench.yaml` traz `audio.bench_sound: forbidden`:
+   o driver recusa `say` sem `--mute`, `play` e a gravação de aplicações que falam sozinhas (`sound_apps`, hoje
+   `espk_waveshare`), com `REFUSED` e código 2; nenhuma flag levanta isto, só ele trocando o arquivo para `allowed`. O
+   firmware de pesquisa só inicializa o codec quando um comando de som é pedido (`audio` mostra se algo o tocou), então o
+   amplificador nem acorda. Os testes que dependem de som (JRN-03, o lado com som de TC-RES-04, TC-LST-03, TC-EXM-03) ficam
+   `not done (precondition)` enquanto isso valer; o último resultado deles continua o registrado no plano.
 1. **Volume de bancada:** teste automático com som roda no teto de volume **10** (de 0 a 100), com padrão **5** no boot
    (FSD FR-RES-07, FR-RES-08); só uma sessão de escuta aberta (`listen open`) sobe o volume, com pessoas presentes. Nunca encostar o alto-falante no ouvido.
 2. **Sessão de escuta** registra posição do ouvinte, volume e ruído de fundo na evidência; o estudo com o CEP fixa esses
