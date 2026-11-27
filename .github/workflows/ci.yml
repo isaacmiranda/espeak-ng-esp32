@@ -17,13 +17,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: sudo apt-get install -y --no-install-recommends ninja-build
       - uses: actions/cache@v4
         with:
           path: ~/.cache/espk
           key: espk-r1-${{ hashFiles('components/espeak-ng/tools/upstream.env', 'tools/ref/pcm_script.c') }}
       - run: ruff check components tools tests conftest.py
       - run: reuse lint
+      - run: python tools/docs/check_translations.py
       - run: pytest -q tools/bench tests/host
       - name: data image for the research firmware (pt-br, en)
         run: scripts/build-image.sh espeak.img

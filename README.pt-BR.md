@@ -1,3 +1,4 @@
+<!-- source-revision: 6b98659 -->
 # espeak-ng-esp32
 
 *[English](README.md)*

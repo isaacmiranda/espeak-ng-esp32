@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# The translations of the FSD's table of documents (section 26): the source, and what translates it.
+# Each translation carries `source-revision: <commit>` at its top, the commit of the source it translates.
+# CONTRIBUTING.md is one bilingual file, so it has no separate translation.
+translations:
+  - {source: README.md, translation: README.pt-BR.md}
+  - {source: AI-USE.md, translation: AI-USE.pt-BR.md}

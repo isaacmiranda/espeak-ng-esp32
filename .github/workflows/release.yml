@@ -10,8 +10,20 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/ci.yml
+  translations:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install PyYAML==6.0.4
+      # FR-DOC-02: a source that changed after the source-revision of its translation stops the release
+      - run: python tools/docs/check_translations.py --release
   release-verify:
-    needs: build
+    needs: [build, translations]
     runs-on: [self-hosted, bench-notebook]
     timeout-minutes: 30
     steps:
