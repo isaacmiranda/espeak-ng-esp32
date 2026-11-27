@@ -128,7 +128,8 @@ def evaluate(transcriber, corpora: dict[str, list[tuple[str, str, str]]], speeds
                 hyp = transcriber.transcribe(wav, code)
                 ce, cn, we, wn = cer_wer(text, hyp)
                 rows.append(
-                    {"lang": lang, "speed": speed, "kind": kind, "condition": "accent" if ACCENT.search(text) else "plain",
+                    {"lang": lang, "speed": speed, "kind": kind,
+                     "condition": "accent" if ACCENT.search(text) else "plain",
                      "id": item_id, "reference": text, "hypothesis": hyp,
                      "char_errors": ce, "chars": cn, "word_errors": we, "words": wn}
                 )  # fmt: skip
@@ -159,7 +160,13 @@ def markdown(rep: dict) -> str:
             "| language | ppm | corpus | items | CER | WER |", "|---|---|---|---|---|---|"]  # fmt: skip
     for c in rep["by_lang_speed_kind"]:
         head.append(f"| {c['lang']} | {c['speed']} | {c['kind']} | {c['items']} | {c['cer']} | {c['wer']} |")
-    head += ["", "pt-BR by condition:", "", "| ppm | condition | items | CER | WER |", "|---|---|---|---|---|"]
+    head += [
+        "",
+        "pt-BR by condition:",
+        "",
+        "| ppm | condition | items | CER | WER |",
+        "|---|---|---|---|---|",
+    ]
     for c in rep["pt_br_by_condition"]:
         head.append(f"| {c['speed']} | {c['condition']} | {c['items']} | {c['cer']} | {c['wer']} |")
     for lang, why in rep["languages_omitted"].items():
@@ -212,7 +219,8 @@ def main(argv: list[str] | None = None) -> int:
     binary, model = (Path(x) for x in setup.stdout.split())
     with tempfile.TemporaryDirectory(dir=model.parent) as tmp:
         rep = run(
-            Whisper(binary, model), [x for x in a.langs.split(",") if x], [x for x in a.auto_langs.split(",") if x],
+            Whisper(binary, model), [x for x in a.langs.split(",") if x],
+            [x for x in a.auto_langs.split(",") if x],
             [int(s) for s in a.speeds.split(",")], a.limit, a.commit, Path(tmp),
         )  # fmt: skip
     a.out.write_text(json.dumps(rep, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")

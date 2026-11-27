@@ -46,12 +46,16 @@ def make(work, speeds=(140, 175, 220)):
         "pt-br": report.load_corpus(ROOT / "tests/corpus/listen/pt-br.tsv"),
         "en": report.load_corpus(ROOT / "tests/corpus/listen/en.tsv"),
     }
-    corp = {k: [v[0], *v[200:203], *v[-3:]] if k == "pt-br" else v[:4] for k, v in corp.items()}  # words, sus, daily
+    corp = {
+        k: [v[0], *v[200:203], *v[-3:]] if k == "pt-br" else v[:4] for k, v in corp.items()
+    }  # words, sus, daily
     texts = {(lang, i): t for lang, items in corp.items() for i, (_a, _b, t) in enumerate(items)}
     out = work / "w"
     out.mkdir(exist_ok=True)
     rows = report.evaluate(Echo(texts), corp, speeds, out)
-    return report.build_report(rows, report.pins(), "abc1234", {"xx": "the Whisper model does not support this language"})
+    return report.build_report(
+        rows, report.pins(), "abc1234", {"xx": "the Whisper model does not support this language"}
+    )
 
 
 def test_metrics_normalise_and_count_errors():
@@ -104,7 +108,8 @@ def test_the_setup_refuses_a_model_with_another_hash(tmp_path):
     exe.write_text("#!/bin/sh\n")
     exe.chmod(0o755)
     (cache / "whisper" / pins["MODEL_NAME"]).write_bytes(b"not the model")
-    p = subprocess.run([str(ROOT / "scripts/whisper-setup.sh")], env={"PATH": "/usr/bin:/bin", "ESPK_CACHE": str(cache)},
+    env = {"PATH": "/usr/bin:/bin", "ESPK_CACHE": str(cache)}
+    p = subprocess.run([str(ROOT / "scripts/whisper-setup.sh")], env=env,
                        capture_output=True, text=True)  # fmt: skip
     assert p.returncode == 1 and "FATAL: sha256 of the model" in p.stderr
     assert not (cache / "whisper" / pins["MODEL_NAME"]).exists()
