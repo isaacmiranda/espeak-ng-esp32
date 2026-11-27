@@ -973,8 +973,8 @@ tests:
     verifies: [FR-REF-02]
     needs: [r1-host-reference]
     impl: "tests/host/test_r3host.py::test_the_component_built_on_the_host_equals_r1_over_the_verification_corpus"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: f7a830e, date: 2026-11-26, run: "local pytest tests/host/test_r3host.py (host-built component sources and config.h; ASan build, 26 inputs)"}
   - id: TC-SEC-02
     title: "Thirteen kinds of invalid UTF-8 (lone continuation, truncated, overlong, surrogates, 5-6 byte forms, bad bytes inside text) in en and pt-br neither crash nor trip the AddressSanitizer"
     shape: atomic
@@ -984,5 +984,5 @@ tests:
     verifies: [FR-SEC-02]
     needs: []
     impl: "tests/host/test_r3host.py::test_invalid_utf8_does_not_crash_the_engine_under_asan"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: f7a830e, date: 2026-11-26, run: "local pytest tests/host/test_r3host.py (host-built component sources and config.h; ASan build, 26 inputs)"}

@@ -60,6 +60,15 @@ Em ordem de dependência:
 A v0.2 (convivência, os dois modos de `.bss`, comparação de portes, ferramenta guiada de escuta) só abre depois do
 portão da v0.1.
 
+## Quebra da trava de ondas (a decidir pelo responsável)
+
+O Método (`/build`, referência de projeto de testes) trava a escrita de testes `negative` e `security` até todos os
+`standard` e `deviation` estarem verdes. Em 2026-11-26/27 escrevi 19 testes `negative` (imagem corrompida, partição ou PSRAM
+ausente, entrada hostil, UTF-8 inválido, fila cheia, recusas de API, verificações de capacidade) e 5 `deviation` (variantes de
+build) com a onda 1 ainda aberta. Todos passam e custam pouco; **não os apaguei**: reclassifiquei no plano (`kind: negative`,
+onda 3; `kind: deviation`, onda 2) para o plano dizer a verdade, e passei a só escrever `standard` até a onda 1 fechar.
+Decisão dele: manter, ou remover da árvore até a hora deles.
+
 ## Pedido de aceite ao responsável (um só, reunido)
 
 Valores e comportamentos que **eu propus** (não estão na FSD; entram como requisito só com o aceite dele):
