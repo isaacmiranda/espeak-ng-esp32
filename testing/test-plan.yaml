@@ -1173,3 +1173,25 @@ tests:
     impl: "tests/host/test_corpus.py::test_every_corpus_file_has_a_registered_licence_and_no_protected_material_is_in"
     status: successful
     result: {commit: d300117, date: 2026-11-26, run: "local pytest tests/host/test_corpus.py"}
+  - id: TC-LST-02
+    title: "The presentation lists are a Latin square over the speed conditions and come from the recorded seed"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-LST-02]
+    needs: []
+    impl: "tests/host/test_listening_tools.py::test_the_lists_are_a_latin_square_over_the_speed_conditions"
+    status: not done
+    reason: "not implemented: the test has not run yet"
+  - id: TC-LST-04
+    title: "The answer recorder keeps the pseudonym key outside the repository and accepts no field that identifies a person"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-LST-04]
+    needs: []
+    impl: "tests/host/test_listening_tools.py::test_a_person_gets_the_same_code_and_the_responses_carry_no_identity"
+    status: not done
+    reason: "not implemented: the test has not run yet"
