@@ -1138,8 +1138,8 @@ tests:
     verifies: [FR-COR-03]
     needs: []
     impl: "tests/host/test_corpus.py::test_the_automatic_corpus_is_numerals_a_date_and_a_time_and_nothing_else"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: d300117, date: 2026-11-26, run: "local pytest tests/host/test_corpus.py"}
   - id: TC-COR-07
     title: "The sentence generator gives the same bytes for the same seed and list, other bytes for another seed"
     shape: atomic
@@ -1149,8 +1149,8 @@ tests:
     verifies: [FR-COR-07]
     needs: []
     impl: "tests/host/test_corpus.py::test_the_generator_is_deterministic"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: d300117, date: 2026-11-26, run: "local pytest tests/host/test_corpus.py"}
   - id: TC-COR-05
     title: "The English listening corpus has 50 unpredictable and 30 everyday sentences, equal to its generator at the recorded seed"
     shape: atomic
@@ -1160,8 +1160,8 @@ tests:
     verifies: [FR-COR-05]
     needs: []
     impl: "tests/host/test_corpus.py::test_the_english_listening_corpus_has_50_unpredictable_and_30_everyday_sentences"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: d300117, date: 2026-11-26, run: "local pytest tests/host/test_corpus.py"}
   - id: TC-COR-06
     title: "Every corpus file has a registered licence and no protected material is in the repository"
     shape: atomic
@@ -1171,5 +1171,5 @@ tests:
     verifies: [FR-COR-06]
     needs: []
     impl: "tests/host/test_corpus.py::test_every_corpus_file_has_a_registered_licence_and_no_protected_material_is_in"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: d300117, date: 2026-11-26, run: "local pytest tests/host/test_corpus.py"}
