@@ -101,3 +101,18 @@ def test_mute_and_sound_give_the_same_pcm_hash(flashed):
     # the engine keeps state between says (FSD 7): compare with R1 running the same two says
     r1 = board.r1_run(f"init en\nvoice en\nsay {PT}\nsay {PT}\n")
     assert muted["sha256"] == r1[0]["sha256"] and m.fields["sha256"] == r1[1]["sha256"]
+
+
+def test_a_muted_session_never_touches_the_codec(flashed):
+    """FR-RES-04, nothing in the I2S with --mute: after a boot and several --mute says the codec was never
+    initialised, so the amplifier was never woken (the silent bench of 2026-11-27)."""
+    ms, p = board.boot()
+    assert "ready" in ms, p.stdout
+    m, _p = board.command("audio", r"^ESPK audio")
+    assert m.fields == {"initialised": "0"}, "the codec was initialised at boot"
+    for text in (PT, "Hello there.", PT):
+        m, _p = board.command(f"say --mute {text}", r"^ESPK (done|error)", timeout=60)
+        assert m.event == "done"
+    m, _p = board.command("pcm Hello there.", r"^ESPK (pcmdone|error)", timeout=60)
+    m, _p = board.command("audio", r"^ESPK audio")
+    assert m.fields == {"initialised": "0"}, "a silent command woke the codec"

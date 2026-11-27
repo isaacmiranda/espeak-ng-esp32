@@ -60,10 +60,15 @@ def main(argv: list[str] | None = None) -> int:
         if a.cmd == "chip-info":
             return actions.chip_info(port, actions.run_capture, out, expect=role)
         if a.cmd == "flash":
+            why = actions.flash_sound_guard(Path(a.artifact), bench.sound_apps, bench.sound_allowed)
+            if why:
+                print(f"REFUSED: {why}", file=sys.stderr)
+                return actions.REFUSED
             return actions.flash(a.artifact, port, role.chip,
                                  lambda argv: subprocess.call(argv), out)
         if a.cmd == "command":
-            why = actions.volume_guard(a.line, bench.volume_ceiling, a.listening)
+            why = actions.sound_guard(a.line, bench.sound_allowed) or actions.volume_guard(
+                a.line, bench.volume_ceiling, a.listening)
             if why:
                 print(f"REFUSED: {why}", file=sys.stderr)
                 return actions.REFUSED

@@ -25,6 +25,8 @@ def _example(name):
     if os.environ.get("ESPK_EXAMPLE") != name or not art or not (Path(art) / "flash_args").is_file():
         pytest.skip(f"not done (precondition): ESPK_EXAMPLE does not name {name} with its artifact")
     p = board.bench("flash", "dut", art, timeout=300)
+    if p.returncode == 2 and "forbids sound" in p.stderr:  # speaks at boot: the bench is silent
+        pytest.skip(f"not done (precondition): {p.stderr.strip()}")
     assert p.returncode == 0, p.stdout + p.stderr
 
 

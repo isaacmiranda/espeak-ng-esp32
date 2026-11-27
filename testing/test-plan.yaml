@@ -1316,3 +1316,14 @@ tests:
     impl: "tests/host/test_resample.py::test_the_block_size_does_not_change_the_samples"
     status: not done
     reason: "not implemented: the test has not run yet"
+  - id: TC-RES-04-silent
+    title: "After a boot and several --mute says and a pcm dump the codec was never initialised: nothing reaches the I2S and the amplifier stays asleep"
+    shape: atomic
+    kind: standard
+    tier: target
+    wave: 1
+    verifies: [FR-RES-04]
+    needs: [dut, bench-flash, bench-command]
+    impl: "tests/target/test_performance.py::test_a_muted_session_never_touches_the_codec"
+    status: not done
+    reason: "not implemented: the test has not run yet"

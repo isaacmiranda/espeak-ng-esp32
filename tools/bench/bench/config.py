@@ -29,6 +29,8 @@ class Bench:
     link_prefix: str
     volume_ceiling: int | None
     roles: dict[str, Role]
+    sound_allowed: bool = False  # audio.bench_sound: allowed; anything else, or nothing, is forbidden
+    sound_apps: tuple[str, ...] = ()  # applications that speak alone: not flashed while sound is forbidden
 
     def role(self, name: str) -> Role:
         if name not in self.roles:
@@ -64,6 +66,8 @@ def parse(data: dict) -> Bench:
         link_prefix=data["link_prefix"],
         volume_ceiling=audio.get("bench_volume_ceiling"),
         roles=roles,
+        sound_allowed=audio.get("bench_sound") == "allowed",
+        sound_apps=tuple(audio.get("sound_apps") or ()),
     )
 
 

@@ -42,7 +42,17 @@ typedef struct {
     bool opened;     // the codec is open for this request
 } say_ctx_t;
 
-static bool s_audio_ok;
+static bool s_audio_ok, s_audio_tried;
+
+// The codec is initialised the first time a command asks for sound, never at boot: the amplifier is not touched
+// unless someone asked the board to speak (a silent bench never wakes it).
+static bool audio_ready(void)
+{
+    if (!s_audio_tried) {
+        s_audio_tried = true;
+        }
+    return s_audio_ok;
+}
 static espk_vol_t s_vol;  // FR-RES-07, 08, 09
 
 static bool on_pcm(const int16_t *pcm, size_t n, void *arg)
@@ -117,7 +127,7 @@ static void cmd_say(const char *text, bool sound)
         printf("ESPK error code=too_long\n");
         return;
     }
-    if (sound && !s_audio_ok) {
+    if (sound && !audio_ready()) {
         printf("ESPK error code=no_audio\n");
         return;
     }
@@ -388,6 +398,8 @@ static void dispatch(char *line)
         if (err != ESP_OK) printf("ESPK cancel err=%s\n", esp_err_to_name(err));
     } else if (strncmp(line, "synth ", 6) == 0) {
         cmd_synth(line + 6);
+    } else if (strcmp(line, "audio") == 0) {  // has anything touched the codec since boot? (FR-RES-04, silent bench)
+        printf("ESPK audio initialised=%d\n", s_audio_tried);
     } else if (strncmp(line, "play ", 5) == 0) {
         cmd_play(line + 5);
     } else if (strncmp(line, "pcm ", 4) == 0) {
@@ -464,7 +476,6 @@ void app_main(void)
     setvbuf(stdin, NULL, _IONBF, 0);
 
     espk_vol_init(&s_vol);
-    s_audio_ok = espk_aud_init() == ESP_OK;  // FR-ERR-01: a missing codec is reported, not fatal
     int64_t t0 = esp_timer_get_time();
     esp_err_t err = espk_init(&s_cfg);
     int64_t init_ms = (esp_timer_get_time() - t0) / 1000;

@@ -49,6 +49,8 @@ def command(line: str, expect: str = r"^ESPK ", timeout: float = 30):
     p = bench("command", "dut", line, "--expect", expect, "--timeout", str(timeout))
     if p.returncode == 4:
         pytest.skip(f"not done (precondition): {p.stderr.strip()}")
+    if p.returncode == 2 and "forbids sound" in p.stderr:  # the bench is silent (bench.yaml): not a failure
+        pytest.skip(f"not done (precondition): {p.stderr.strip()}")
     ms = markers(p.stdout)
     return (ms[-1] if ms else None), p
 

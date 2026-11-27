@@ -7,6 +7,10 @@ status: available                 # comissionada em 2026-11-26 (testing/test-pla
 shared_with: alertalergo-v3-firmware   # a mesma placa; cada sessão regrava o próprio artefato
 audio:
   bench_volume_ceiling: 10        # teto fora de sessão de escuta (FSD FR-RES-07); padrão no boot: 5 (FR-RES-08)
+  # Decisão do responsável (2026-11-27): a placa não faz barulho. O driver recusa `say` sem --mute e `play`, e recusa
+  # gravar aplicações que falam sozinhas no boot. Só ele levanta isto, trocando para `allowed`.
+  bench_sound: forbidden
+  sound_apps: [espk_waveshare]    # o exemplo waveshare-s3-rlcd fala a cada boot
 roles:
   dut:
     board: Waveshare ESP32-S3-RLCD-4.2

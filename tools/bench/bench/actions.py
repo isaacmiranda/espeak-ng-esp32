@@ -153,6 +153,34 @@ def volume_guard(cmd: str, ceiling: int | None, listening: bool) -> str | None:
     return None
 
 
+# A console line that makes the speaker sound: `say` without --mute, `play`. While bench.yaml forbids sound
+# the driver, where every command passes, refuses them: no flag lifts it, only the responsible editing
+# bench.yaml.
+_SOUND = re.compile(r"^\s*(?:say\s+(?!--mute\b)\S|play\s+\S)")
+
+
+def sound_guard(cmd: str, sound_allowed: bool) -> str | None:
+    if sound_allowed or not _SOUND.match(cmd):
+        return None
+    return ("bench.yaml forbids sound (audio.bench_sound is not `allowed`): `say` needs --mute and `play` is "
+            "refused; the speaker must stay silent")
+
+
+def flash_sound_guard(artifact: Path, sound_apps: tuple[str, ...], sound_allowed: bool) -> str | None:
+    """Refuse to flash an application that speaks by itself at boot while sound is forbidden."""
+    if sound_allowed or not sound_apps:
+        return None
+    fa = artifact / "flash_args"
+    names: set[str] = set()
+    if fa.is_file():
+        for line in fa.read_text().splitlines():
+            names |= {Path(tok).name.removesuffix(".bin") for tok in line.split() if tok.endswith(".bin")}
+    hit = sorted(names & set(sound_apps))
+    if hit:
+        return f"{hit[0]} speaks by itself at boot and bench.yaml forbids sound: it is not flashed"
+    return None
+
+
 def command(ser, cmd: str, out, timeout: float = 5.0, expect: str = r"^ESPK ",
             clock=time.monotonic) -> int:
     """Send one console line; print lines until one matches ``expect``."""
