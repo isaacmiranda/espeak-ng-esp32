@@ -1248,8 +1248,8 @@ tests:
     verifies: [FR-REF-05]
     needs: [r1-host-reference]
     impl: "tests/host/test_r2.py::test_r2_compares_the_api_and_the_cli_of_r1_and_the_system_package"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 5ae3257, date: 2026-11-26, run: "local pytest tests/host/test_r2.py against espeak-ng 1.52.0+dfsg-5build1 (141 voices through the API; the CLI pass over all voices is not run here)"}
   - id: TC-REF-06
     title: "A divergence is a report row with voice, item, kind, greatest difference, SNR and an attributed cause, and does not fail the run"
     shape: atomic
@@ -1259,8 +1259,8 @@ tests:
     verifies: [FR-REF-06]
     needs: [r1-host-reference]
     impl: "tests/host/test_r2.py::test_a_divergence_is_a_report_row_and_does_not_fail_the_run"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 5ae3257, date: 2026-11-26, run: "local pytest tests/host/test_r2.py against espeak-ng 1.52.0+dfsg-5build1 (141 voices through the API; the CLI pass over all voices is not run here)"}
   - id: TC-REF-07
     title: "R2 runs over every voice of the upstream with the automatic corpus and every divergence has a cause (the CLI pass over all voices is for the CI)"
     shape: atomic
@@ -1270,5 +1270,5 @@ tests:
     verifies: [FR-REF-07]
     needs: [r1-host-reference]
     impl: "tests/host/test_r2.py::test_r2_runs_for_every_voice_of_the_upstream_and_every_divergence_is_explained"
-    status: not done
-    reason: "not implemented: the test has not run yet"
+    status: successful
+    result: {commit: 5ae3257, date: 2026-11-26, run: "local pytest tests/host/test_r2.py against espeak-ng 1.52.0+dfsg-5build1 (141 voices through the API; the CLI pass over all voices is not run here)"}
