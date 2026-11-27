@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""The board's own PCM, streamed by its `pcm` command (the seam of FR-LST-01 and FR-REF-04): it equals the host
-build's byte for byte, and the sample generator can write it as WAV files."""
+"""The board's own PCM, streamed by its `pcm` command (the seam of FR-LST-01 and FR-REF-04): it equals the
+host build's byte for byte, and the sample generator can write it as WAV files."""
 
 import json
 import sys
@@ -10,9 +10,9 @@ import board
 
 sys.path.insert(0, str(board.ROOT / "tools/listening"))
 sys.path.insert(0, str(board.ROOT / "tools/ref"))
-import diverge  # noqa: E402
-import r3host  # noqa: E402
-import samples  # noqa: E402
+import diverge
+import r3host
+import samples
 
 CORPUS = board.ROOT / "tests/corpus/listen/en.tsv"
 
@@ -31,8 +31,8 @@ def test_the_pcm_streamed_by_the_board_equals_the_host_build_byte_for_byte(flash
 def test_the_generator_writes_the_boards_pcm_as_wav_files(flashed, tmp_path):
     """FR-LST-01 from the artifact: two items at one speed, named pseudorandomly, the map apart."""
     out, mapf = tmp_path / "samples", tmp_path / "key/map.json"
-    samples.main(["--corpus", str(CORPUS), "--voice", "en", "--speeds", "175", "--seed", "5", "--out-dir", str(out),
-                  "--map-file", str(mapf), "--source", "board", "--limit", "2"])
+    samples.main(["--corpus", str(CORPUS), "--voice", "en", "--speeds", "175", "--seed", "5",
+                  "--out-dir", str(out), "--map-file", str(mapf), "--source", "board", "--limit", "2"])
     m = json.loads(mapf.read_text())["files"]
     assert len(m) == 2 and all(v["source"] == "board" for v in m.values())
     items = samples.corpus(CORPUS)[:2]
