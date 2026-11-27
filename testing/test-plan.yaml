@@ -1173,6 +1173,50 @@ tests:
     impl: "tests/host/test_corpus_pt.py::test_the_committed_file_is_what_the_generator_makes_from_its_seed"
     status: successful
     result: {commit: 2bed194, date: 2026-11-26, run: "local pytest tests/host/test_corpus_pt.py"}
+  - id: TC-ASR-01
+    title: "The setup refuses a model with another SHA-256 and removes it"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASR-01]
+    needs: []
+    impl: "tests/host/test_asr.py::test_the_setup_refuses_a_model_with_another_hash"
+    status: successful
+    result: {commit: 410b75d, date: 2026-11-26, run: "local pytest tests/host/test_asr.py (stand-in transcriber); real whisper.cpp v1.9.6 + small model smoke run of 3 pt-br items twice gave identical JSON (19 min for 6 clips on the notebook without AVX; the full report is the release job's)"}
+  - id: TC-ASR-02-03
+    title: "The report has language x speed x corpus (and pt-BR condition) and names whisper.cpp tag, model hash, commit, normalisation"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASR-02, FR-ASR-03]
+    needs: []
+    impl: "tests/host/test_asr.py::test_the_report_has_the_four_dimensions_and_names_its_inputs"
+    status: successful
+    result: {commit: 410b75d, date: 2026-11-26, run: "local pytest tests/host/test_asr.py (stand-in transcriber); real whisper.cpp v1.9.6 + small model smoke run of 3 pt-br items twice gave identical JSON (19 min for 6 clips on the notebook without AVX; the full report is the release job's)"}
+  - id: TC-ASR-04-05
+    title: "Two runs give the same report; the caveat travels with the numbers"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASR-04, FR-ASR-05]
+    needs: []
+    impl: "tests/host/test_asr.py::test_two_runs_give_the_same_report_and_the_caveat_travels_with_the_numbers"
+    status: successful
+    result: {commit: 410b75d, date: 2026-11-26, run: "local pytest tests/host/test_asr.py (stand-in transcriber); real whisper.cpp v1.9.6 + small model smoke run of 3 pt-br items twice gave identical JSON (19 min for 6 clips on the notebook without AVX; the full report is the release job's)"}
+  - id: TC-ASR-06
+    title: "A language the model does not support is listed as omitted"
+    shape: atomic
+    kind: standard
+    tier: host
+    wave: 1
+    verifies: [FR-ASR-06]
+    needs: []
+    impl: "tests/host/test_asr.py::test_a_language_the_model_does_not_support_is_listed_as_omitted"
+    status: successful
+    result: {commit: 410b75d, date: 2026-11-26, run: "local pytest tests/host/test_asr.py (stand-in transcriber); real whisper.cpp v1.9.6 + small model smoke run of 3 pt-br items twice gave identical JSON (19 min for 6 clips on the notebook without AVX; the full report is the release job's)"}
   - id: TC-BLD-03
     title: "Board tests run only from a tag, on the notebook runner, with that tag's artifact"
     shape: atomic
