@@ -116,8 +116,8 @@ Ele aceitou todas as sugestões. Viram trabalho abaixo; a FSD ainda **não** as 
 8. **Responsável — som:** se quiser a bancada falando de vez, editar `bench.yaml` (`audio.bench_sound: allowed`); o
    assistente nunca faz isso sozinho.
 
-**Não fazer sem ele:** `git push`, tag, registrar runner, enviar qualquer texto a terceiros, tocar som, afirmar
-inteligibilidade ou "primeiro TTS pt-BR offline no ESP32".
+**Não fazer sem ele:** `git push`, tag, registrar runner, enviar qualquer texto a terceiros, tocar som, e nunca
+afirmar inteligibilidade nem o "primeiro TTS pt-BR offline no ESP32".
 
 ## Depois da fila (histórico)
 
