@@ -1,4 +1,4 @@
-<!-- source-revision: 8a62bd1 -->
+<!-- source-revision: da7f901 -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # Como a IA é usada neste projeto
 
